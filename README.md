@@ -139,7 +139,8 @@ contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.
 There are many real-world situations in which we have to decide between multiple options yet we are
 only able to learn the best course of action by testing each option sequentially. 
 
-**Multi-armed bandit (MAB)** algorithms are suitable for such sequential, online decision making problems under uncertainty.
+[**Multi-Armed Bandit (MAB)** algorithms](https://en.wikipedia.org/wiki/Multi-armed_bandit) are suitable for such 
+sequential, online decision making problems under uncertainty.
 As such, they play an important role in many machine learning applications in internet advertising, recommendation 
 engines, and clinical trials among many others.
 In this setting, for each and every renewed decision we face an underlying question: 
