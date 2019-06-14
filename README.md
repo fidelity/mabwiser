@@ -1,30 +1,12 @@
-# MABWiser: Contextual Multi-Armed Bandits 
+# MABWiser: Parallelizable Contextual Multi-Armed Bandits 
 
-MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
-It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models.
-It provides built-in parallelization for both training and testing components and a simulation utility 
-for algorithm comparisons and hyper-parameter tuning.
-The library follows the scikit-learn style, adheres to [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/)
-, and is tested heavily.
+MABWiser is a research library written in Python for rapid prototyping of multi-armed bandit algorithms.
+It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models and provides built-in 
+parallelization for both training and testing components. The library also provides a a simulation utility for comparing 
+different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to 
+[PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily.
 
-MABWiser is released by Fidelity Investments Artificial Intelligence Center of Excellence.
-
-Available Learning Policies:
-* Epsilon Greedy
-* LinUCB
-* Softmax
-* Thompson Sampling (TS)
-* Upper Confidence Bound (UCB1)
-
-
-Available Neighborhood Policies: 
-* Clusters
-* K-Nearest
-* Radius
-
-## Documentation
-
-The API Reference and Installation instructions can be found at TBD.
+MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments.
 
 ## Quick Start
 
@@ -50,26 +32,134 @@ mab.fit(decisions, rewards)
 mab.predict()
 ```
 
+## Available Bandit Policies
+
+Available Learning Policies:
+* Epsilon Greedy
+* LinUCB
+* Softmax
+* Thompson Sampling (TS)
+* Upper Confidence Bound (UCB1)
+
+Available Neighborhood Policies: 
+* Clusters
+* K-Nearest
+* Radius
+
+## Installation
+
+There are two alternatives to install the library: 
+
+1. Install from the provided wheel package
+2. Build from the source code 
+	
+### Requirements
+
+The library requires Python **3.6+**. The ``requirements.txt`` lists the necessary
+packages. The following packages are used currently:
+
+```python
+joblib
+numpy
+pandas
+scikit-learn
+scipy
+seaborn>=0.9.0
+```
+
+### Install from wheel package
+
+You can install the library from the provided wheel package using the following commands:
+
+```bash
+git clone https://github.com/fmr-llc/mabwiser.git 
+cd mabwiser
+pip install dist/mabwiser-X.X.X-py3-none-any.whl
+```
+Note: Don't forget to replace ``X.X.X`` with the current version number. 
+
+### Install from source code
+
+Alternatively, you can build a wheel package on your platform from scratch using the source code:
+
+```bash
+git clone https://github.com/fmr-llc/mabwiser.git
+cd mabwiser
+pip install setuptools wheel # if wheel is not installed
+python setup.py bdist_wheel 
+pip install dist/mabwiser-X.X.X-py3-none-any.whl
+```
+
+### Test Your Setup
+To confirm that cloning the repo was successful, run the tests and all should pass.
+
+```bash
+git clone https://github.com/fmr-llc/mabwiser.git
+cd mabwiser
+python -m unittest discover tests
+```
+
+To confirm that installation was successful, import the library in Python shell or notebook. 
+
+```python
+from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+```
+
+### Upgrade the Library
+
+To upgrade to the latest version of the library, run ``git pull origin master`` in the repo folder, 
+and then run ``pip install --upgrade --no-cache-dir dist/mabwiser-X.X.X-py3-none-any.whl``.
+
+
 ## Usage Examples
 
-See /examples folder for usage examples 
-on context-free, contextual, parametric, non-parametric and customized bandit algorithms.
+See the [/examples](https://github.com/fmr-llc/mabwiser/tree/master/examples) folder for self-contained usage examples:
+
+* [Content-Free Bandits](https://github.com/fmr-llc/mabwiser/blob/master/examples/context_free_mab.py)
+* [Contextual Parametric Bandits](https://github.com/fmr-llc/mabwiser/blob/master/examples/parametric_mab.py)
+* [Contextual Non-Parametric Bandits](https://github.com/fmr-llc/mabwiser/blob/master/examples/contextual_mab.py)
+* [Customizing Bandits](https://github.com/fmr-llc/mabwiser/blob/master/examples/customized_mab.py)
+* [Parallelization](https://github.com/fmr-llc/mabwiser/blob/master/examples/parallel_mab.py)
+* [Hyper-Parameter Tuning](https://github.com/fmr-llc/mabwiser/blob/master/examples/simulator.py)
 
 Conceptually, given a set of historical decisions and their corresponding rewards, 
-the high-level idea behind MABWiser is to train a model using the `fit()` method to make predictions 
-about next best decisions using the `predict()` method.
+the high-level idea behind MABWiser is to train a model using the `fit()` method, and then, predict the 
+next best decisions using the `predict()` method.
 
-It is possible to retrieve the expected reward of each arm using the `predict_expectations()` method
-and online training is available using the `partial_fit()` method.
-New arms can be added to the bandits using the `add_arm()` method.
-Decisions and rewards data support lists, 1D numpy arrays, and pandas series.
-Contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.
+Apart from the actual predictions, it is also possible to retrieve the expected reward of each arm using 
+the `predict_expectations()` method. As time progresses and new decision and reward history becomes available, online 
+training can be performed using the `partial_fit()` method. New arms can be introduced to the system dynamically using 
+the `add_arm()` method. 
 
-## Bug Reports
+In terms of input data types, decisions and rewards data support lists, 1D numpy arrays, and pandas series while 
+contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.
 
-You can send feedback, bug reports and feature requests to <a href="mailto:mabwiser@fmr.com?subject=%5BMABWiser%5D%20Feedback%20&body=Feedback%20%26%20Feature%20Request%0A%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%0AXXX%0A%0ABug%20Report%20%0A%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%0AOS%3A%20XXX%0APython%20Environment%3A%20XXX%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0ADescription%3A%20XXX%0ASteps%20to%20reproduce%3A%20XXX%0AExpected%20result%3A%20XXX%0AActual%20result%3A%20XXX%0A%0A%0APlease%20allow%20up%20to%201-2%20business%20days%20for%20a%20response.%20%0A%0AAtlas%20Team%0A">mabwiser@fmr.com</a>.
+## Multi-Armed Bandits In a Nutshell
+
+There are many real-world situations in which we have to decide between multiple options yet we are
+only able to learn the best course of action by testing each option sequentially. 
+
+**Multi-armed bandit (MAB)** algorithms are suitable for such sequential, online decision making problems under uncertainty.
+As such, they play an important role in many machine learning applications in internet advertising, recommendation 
+engines, and clinical trials among many others.
+In this setting, for each and every renewed decision we face an underlying question: 
+Do we stick to what we know and receive an expected result ("**_exploit_**") or choose an option we do not know much 
+about and potentially learn something new ("**_explore_**")?
+
+**Problem Definition:** In a multi-armed bandits problem, the model of outcomes is unknown, and the outcomes can be 
+deterministic
+or stochastic. The agent needs to make a sequence of decisions in time *1, 2, ..., T*.
+At each time *t* the agent is given a set of *K* arms, and it has to decide which arm to pull. 
+After pulling an arm, it receives a *reward* of that arm, and the rewards of other arms are unknown. 
+In a stochastic setting the reward of an arm is sampled from some unknown distribution. Situations exist in which we 
+also observe side information at each time *t*. This side information is referred to as *context*. The arm that has the 
+highest expected reward may be different given different contexts.
+This variant is called **contextual multi-armed bandits**. Overall, the objective is to minimize _regret_, or 
+equivalently, maximize the cumulative expected reward in the long run.
+
+
+## License
+
+MABWiser is licensed under the [Apache License 2.0](LICENSE.md).
 
 <br>
-
-© Copyright 2018, FMR LLC
-
