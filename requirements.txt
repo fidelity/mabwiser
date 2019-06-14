@@ -1,0 +1,6 @@
+joblib
+numpy
+pandas
+scikit-learn
+scipy
+seaborn>=0.9.0

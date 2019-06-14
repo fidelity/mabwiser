@@ -1,0 +1,137 @@
+=====================
+MABWiser CHANGELOG
+=====================
+
+-------------------------------------------------------------------------------
+June, 11, 2019 1.5.6
+-------------------------------------------------------------------------------
+major:
+- license set to Apache 2.0
+
+minor:
+- bug fix in Simulator n_jobs handling
+
+-------------------------------------------------------------------------------
+May, 16, 2019 1.5.5
+-------------------------------------------------------------------------------
+
+minor:
+- bug fix in Simulator distance calculation
+
+-------------------------------------------------------------------------------
+May, 14, 2019 1.5.4
+-------------------------------------------------------------------------------
+
+minor:
+- bug fix in Simulator for bandit_to_arm_to_stats_neighborhoods and bandit_to_expectations
+
+-------------------------------------------------------------------------------
+April, 30, 2019 1.5.3
+-------------------------------------------------------------------------------
+
+minor:
+- bug fix in ucb
+
+-------------------------------------------------------------------------------
+April, 24, 2019 1.5.2
+-------------------------------------------------------------------------------
+
+minor:
+- Simulator performs parallel distance calculations
+- Bug fix with plotting functionality
+- Chunk size in Simulator dependent on number of jobs
+
+-------------------------------------------------------------------------------
+April, 19, 2019 1.5.1
+-------------------------------------------------------------------------------
+
+minor:
+- Simulator save results with a prefix
+
+-------------------------------------------------------------------------------
+April, 17, 2019 1.5.0
+-------------------------------------------------------------------------------
+
+major:
+- New Feature: Simulation utility
+- Utility supports both online and offline simulations with historic data sets
+- Nearest neighbors simulations share distance calculations and track size, descriptive statistics
+
+minor:
+- Parallelization bug fix
+
+-------------------------------------------------------------------------------
+April, 2, 2019 1.4.1
+-------------------------------------------------------------------------------
+
+minor:
+- Additional unit tests to improve code coverage
+- Unit test data changes to remove warnings
+- Logic fix for Softmax edge case
+- Improvements to MAB handling of series data
+- LinUCB with scaler array type conversion
+
+-------------------------------------------------------------------------------
+March, 12, 2019 1.4.0
+-------------------------------------------------------------------------------
+
+major:
+- New Feature: Built-in parallelization for both training and testing components
+- BaseMAB automates the parallelization of each policy
+- Policies to be added in the future can take advantage of built-in parallization as well
+- Allow initialization with standard scaler for _Linear class constructor
+
+minor:
+- binarization bug fix
+- parallelization tests
+
+-------------------------------------------------------------------------------
+February, 12, 2019 1.3.0
+-------------------------------------------------------------------------------
+
+major:
+- simulator script is added for experimentation
+- rollback neighborhood calculation to iterative
+- no more scikit-learn dependency
+
+minor:
+- _convert_array() and _convert_matrix() for efficient numpy transformations
+
+-------------------------------------------------------------------------------
+February, 07, 2019 1.2.0
+-------------------------------------------------------------------------------
+
+major:
+- speed-up in neighborhood calculation.
+- This change requires scikit-learn>=0.20.0
+- Big thanks to Nicholas Cilfone for this pull request!
+
+minor:
+- the change in neighborhood calculation allows combining _predict_operation for radius and knearest
+
+-------------------------------------------------------------------------------
+December, 26, 2018 1.1.0
+-------------------------------------------------------------------------------
+
+major:
+- speed-ups in greedy, ucb, softmax, thompson, and contextual mab
+- speed-up numpy _convert_context with row major C arrays
+
+minor:
+- numpy _convert function for decision & rewards
+- api docstring _convert_context return type fixed
+- typo fix in website rst contributing and installation
+- replace k in dict.keys() with faster version k in dict
+- remove arm_expectation = 0 from uptake_arms in softmax/thompson/ucb
+
+-------------------------------------------------------------------------------
+December, 17, 2018 1.0.0 
+-------------------------------------------------------------------------------
+
+- Initial public release.
+
+-------------------------------------------------------------------------------
+July, 7, 2018 0.1.0
+-------------------------------------------------------------------------------
+
+- Development starts. Unstable.

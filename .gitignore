@@ -1,0 +1,60 @@
+# Pycharm cache files
+.cache/*
+.idea/*
+.pytest_cache/*
+tests/__pycache__/*
+mabwiser/__pycache__/*
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.swp
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Compiled python modules.
+*.pyc
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+# Dev and data folders on working branch
+dev/*
+data/*
+notebooks/*
+
+# Metadata
+.DS_Store
+
+# Build folder
+build/*
+eggs/
+.eggs/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Spyder project settings
+.spyderproject
+.spyproject
