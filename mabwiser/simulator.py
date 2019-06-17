@@ -44,6 +44,7 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
     """Default evaluation function.
 
     Calculates predicted rewards for the test batch based on predicted arms.
+    When the predicted arm is the same as the historic decision, the historic reward is used.
     When the predicted arm is different, the mean, min or max reward from the training data is used.
     If using Radius or KNearest neighborhood policy, the statistics from the neighborhood are used
     instead of the entire training set.
