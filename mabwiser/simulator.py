@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.6 of June 11, 2019
+:Version: 1.5.7 of June 17, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -44,7 +44,7 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
     """Default evaluation function.
 
     Calculates predicted rewards for the test batch based on predicted arms.
-    Where the predicted arm is the same as the historic decision, the historic reward is used.
+    When the predicted arm is the same as the historic decision, the historic reward is used.
     When the predicted arm is different, the mean, min or max reward from the training data is used.
     If using Radius or KNearest neighborhood policy, the statistics from the neighborhood are used
     instead of the entire training set.
@@ -618,7 +618,7 @@ class Simulator:
             else:
                 stats[arm] = {'count': 0, 'sum': 0, 'min': 0,
                               'max': 0, 'mean': 0, 'std': 0}
-                self.logger.info('No historic data for ')
+                self.logger.info('No historic data for ' + str(arm))
         return stats
 
     def plot(self, metric: str = 'avg', is_per_arm: bool = False) -> NoReturn:
@@ -728,14 +728,18 @@ class Simulator:
                 for mab_name, mab in self.bandits:
                     for arm in self.arms:
                         x_labels.append(str(mab_name) + '_' + str(arm))
-                        y_values.append(stats[mab_name][arm]['sum'])
+                        if not np.isnan(stats[mab_name][arm]['sum']):
+                            y_values.append(stats[mab_name][arm]['sum'])
+                        else:
+                            y_values.append(0)
 
             else:
                 for mab_name, mab in self.bandits:
                     x_labels.append(mab_name)
                     cumulative = 0
                     for arm in self.arms:
-                        cumulative += stats[mab_name][arm]['sum']
+                        if not np.isnan(stats[mab_name][arm]['sum']):
+                            cumulative += stats[mab_name][arm]['sum']
                     y_values.append(cumulative)
 
             plt.bar(x_labels, y_values)
