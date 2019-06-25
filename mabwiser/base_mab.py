@@ -159,7 +159,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         seeds = self.rng.randint(np.iinfo(np.int32).max, size=total_contexts)
 
         # Perform parallel predictions
-        predictions = Parallel(n_jobs=n_jobs, backend='threading')(
+        predictions = Parallel(n_jobs=n_jobs, backend='multiprocessing')(
                           delayed(self._predict_contexts)(
                               contexts[starts[i]:starts[i + 1]],
                               is_predict,
