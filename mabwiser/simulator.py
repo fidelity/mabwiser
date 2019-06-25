@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.7 of June 17, 2019
+:Version: 1.5.8 of June 25, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -904,7 +904,7 @@ class Simulator:
                         expectations = mab.row_arm_to_expectation.copy()
 
                     else:
-                        predictions = mab.predict(test_contexts)
+                        predictions = mab.predict(chunk_contexts)
                         if isinstance(mab._imp, _Neighbors):
                             expectations = mab._imp.arm_to_expectation.copy()
                         else:
