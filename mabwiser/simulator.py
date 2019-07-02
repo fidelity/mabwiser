@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.8 of June 25, 2019
+:Version: 1.5.9 of July 1, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -183,6 +183,7 @@ class _NeighborsSimulator(_Neighbors):
 
         if isinstance(out[0], list):
             df = pd.DataFrame(out, columns=['prediction', 'expectations', 'size', 'stats'])
+
             if is_predict:
                 self.row_arm_to_expectation = self.row_arm_to_expectation + df['expectations'].tolist()
             else:
@@ -901,7 +902,7 @@ class Simulator:
                         else:
                             mab.set_distances(distances)
                         predictions = mab.predict(chunk_contexts)
-                        expectations = mab.row_arm_to_expectation.copy()
+                        expectations = mab.row_arm_to_expectation[start:stop].copy()
 
                     else:
                         predictions = mab.predict(chunk_contexts)
@@ -930,7 +931,7 @@ class Simulator:
 
             if not mab.is_contextual:
                 self.bandit_to_expectations[name] = mab._imp.arm_to_expectation.copy()
-            if isinstance(mab, _RadiusSimulator) and not self.is_quick:
+            if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
                 self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
 
             # Evaluate the predictions
@@ -1009,9 +1010,9 @@ class Simulator:
 
             self._get_partial_evaluation(name, 'total', test_decisions, self.bandit_to_predictions[name],
                                          test_rewards, 0, nn)
-            if isinstance(mab, _RadiusSimulator) and not self.is_quick:
-                self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
+
             if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
+                self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
                 self.bandit_to_arm_to_stats_neighborhoods[name] = mab.neighborhood_arm_to_stat.copy()
 
     def _online_test_bandits_chunks(self, test_decisions, test_rewards, test_contexts):
@@ -1067,7 +1068,7 @@ class Simulator:
                                 mab.set_distances(distances)
                                 self.logger.info('Distances set')
                             predictions = mab.predict(chunk_contexts)
-                            expectations = mab.row_arm_to_expectation.copy()
+                            expectations = mab.row_arm_to_expectation[start+chunk_start:start+chunk_stop].copy()
                         else:
                             predictions = mab.predict(chunk_contexts)
                             expectations = mab.predict_expectations(chunk_contexts)

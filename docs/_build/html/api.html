@@ -271,7 +271,7 @@ decision and reward history and corresponding contexts if any.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Email:</th><td class="field-body"><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.5.6 of June 11, 2019</td>
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.5.9 of July 1, 2019</td>
 </tr>
 </tbody>
 </table>
@@ -1130,7 +1130,7 @@ Default value is Euclidean distance.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Email:</th><td class="field-body"><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.5.6 of June 11, 2019</td>
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.5.9 of July 1, 2019</td>
 </tr>
 </tbody>
 </table>
@@ -1613,7 +1613,7 @@ Simulation must be run before calling this method.</p>
 <code class="descclassname">mabwiser.simulator.</code><code class="descname">default_evaluator</code><span class="sig-paren">(</span><em>arms: List[NewType.&lt;locals&gt;.new_type], decisions: numpy.ndarray, rewards: numpy.ndarray, predictions: List[NewType.&lt;locals&gt;.new_type], arm_to_stats: dict, stat: str, start_index: int, nn: bool = False</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#mabwiser.simulator.default_evaluator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default evaluation function.</p>
 <p>Calculates predicted rewards for the test batch based on predicted arms.
-Where the predicted arm is the same as the historic decision, the historic reward is used.
+When the predicted arm is the same as the historic decision, the historic reward is used.
 When the predicted arm is different, the mean, min or max reward from the training data is used.
 If using Radius or KNearest neighborhood policy, the statistics from the neighborhood are used
 instead of the entire training set.</p>

@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import logging
 
-import os
 import math
 import numpy as np
 import pandas as pd
@@ -559,6 +558,131 @@ class TestSimulator(unittest.TestCase):
                         contexts=contexts,
                         scaler=StandardScaler(), test_size=0.4, batch_size=0,
                         is_ordered=True, seed=7)
+
+    def test_expectations_online(self):
+        rng = np.random.RandomState(seed=7)
+        decisions = pd.Series([rng.randint(0, 2) for _ in range(100)])
+        rewards = pd.Series([rng.randint(0, 2) for _ in range(100)])
+        contexts = pd.DataFrame([[rng.rand() for _ in range(5)] for _ in range(100)])
+        for lp in self.lps:
+            sim = Simulator(bandits=[("example", MAB([0, 1], lp))],
+                            decisions=decisions,
+                            rewards=rewards, test_size=0.4, batch_size=10,
+                            is_ordered=True, seed=7)
+            sim.run()
+            self.assertEqual(len(sim.bandit_to_expectations['example']), 4)
+
+        for par in self.parametric:
+            sim = Simulator(bandits=[("example", MAB([0, 1], par))],
+                            decisions=decisions,
+                            rewards=rewards,
+                            contexts=contexts,
+                            test_size=0.4, batch_size=10,
+                            is_ordered=True, seed=7)
+            sim.run()
+            self.assertEqual(len(sim.bandit_to_expectations['example']),
+                             len(sim.bandit_to_predictions['example']))
+            self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+
+        for nbp in self.nps:
+            for lp in self.lps:
+                sim = Simulator(bandits=[("example", MAB([0, 1], lp, nbp))],
+                                decisions=decisions,
+                                rewards=rewards,
+                                contexts=contexts,
+                                test_size=0.4, batch_size=10,
+                                is_ordered=True, seed=7)
+                sim.run()
+
+                self.assertEqual(len(sim.bandit_to_expectations['example']),
+                                 len(sim.bandit_to_predictions['example']))
+
+                self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+
+                name, bandit = sim.bandits[0]
+                if isinstance(bandit, _NeighborsSimulator):
+                    self.assertEqual(len(sim.bandit_to_neighborhood_size['example']),
+                                     len(sim.bandit_to_predictions['example']))
+
+            for par in self.parametric:
+                sim = Simulator(bandits=[("example", MAB([0, 1], par, nbp))],
+                                decisions=decisions,
+                                rewards=rewards,
+                                contexts=contexts,
+                                test_size=0.4, batch_size=10,
+                                is_ordered=True, seed=7)
+                sim.run()
+                self.assertEqual(len(sim.bandit_to_expectations['example']),
+                                 len(sim.bandit_to_predictions['example']))
+
+                self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+
+                name, bandit = sim.bandits[0]
+                if isinstance(bandit, _NeighborsSimulator):
+                    self.assertEqual(len(sim.bandit_to_neighborhood_size['example']),
+                                     len(sim.bandit_to_predictions['example']))
+
+    def test_expectations_offline(self):
+        rng = np.random.RandomState(seed=7)
+        decisions = pd.Series([rng.randint(0, 2) for _ in range(100)])
+        rewards = pd.Series([rng.randint(0, 2) for _ in range(100)])
+        contexts = pd.DataFrame([[rng.rand() for _ in range(5)] for _ in range(100)])
+        for lp in self.lps:
+            sim = Simulator(bandits=[("example", MAB([0, 1], lp))],
+                            decisions=decisions,
+                            rewards=rewards, test_size=0.4, batch_size=0,
+                            is_ordered=True, seed=7)
+            sim.run()
+
+            self.assertEqual(len(sim.bandit_to_expectations['example']), 2)
+
+        for par in self.parametric:
+            sim = Simulator(bandits=[("example", MAB([0, 1], par))],
+                            decisions=decisions,
+                            rewards=rewards,
+                            contexts=contexts,
+                            test_size=0.4, batch_size=0,
+                            is_ordered=True, seed=7)
+            sim.run()
+            self.assertEqual(len(sim.bandit_to_expectations['example']),
+                             len(sim.bandit_to_predictions['example']))
+            self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+
+        for nbp in self.nps:
+            for lp in self.lps:
+                sim = Simulator(bandits=[("example", MAB([0, 1], lp, nbp))],
+                                decisions=decisions,
+                                rewards=rewards,
+                                contexts=contexts,
+                                test_size=0.4, batch_size=0,
+                                is_ordered=True, seed=7)
+                sim.run()
+
+                self.assertEqual(len(sim.bandit_to_expectations['example']),
+                                 len(sim.bandit_to_predictions['example']))
+
+                self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+                name, bandit = sim.bandits[0]
+                if isinstance(bandit, _NeighborsSimulator):
+                    self.assertEqual(len(sim.bandit_to_neighborhood_size['example']),
+                                     len(sim.bandit_to_predictions['example']))
+
+            for par in self.parametric:
+                sim = Simulator(bandits=[("example", MAB([0, 1], par, nbp))],
+                                decisions=decisions,
+                                rewards=rewards,
+                                contexts=contexts,
+                                test_size=0.4, batch_size=0,
+                                is_ordered=True, seed=7)
+                sim.run()
+                self.assertEqual(len(sim.bandit_to_expectations['example']),
+                                 len(sim.bandit_to_predictions['example']))
+                self.assertEqual(len(sim.bandit_to_expectations['example']), 40)
+
+                name, bandit = sim.bandits[0]
+                if isinstance(bandit, _NeighborsSimulator):
+                    self.assertEqual(len(sim.bandit_to_neighborhood_size['example']),
+                                     len(sim.bandit_to_predictions['example']))
 
     def test_context_df(self):
         rng = np.random.RandomState(seed=7)
