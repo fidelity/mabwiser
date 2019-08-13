@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.10 of August 12, 2019
+:Version: 1.6.0 of August 13, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -206,7 +206,7 @@ class _NeighborsSimulator(_Neighbors):
                 self.neighborhood_arm_to_stat = self.neighborhood_arm_to_stat + [stats]
             return prediction
 
-    def _lp_fit_predict(self, lp, row_2d, indices, is_predict):
+    def _get_nhood_predictions(self, lp, row_2d, indices, is_predict):
 
         nn_decisions = self.decisions[indices]
         nn_rewards = self.rewards[indices]
@@ -249,9 +249,10 @@ class _RadiusSimulator(_NeighborsSimulator):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
-                 radius: Num, metric: str, is_quick: bool):
+                 radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, lp, metric, is_quick)
         self.radius = radius
+        self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -281,22 +282,28 @@ class _RadiusSimulator(_NeighborsSimulator):
             # If neighbors exist
             if indices[0].size > 0:
 
-                prediction, exp, stats = self._lp_fit_predict(lp, row_2d, indices, is_predict)
+                prediction, exp, stats = self._get_nhood_predictions(lp, row_2d, indices, is_predict)
                 predictions[index] = [prediction, exp, len(indices[0]), stats]
 
             else:  # When there are no neighbors
 
                 # Random arm (or nan expectations)
-                if is_predict:
-                    prediction = self.arms[lp.rng.randint(0, len(self.arms))]
-                    predictions[index] = [prediction, {}, 0, {}]
-
-                else:
-                    prediction = self.arm_to_expectation.copy()
-                    predictions[index] = [prediction, {}, 0, {}]
+                prediction = self._get_no_nhood_predictions(lp, is_predict)
+                predictions[index] = [prediction, {}, 0, {}]
 
         # Return the list of predictions
         return predictions
+
+    def _get_no_nhood_predictions(self, lp, is_predict):
+        if is_predict:
+            # if no_nhood_prob_of_arm is None, select a random int
+            # else, select a non-uniform random arm
+            # choice returns an array, hence get zero index
+            rand_int = lp.rng.choice(len(self.arms), 1, p=self.no_nhood_prob_of_arm)[0]
+            return self.arms[rand_int]
+        else:
+            # Expectations will be nan when there are no neighbors
+            return self.arm_to_expectation.copy()
 
 
 class _KNearestSimulator(_NeighborsSimulator):
@@ -331,7 +338,7 @@ class _KNearestSimulator(_NeighborsSimulator):
             # Find the k nearest neighbor indices
             indices = np.argpartition(distances_to_row, self.k - 1)[:self.k]
 
-            prediction, exp, stats = self._lp_fit_predict(lp, row_2d, indices, is_predict)
+            prediction, exp, stats = self._get_nhood_predictions(lp, row_2d, indices, is_predict)
             predictions[index] = [prediction, exp, self.k, stats]
 
         # Return the list of predictions
@@ -1270,7 +1277,9 @@ class Simulator:
                 imp = mab
             if isinstance(imp, _Radius):
                 mab = _RadiusSimulator(imp.rng, imp.arms, imp.n_jobs, imp.lp, imp.radius,
-                                       imp.metric, is_quick=self.is_quick)
+                                       imp.metric, is_quick=self.is_quick,
+                                       no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm)
+
             elif isinstance(imp, _KNearest):
                 mab = _KNearestSimulator(imp.rng, imp.arms, imp.n_jobs, imp.lp, imp.k,
                                          imp.metric, is_quick=self.is_quick)

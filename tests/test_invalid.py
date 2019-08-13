@@ -7,9 +7,11 @@ import logging
 from copy import deepcopy
 from sklearn.preprocessing import StandardScaler
 
+from tests.test_base import BaseTest
+
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator
-from tests.test_base import BaseTest
+
 
 logging.disable(logging.CRITICAL)
 
@@ -136,6 +138,16 @@ class InvalidTest(BaseTest):
     def test_invalid_radius(self):
         with self.assertRaises(ValueError):
             MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=-1))
+
+    def test_invalid_radius_no_nhood_type(self):
+        with self.assertRaises(TypeError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=1,
+                                                                                           no_nhood_prob_of_arm={}))
+
+    def test_invalid_radius_no_nhood_sum(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=1,
+                                                                                           no_nhood_prob_of_arm=[0, 0]))
 
     def test_invalid_k(self):
         with self.assertRaises(ValueError):

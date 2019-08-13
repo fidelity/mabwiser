@@ -5,10 +5,11 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+from tests.test_base import BaseTest
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator
-from tests.test_base import BaseTest
+
 
 logging.disable(logging.CRITICAL)
 
