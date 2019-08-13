@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.9 of July 1, 2019
+:Version: 1.5.10 of August 12, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -913,7 +913,7 @@ class Simulator:
 
                     if not isinstance(expectations, list):
                         expectations = [expectations]
-                    self.bandit_to_expectations[name] = expectations
+                    self.bandit_to_expectations[name] = self.bandit_to_expectations[name] + expectations
 
                 else:
                     predictions = [mab.predict() for _ in range(len(chunk_decision))]
