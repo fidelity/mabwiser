@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.5.10 of August 12, 2019
+:Version: 1.6.0 of August 13, 2019
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -14,7 +14,7 @@ This module defines the public interface of the **MABWiser Library** providing a
     - ``NeighborhoodPolicy``
 """
 
-from typing import List, Union, Dict, NamedTuple, NoReturn, Callable
+from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -36,7 +36,6 @@ __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
 class LearningPolicy(NamedTuple):
-
     class EpsilonGreedy(NamedTuple):
         """Epsilon Greedy Learning Policy.
 
@@ -49,7 +48,7 @@ class LearningPolicy(NamedTuple):
             The probability of selecting a random arm for exploration.
             Integer or float. Must be between 0 and 1.
             Default value is 0.05.
-        
+
         Example
         -------
             >>> from mabwiser.mab import MAB, LearningPolicy
@@ -64,7 +63,6 @@ class LearningPolicy(NamedTuple):
         epsilon: Num = 0.05
 
         def _validate(self):
-
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("The value of epsilon must be between 0 and 1."))
 
@@ -286,7 +284,6 @@ class LearningPolicy(NamedTuple):
 
 
 class NeighborhoodPolicy(NamedTuple):
-
     class Clusters(NamedTuple):
         """Clusters Neighborhood Policy.
 
@@ -378,6 +375,10 @@ class NeighborhoodPolicy(NamedTuple):
             The metric used to calculate distance.
             Accepts any of the metrics supported by scipy.spatial.distance.cdist.
             Default value is Euclidean distance.
+        no_nhood_prob_of_arm: None or List
+            The probabilities associated with each arm.
+            If not given, a uniform random distribution over all arms is assumed.
+            The probabilities should sum up to 1.
 
         Example
         -------
@@ -395,12 +396,18 @@ class NeighborhoodPolicy(NamedTuple):
         """
         radius: Num = 0.05
         metric: str = "euclidean"
+        no_nhood_prob_of_arm: Optional[List] = None
 
         def _validate(self):
             check_true(isinstance(self.radius, (int, float)), TypeError("Radius must be an integer or a float."))
             check_true((self.metric in Constants.distance_metrics),
                        ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
             check_true(self.radius > 0, ValueError("Radius must be greater than zero."))
+            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+                       TypeError("no_nhood_prob_of_arm must be None or List."))
+            if isinstance(self.no_nhood_prob_of_arm, List):
+                check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
+                           ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
 
 
 class MAB:
@@ -494,7 +501,6 @@ class MAB:
             If set to -1, all CPUs are used.
             If set to -2, all CPUs but one are used, and so on.
 
-
         Raises
         ------
         TypeError:  Arms were not provided in a list.
@@ -511,6 +517,7 @@ class MAB:
         TypeError:  For Clusters, n_clusters must be an integer.
         TypeError:  For Clusters, is_minibatch must be a boolean.
         TypeError:  For Radius, radius must be an integer or float.
+        TypeError:  For Radius, no_nhood_prob_of_arm must be None or List that sums up to 1.0.
         TypeError:  For KNearest, k must be an integer or float.
 
         ValueError: Invalid number of arms.
@@ -525,6 +532,7 @@ class MAB:
         ValueError: For Clusters, n_clusters cannot be less than 2.
         ValueError: For Radius and KNearest, metric is not supported by scipy.spatial.distance.cdist.
         ValueError: For Radius, radius must be greater than zero.
+        ValueError: For Radius, if given, no_nhood_prob_of_arm list should sum up to 1.0.
         ValueError: For KNearest, k must be greater than zero.
         """
 
@@ -564,7 +572,7 @@ class MAB:
         if neighborhood_policy:
             self.is_contextual = True
 
-            # Do not use parallel fit or predict for Learning Policy when co
+            # Do not use parallel fit or predict for Learning Policy when contextual
             lp.n_jobs = 1
 
             if isinstance(neighborhood_policy, NeighborhoodPolicy.Clusters):
@@ -572,7 +580,8 @@ class MAB:
                                       self.neighborhood_policy.is_minibatch)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.Radius):
                 self._imp = _Radius(self._rng, self.arms, self.n_jobs, lp,
-                                    self.neighborhood_policy.radius, self.neighborhood_policy.metric)
+                                    self.neighborhood_policy.radius, self.neighborhood_policy.metric,
+                                    self.neighborhood_policy.no_nhood_prob_of_arm)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.KNearest):
                 self._imp = _KNearest(self._rng, self.arms, self.n_jobs, lp,
                                       self.neighborhood_policy.k, self.neighborhood_policy.metric)
@@ -881,7 +890,7 @@ class MAB:
             # Sync contexts data with contextual policy
             check_true(self.is_contextual,
                        TypeError("Fitting contexts data requires context policy or parametric learning policy."))
-            check_true((len(decisions) == len(contexts)) or (len(decisions)==1 and isinstance(contexts, pd.Series)),
+            check_true((len(decisions) == len(contexts)) or (len(decisions) == 1 and isinstance(contexts, pd.Series)),
                        ValueError("Decisions and contexts should be same length: len(decision) = " +
                                   str(len(decisions)) + " vs. len(contexts) = " + str(len(contexts))))
 

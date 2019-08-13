@@ -2,6 +2,14 @@
 MABWiser CHANGELOG
 =====================
 
+
+-------------------------------------------------------------------------------
+Aug, 13, 2019 1.6.0
+-------------------------------------------------------------------------------
+major:
+- Configurable empty neighborhood operation for Radius policy
+- Empty neighborhood operation changed to use numpy.random.choice instead of numpy.random.randint. Observed predictions for empty neighborhoods may differ from versions 1.5 and prior.
+
 -------------------------------------------------------------------------------
 August, 12, 2019 1.5.10
 -------------------------------------------------------------------------------

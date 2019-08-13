@@ -96,7 +96,7 @@ To confirm that cloning the repo was successful, run the tests and all should pa
 ```bash
 git clone https://github.com/fmr-llc/mabwiser.git
 cd mabwiser
-python -m unittest discover tests
+python -m unittest discover -v tests
 ```
 
 To confirm that installation was successful, import the library in Python shell or notebook. 

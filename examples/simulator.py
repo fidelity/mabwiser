@@ -58,7 +58,6 @@ start = time()
 sim = Simulator(contextual_mabs, decisions, rewards, contexts,
                 scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=0, seed=123456)
 sim.run()
-sim.save_results()
 end = time()
 
 runtime = (end - start) / 60
@@ -84,7 +83,6 @@ start = time()
 sim = Simulator(context_free_mabs, decisions, rewards, contexts=None,
                 scaler=None, test_size=0.5, is_ordered=False, batch_size=100, seed=123456)
 sim.run()
-sim.save_results()
 end = time()
 
 runtime = (end - start) / 60
@@ -110,7 +108,6 @@ start = time()
 sim = Simulator(mixed, decisions, rewards, contexts,
                 scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=0, seed=123456)
 sim.run()
-sim.save_results()
 end = time()
 
 runtime = (end - start) / 60
@@ -138,7 +135,6 @@ start = time()
 sim = Simulator(hyper_parameter_tuning, decisions, rewards, contexts,
                 scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=10, seed=123456)
 sim.run()
-sim.save_results()
 end = time()
 
 runtime = (end - start) / 60
@@ -165,7 +161,6 @@ start = time()
 sim = Simulator(contextual_mabs, decisions, rewards, contexts,
                 scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=0, seed=123456, is_quick=True)
 sim.run()
-sim.save_results()
 end = time()
 
 runtime = (end - start) / 60

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-
 from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
@@ -379,3 +378,64 @@ class RadiusTest(BaseTest):
         self.assertTrue(5 in mab._imp.arms)
         self.assertTrue(5 in mab._imp.lp.arms)
         self.assertTrue(5 in mab._imp.lp.arm_to_expectation.keys())
+
+    def test_greedy0_no_nhood_predict_random(self):
+
+        # 2nd, 3rd arm has bad rewards should not be selected
+        # Use small neighborhood size to force Radius to no nhood
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 2, 2, 2],
+                                 rewards=[10, 10, 10, -10, -10, -10],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(0.00001),
+                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=2,
+                                 is_predict=True)
+
+        # 3rd arm was never seen but picked up by random neighborhood in both tests
+        self.assertListEqual(arms[0], [3, 3])
+        self.assertListEqual(arms[1], [1, 1])
+
+    def test_greedy0_no_nhood_predict_weighted(self):
+
+        # 2nd, 3rd arm has bad rewards should not be selected
+        # Use small neighborhood size to force Radius to no nhoods
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 2, 2, 2],
+                                 rewards=[10, 10, 10, -10, -10, -10],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(0.00001,
+                                                                               no_nhood_prob_of_arm=[0, 0.8, 0.2]),
+                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=45676,
+                                 num_run=2,
+                                 is_predict=True)
+
+        # 2nd arm is weighted highly but 3rd is picked too
+        self.assertListEqual(arms[0], [3, 2])
+        self.assertListEqual(arms[1], [2, 2])
+
+    def test_greedy0_no_nhood_expectation_nan(self):
+
+        # 2nd, 3rd arm has bad rewards should not be selected
+        # Use small neighborhood size to force Radius to no nhoods
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 2, 2, 2],
+                                 rewards=[10, 10, 10, -10, -10, -10],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(0.00001),
+                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=False)
+
+        # When there are no neighborhoods, expectations will be nan
+        self.assertDictEqual(arms[0], {1: np.nan, 2: np.nan, 3: np.nan})
+        self.assertDictEqual(arms[1], {1: np.nan, 2: np.nan, 3: np.nan})

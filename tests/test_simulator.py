@@ -13,6 +13,7 @@ from mabwiser.base_mab import BaseMAB
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator, _NeighborsSimulator, _RadiusSimulator, _KNearestSimulator, default_evaluator
 from mabwiser.greedy import _EpsilonGreedy
+from mabwiser.neighbors import _Radius
 
 logging.disable(logging.CRITICAL)
 
@@ -843,8 +844,8 @@ class TestSimulator(unittest.TestCase):
         rewards = np.array([rng.randint(0, 100) for _ in range(20)])
         predictions = [rng.randint(0, 3) for _ in range(20)]
         train_stats = {0: {'count': 7, 'sum': 21, 'min': 0, 'max': 5, 'mean': 3, 'std': 1.2},
-                        1: {'count': 3, 'sum': 15, 'min': 1, 'max': 7, 'mean': 5, 'std': 3.1},
-                        2: {'count': 5, 'sum': 40, 'min': 5, 'max': 10, 'mean': 8, 'std': 2.5}}
+                       1: {'count': 3, 'sum': 15, 'min': 1, 'max': 7, 'mean': 5, 'std': 3.1},
+                       2: {'count': 5, 'sum': 40, 'min': 5, 'max': 10, 'mean': 8, 'std': 2.5}}
 
         neighborhood_stats = [{0: {'count': 7, 'sum': 21, 'min': 0, 'max': 5, 'mean': 3, 'std': 1.2},
                                1: {'count': 3, 'sum': 15, 'min': 1, 'max': 7, 'mean': 5, 'std': 3.1},
@@ -1018,7 +1019,7 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_distances(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _NeighborsSimulator(rng, [0,1], 1, _EpsilonGreedy(rng, [0,1], 1, .05), 'euclidean', True)
+        nn1 = _NeighborsSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
         nn2 = _NeighborsSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
         decisions = np.array([rng.randint(0, 2) for _ in range(5)])
         rewards = np.array([rng.randint(0, 100) for _ in range(5)])
@@ -1049,7 +1050,7 @@ class TestSimulator(unittest.TestCase):
         rng = np.random.RandomState(seed=7)
         nns = [NeighborhoodPolicy.Radius(), NeighborhoodPolicy.KNearest()]
 
-        bandits=[]
+        bandits = []
         counter = 0
         for nn in nns:
             for lp in TestSimulator.lps:
@@ -1197,9 +1198,36 @@ class TestSimulator(unittest.TestCase):
         self.assertTrue(np.isnan(exp3[0]))
         self.assertTrue(np.isnan(exp3[1]))
 
+    def test_radius_simulator_empty_neighborhood_custom_prob(self):
+        empty_nbhd = [0.25, 0.75]
 
+        rng = np.random.RandomState(seed=9)
 
+        lp = _EpsilonGreedy(rng, [0, 1], 1, .05)
 
+        bandit = [('example', MAB([0, 1], LearningPolicy.EpsilonGreedy(0),
+                                  NeighborhoodPolicy.Radius(radius=1, no_nhood_prob_of_arm=empty_nbhd)))]
 
+        sim = Simulator(bandits=bandit,
+                        decisions=[rng.randint(0, 2) for _ in range(20)],
+                        rewards=[rng.randint(0, 1000) for _ in range(20)],
+                        contexts=[[rng.rand() for _ in range(5)] for _ in range(20)],
+                        scaler=StandardScaler(), test_size=0.4, batch_size=0,
+                        is_ordered=True, seed=7)
 
+        sim._set_stats("total", sim.decisions, sim.rewards)
+
+        train_decisions, train_rewards, train_contexts, test_decisions, test_rewards, test_contexts = \
+            sim._run_train_test_split()
+
+        sim._set_stats("train", train_decisions, train_rewards)
+        sim._set_stats("test", test_decisions, test_rewards)
+
+        sim._train_bandits(train_decisions, train_rewards, train_contexts)
+
+        test_bandit = sim.bandits[0][1]
+        out = [test_bandit._get_no_nhood_predictions(lp, True) for i in range(5)]
+        self.assertIsInstance(test_bandit, _RadiusSimulator)
+        self.assertListEqual(empty_nbhd, test_bandit.no_nhood_prob_of_arm)
+        self.assertListEqual(out, [0, 1, 1, 1, 0])
 
