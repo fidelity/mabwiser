@@ -11,8 +11,8 @@ from mabwiser.utils import reset, argmax, Arm, Num
 
 class _EpsilonGreedy(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, epsilon: Optional[float] = 0.05):
-        super().__init__(rng, arms, n_jobs)
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str, epsilon: Optional[float] = 0.05):
+        super().__init__(rng, arms, n_jobs, backend)
         self.epsilon = epsilon
 
         self.arm_to_sum = dict.fromkeys(self.arms, 0)

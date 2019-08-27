@@ -12,10 +12,10 @@ from mabwiser.utils import reset, Arm, Num
 
 class _Softmax(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  tau: Optional[Union[int, float]] = 1):
 
-        super().__init__(rng, arms, n_jobs)
+        super().__init__(rng, arms, n_jobs, backend)
         self.tau = tau
 
         self.arm_to_sum = dict.fromkeys(self.arms, 0)

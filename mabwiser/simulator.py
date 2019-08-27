@@ -118,10 +118,10 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
 
 class _NeighborsSimulator(_Neighbors):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  metric: str, is_quick: bool):
-        super().__init__(rng, arms, n_jobs, lp, metric)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric)
         self.is_quick = is_quick
         self.neighborhood_arm_to_stat = []
         self.raw_rewards = None
@@ -154,7 +154,7 @@ class _NeighborsSimulator(_Neighbors):
         n_jobs, n_contexts, starts = self._partition_contexts(len(contexts))
 
         # Calculate distances in parallel
-        distances = Parallel(n_jobs=n_jobs, backend='threading')(
+        distances = Parallel(n_jobs=n_jobs, backend=self.backend)(
                              delayed(self._calculate_distances_of_batch)(
                                      contexts[starts[i]:starts[i + 1]])
                              for i in range(n_jobs))
@@ -247,10 +247,10 @@ class _NeighborsSimulator(_Neighbors):
 
 class _RadiusSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
-        super().__init__(rng, arms, n_jobs, lp, metric, is_quick)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
         self.radius = radius
         self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
 
@@ -308,10 +308,10 @@ class _RadiusSimulator(_NeighborsSimulator):
 
 class _KNearestSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  k: int, metric: str, is_quick: bool):
-        super().__init__(rng, arms, n_jobs, lp, metric, is_quick)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
         self.k = k
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
@@ -1276,12 +1276,12 @@ class Simulator:
             else:
                 imp = mab
             if isinstance(imp, _Radius):
-                mab = _RadiusSimulator(imp.rng, imp.arms, imp.n_jobs, imp.lp, imp.radius,
+                mab = _RadiusSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp, imp.radius,
                                        imp.metric, is_quick=self.is_quick,
                                        no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm)
 
             elif isinstance(imp, _KNearest):
-                mab = _KNearestSimulator(imp.rng, imp.arms, imp.n_jobs, imp.lp, imp.k,
+                mab = _KNearestSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp, imp.k,
                                          imp.metric, is_quick=self.is_quick)
 
             new_bandits.append((name, mab))
