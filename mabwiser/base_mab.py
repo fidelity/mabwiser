@@ -47,13 +47,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
         Default value is set to 1.
         If set to -1, all CPUs are used.
         If set to -2, all CPUs but one are used, and so on.
-    backend:
+    backend: str, optional
         Specify a parallelization backend implementation supported in the joblib library. Supported options are:
         - “loky” used by default, can induce some communication and memory overhead when exchanging input and
           output data with the worker Python processes.
         - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
         - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
+        Default value is None. In this case the default backend selected by joblib will be used.
     arm_to_expectation:
         The dictionary of arms (keys) to their expected rewards (values).
     """
