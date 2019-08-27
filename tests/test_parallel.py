@@ -614,3 +614,203 @@ class ParallelTest(BaseTest):
 
         for i in range(len(expected_pred)):
             self.assertListAlmostEqual(exps[i].values(), expected_pred[i])
+
+    def test_UCB1_c2_backend(self):
+        rng = np.random.RandomState(seed=111)
+        contexts_history = rng.randint(0, 5, (10, 5))
+        contexts = rng.randint(0, 5, (10, 5))
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
+                                rewards=[1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+                                learning_policy=LearningPolicy.UCB1(alpha=0.1),
+                                neighborhood_policy=NeighborhoodPolicy.Clusters(2),
+                                context_history=contexts_history,
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=5,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend=None)
+
+        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
+                                rewards=[1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+                                learning_policy=LearningPolicy.UCB1(alpha=0.1),
+                                neighborhood_policy=NeighborhoodPolicy.Clusters(2),
+                                context_history=contexts_history,
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=5,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='loky')
+
+        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
+                                rewards=[1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+                                learning_policy=LearningPolicy.UCB1(alpha=0.1),
+                                neighborhood_policy=NeighborhoodPolicy.Clusters(2),
+                                context_history=contexts_history,
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=5,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='threading')
+
+        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+
+    def test_greedy1_k2_backend(self):
+        rng = np.random.RandomState(seed=7)
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend=None)
+
+        self.assertListEqual(arms, [2, 1, 1, 3, 3, 1, 2, 2, 3, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend='loky')
+
+        self.assertListEqual(arms, [2, 1, 1, 3, 3, 1, 2, 2, 3, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend='threading')
+
+        self.assertListEqual(arms, [2, 1, 1, 3, 3, 1, 2, 2, 3, 3])
+
+    def test_greedy1_r2_backend(self):
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(2),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend=None)
+
+        self.assertListEqual(arms, [3, 3, 1, 1, 3, 1, 1, 2, 2, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(2),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend='loky')
+
+        self.assertListEqual(arms, [3, 3, 1, 1, 3, 1, 1, 2, 2, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(2),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2,
+                                 backend='threading')
+
+        self.assertListEqual(arms, [3, 3, 1, 1, 3, 1, 1, 2, 2, 3])
+
+    def test_linUCB(self):
+
+        rng = np.random.RandomState(seed=111)
+        contexts = rng.randint(0, 5, (10, 5))
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend=None)
+
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='loky')
+
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='threading')
+
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 3])

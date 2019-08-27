@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.6.0 of August 13, 2019
+:Version: 1.6.1 of August 27, 2019
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -31,7 +31,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.5.9"
+__version__ = "1.6.1"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
@@ -477,7 +477,8 @@ class MAB:
                                             NeighborhoodPolicy.KNearest,
                                             NeighborhoodPolicy.Radius] = None,      # The context policy, optional
                  seed: int = Constants.default_seed,                                # The random seed
-                 n_jobs: int = 1                                                    # Number of parallel jobs
+                 n_jobs: int = 1,                                                   # Number of parallel jobs
+                 backend: str = None                                                # Parallel backend implementation
                  ):
         """Initializes a multi-armed bandit (MAB) with the given arguments.
 
@@ -492,14 +493,21 @@ class MAB:
             The learning policy.
         neighborhood_policy : NeighborhoodPolicy, optional
             The context policy. Default value is None.
-        seed : numbers.Rational
+        seed : numbers.Rational, optional
             The random seed to initialize the random number generator.
             Default value is set to Constants.default_seed.value
-        n_jobs: int
+        n_jobs: int, optional
             This is used to specify how many concurrent processes/threads should be used for parallelized routines.
             Default value is set to 1.
             If set to -1, all CPUs are used.
             If set to -2, all CPUs but one are used, and so on.
+        backend: str, optional
+            Specify a parallelization backend implementation supported in the joblib library. Supported options are:
+            - “loky” used by default, can induce some communication and memory overhead when exchanging input and
+              output data with the worker Python processes.
+            - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
+            - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
+              called function relies a lot on Python objects.
 
         Raises
         ------
@@ -508,6 +516,7 @@ class MAB:
         TypeError:  Context policy type mismatch.
         TypeError:  Seed is not an integer.
         TypeError:  Number of parallel jobs is not an integer.
+        TypeError:  Parallel backend is not a string.
         TypeError:  For EpsilonGreedy, epsilon must be integer or float.
         TypeError:  For LinUCB, alpha must be an integer or float.
         TypeError:  For LinUCB, l2_lambda must be an integer or float.
@@ -537,7 +546,7 @@ class MAB:
         """
 
         # Validate arguments
-        MAB._validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs)
+        MAB._validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend)
 
         # Save the arguments
         self.arms = arms.copy()
@@ -545,6 +554,7 @@ class MAB:
         self.neighborhood_policy = neighborhood_policy
         self.seed = seed
         self.n_jobs = n_jobs
+        self.backend = backend
 
         # Create the random number generator
         self._rng = np.random.RandomState(seed=self.seed)
@@ -553,17 +563,17 @@ class MAB:
         # Create the learning policy implementor
         lp = None
         if isinstance(learning_policy, LearningPolicy.EpsilonGreedy):
-            lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.learning_policy.epsilon)
+            lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.epsilon)
         elif isinstance(learning_policy, LearningPolicy.Random):
-            lp = _Random(self._rng, self.arms, self.n_jobs)
+            lp = _Random(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Softmax):
-            lp = _Softmax(self._rng, self.arms, self.n_jobs, self.learning_policy.tau)
+            lp = _Softmax(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.tau)
         elif isinstance(learning_policy, LearningPolicy.ThompsonSampling):
-            lp = _ThompsonSampling(self._rng, self.arms, self.n_jobs, self.learning_policy.binarizer)
+            lp = _ThompsonSampling(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.binarizer)
         elif isinstance(learning_policy, LearningPolicy.UCB1):
-            lp = _UCB1(self._rng, self.arms, self.n_jobs, self.learning_policy.alpha)
+            lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
-            lp = _Linear(self._rng, self.arms, self.n_jobs, learning_policy.l2_lambda,
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
                          learning_policy.alpha, "ucb", learning_policy.arm_to_scaler)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
@@ -576,14 +586,14 @@ class MAB:
             lp.n_jobs = 1
 
             if isinstance(neighborhood_policy, NeighborhoodPolicy.Clusters):
-                self._imp = _Clusters(self._rng, self.arms, self.n_jobs, lp, self.neighborhood_policy.n_clusters,
-                                      self.neighborhood_policy.is_minibatch)
+                self._imp = _Clusters(self._rng, self.arms, self.n_jobs, self.backend, lp,
+                                      self.neighborhood_policy.n_clusters, self.neighborhood_policy.is_minibatch)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.Radius):
-                self._imp = _Radius(self._rng, self.arms, self.n_jobs, lp,
+                self._imp = _Radius(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                     self.neighborhood_policy.radius, self.neighborhood_policy.metric,
                                     self.neighborhood_policy.no_nhood_prob_of_arm)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.KNearest):
-                self._imp = _KNearest(self._rng, self.arms, self.n_jobs, lp,
+                self._imp = _KNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                       self.neighborhood_policy.k, self.neighborhood_policy.metric)
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
@@ -833,7 +843,7 @@ class MAB:
         return self._imp.predict_expectations(contexts)
 
     @staticmethod
-    def _validate_mab_args(arms, learning_policy, context_policy, seed, n_jobs) -> NoReturn:
+    def _validate_mab_args(arms, learning_policy, context_policy, seed, n_jobs, backend) -> NoReturn:
         """
         Validates arguments for the MAB constructor.
         """
@@ -869,6 +879,8 @@ class MAB:
         # Parallel jobs
         check_true(isinstance(n_jobs, int), TypeError("Number of parallel jobs must be an integer."))
         check_true(n_jobs != 0, ValueError('Number of parallel jobs cannot be zero.'))
+        if backend is not None:
+            check_true(isinstance(backend, str), TypeError("Parallel backend must be a string."))
 
     def _validate_fit_args(self, decisions, rewards, contexts) -> NoReturn:
         """"

@@ -1019,8 +1019,8 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_distances(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _NeighborsSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
-        nn2 = _NeighborsSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
+        nn1 = _NeighborsSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
+        nn2 = _NeighborsSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), 'euclidean', True)
         decisions = np.array([rng.randint(0, 2) for _ in range(5)])
         rewards = np.array([rng.randint(0, 100) for _ in range(5)])
         contexts = np.array([[rng.rand() for _ in range(5)] for _ in range(5)])
@@ -1151,9 +1151,9 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_predict_expectations(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _RadiusSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=2,
+        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=2,
                                metric='euclidean', is_quick=True)
-        nn2 = _KNearestSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), k=3,
+        nn2 = _KNearestSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), k=3,
                                  metric='euclidean', is_quick=True)
         decisions = np.array([rng.randint(0, 2) for _ in range(5)])
         rewards = np.array([rng.randint(0, 100) for _ in range(5)])
@@ -1177,7 +1177,7 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_expectations_no_neighbors(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _RadiusSimulator(rng, [0, 1], 1, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=1,
+        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=1,
                                metric='euclidean', is_quick=True)
         decisions = np.array([rng.randint(0, 2) for _ in range(10)])
         rewards = np.array([rng.randint(0, 100) for _ in range(10)])

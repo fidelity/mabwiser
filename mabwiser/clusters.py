@@ -19,10 +19,10 @@ from mabwiser.utils import Arm, Num, reset
 
 class _Clusters(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  n_clusters: Num, is_minibatch: bool):
-        super().__init__(rng, arms, n_jobs)
+        super().__init__(rng, arms, n_jobs, backend)
 
         self.n_clusters = n_clusters
 

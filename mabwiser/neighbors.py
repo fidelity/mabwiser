@@ -19,9 +19,9 @@ from mabwiser.utils import Arm, Num, reset
 
 class _Neighbors(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1], metric: str):
-        super().__init__(rng, arms, n_jobs)
+        super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.metric = metric
 
@@ -97,10 +97,10 @@ class _Neighbors(BaseMAB):
 
 class _Radius(_Neighbors):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear],
                  radius: Num, metric: str, no_nhood_prob_of_arm=Optional[List]):
-        super().__init__(rng, arms, n_jobs, lp, metric)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric)
 
         self.radius = radius
         self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
@@ -154,10 +154,10 @@ class _Radius(_Neighbors):
 
 class _KNearest(_Neighbors):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
                  lp: Union[_EpsilonGreedy, _ThompsonSampling, _UCB1, _Softmax, _Linear],
                  k: int, metric: str):
-        super().__init__(rng, arms, n_jobs, lp, metric)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric)
 
         self.k = k
 

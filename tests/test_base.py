@@ -68,7 +68,8 @@ class BaseTest(unittest.TestCase):
                 seed: Optional[int] = 123456,
                 num_run: Optional[int] = 1,
                 is_predict: Optional[bool] = True,
-                n_jobs: Optional[int] = 1
+                n_jobs: Optional[int] = 1,
+                backend: Optional[str] = None
                 ) -> (Union[Arm, List[Arm], List[float], List[List[float]]], MAB):
         """Sets up a MAB model and runs the given configuration.
 
@@ -79,7 +80,7 @@ class BaseTest(unittest.TestCase):
         """
 
         # Model
-        mab = MAB(arms, learning_policy, neighborhood_policy, seed, n_jobs)
+        mab = MAB(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend)
 
         # Train
         mab.fit(decisions, rewards, context_history)

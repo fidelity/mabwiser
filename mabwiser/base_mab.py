@@ -47,12 +47,19 @@ class BaseMAB(metaclass=abc.ABCMeta):
         Default value is set to 1.
         If set to -1, all CPUs are used.
         If set to -2, all CPUs but one are used, and so on.
+    backend:
+        Specify a parallelization backend implementation supported in the joblib library. Supported options are:
+        - “loky” used by default, can induce some communication and memory overhead when exchanging input and
+          output data with the worker Python processes.
+        - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
+        - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
+          called function relies a lot on Python objects.
     arm_to_expectation:
         The dictionary of arms (keys) to their expected rewards (values).
     """
 
     @abc.abstractmethod
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int):
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str = None):
         """Abstract method.
 
         Creates a multi-armed bandit policy with the given arms.
@@ -60,6 +67,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.rng: np.random.RandomState = rng
         self.arms: List[Arm] = arms
         self.n_jobs: int = n_jobs
+        self.backend: str = backend
 
         self.arm_to_expectation: Dict[Arm, float] = dict.fromkeys(self.arms, 0)
 
@@ -159,7 +167,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         seeds = self.rng.randint(np.iinfo(np.int32).max, size=total_contexts)
 
         # Perform parallel predictions
-        predictions = Parallel(n_jobs=n_jobs, backend='multiprocessing')(
+        predictions = Parallel(n_jobs=n_jobs, backend=self.backend)(
                           delayed(self._predict_contexts)(
                               contexts[starts[i]:starts[i + 1]],
                               is_predict,

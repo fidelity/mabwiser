@@ -11,8 +11,9 @@ from mabwiser.utils import Arm, Num, reset, argmax
 
 class _ThompsonSampling(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, binarizer: Optional[Callable] = None):
-        super().__init__(rng, arms, n_jobs)
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+                 binarizer: Optional[Callable] = None):
+        super().__init__(rng, arms, n_jobs, backend)
         self.binarizer = binarizer
 
         # Track whether the rewards have been binarized already by a context policy external
