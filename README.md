@@ -158,6 +158,12 @@ highest expected reward may be different given different contexts.
 This variant is called **contextual multi-armed bandits**. Overall, the objective is to minimize _regret_, or 
 equivalently, maximize the cumulative expected reward in the long run.
 
+## Support
+Please submit bug reports and feature requests as [Issues](https://github.com/fmr-llc/mabwiser/issues).
+
+For additional questions and feedback, please contact us at [mabwiser@fmr.com](mailto:mabwiser@fmr.com?subject=[Github]%20MABWiser%20Feedback).
+
+
 
 ## License
 
