@@ -118,7 +118,7 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
 
 class _NeighborsSimulator(_Neighbors):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
@@ -247,7 +247,7 @@ class _NeighborsSimulator(_Neighbors):
 
 class _RadiusSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
@@ -308,7 +308,7 @@ class _RadiusSimulator(_NeighborsSimulator):
 
 class _KNearestSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
                  k: int, metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)

@@ -12,7 +12,7 @@ from mabwiser.utils import reset, argmax, Arm, Num
 
 class _UCB1(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  alpha: Optional[Num] = 0.05):
         super().__init__(rng, arms, n_jobs, backend)
         self.alpha = alpha

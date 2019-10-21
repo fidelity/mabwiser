@@ -84,7 +84,7 @@ class _Linear(BaseMAB):
 
     factory = {"ucb": _LinUCB, "ridge": _RidgeRegression}
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  l2_lambda: Num, alpha: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
         super().__init__(rng, arms, n_jobs, backend)
         self.l2_lambda = l2_lambda
