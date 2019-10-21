@@ -11,7 +11,7 @@ from mabwiser.utils import Arm, Num
 
 class _Random(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str):
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str]):
         super().__init__(rng, arms, n_jobs, backend)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:

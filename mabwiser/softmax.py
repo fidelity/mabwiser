@@ -12,7 +12,7 @@ from mabwiser.utils import reset, Arm, Num
 
 class _Softmax(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: str,
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  tau: Optional[Union[int, float]] = 1):
 
         super().__init__(rng, arms, n_jobs, backend)
