@@ -58,3 +58,6 @@ coverage.xml
 # Spyder project settings
 .spyderproject
 .spyproject
+
+# Documentation
+docsrc/_build/
