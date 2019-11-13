@@ -1,0 +1,1659 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MABWiser Public API &mdash; MABWiser 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MABWiser
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Multi-Armed Bandits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Usage Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MABWiser Public API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.base_mab">base_mab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.mab">mab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.simulator">simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.utils">utils</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MABWiser</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>MABWiser Public API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="mabwiser-public-api">
+<span id="mabwiser-api"></span><h1>MABWiser Public API<a class="headerlink" href="#mabwiser-public-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-mabwiser.base_mab">
+<span id="base-mab"></span><h2>base_mab<a class="headerlink" href="#module-mabwiser.base_mab" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>FMR LLC</p>
+</dd>
+<dt class="field-even">Email</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
+</dd>
+</dl>
+<p>This module defines the abstract base class for contextual multi-armed bandit algorithms.</p>
+<dl class="class">
+<dt id="mabwiser.base_mab.BaseMAB">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.base_mab.</code><code class="sig-name descname">BaseMAB</code><span class="sig-paren">(</span><em class="sig-param">rng: numpy.random.mtrand.RandomState, arms: List[NewType.&lt;locals&gt;.new_type], n_jobs: int, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for multi-armed bandits.</p>
+<p>This module is not intended to be used directly, instead it declares
+the basic skeleton of multi-armed bandits together with a set of parameters
+that are common to every bandit algorithm.</p>
+<p>It declares abstract methods that sub-classes can override to
+implement specific bandit policies using:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__init__</span></code> constructor to initialize the bandit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_arm</span></code> method to add a new arm</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fit</span></code> method for training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> method for _online learning</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_expectations</span></code> method to retrieve the expectation of each arm</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> method for testing to retrieve the best arm based on the policy</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="mabwiser.base_mab.BaseMAB.rng">
+<code class="sig-name descname">rng</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.rng" title="Permalink to this definition">¶</a></dt>
+<dd><p>The random number generator.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.base_mab.BaseMAB.arms">
+<code class="sig-name descname">arms</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.arms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of all arms.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.base_mab.BaseMAB.n_jobs">
+<code class="sig-name descname">n_jobs</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.n_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is used to specify how many concurrent processes/threads should be used for parallelized routines.
+Default value is set to 1.
+If set to -1, all CPUs are used.
+If set to -2, all CPUs but one are used, and so on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.base_mab.BaseMAB.backend">
+<code class="sig-name descname">backend</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a parallelization backend implementation supported in the joblib library. Supported options are:
+- “loky” used by default, can induce some communication and memory overhead when exchanging input and</p>
+<blockquote>
+<div><p>output data with the worker Python processes.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>“multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.</p></li>
+<li><p>“threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
+called function relies a lot on Python objects.</p></li>
+</ul>
+<p>Default value is None. In this case the default backend selected by joblib will be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.base_mab.BaseMAB.arm_to_expectation">
+<code class="sig-name descname">arm_to_expectation</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.arm_to_expectation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dictionary of arms (keys) to their expected rewards (values).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.base_mab.BaseMAB.add_arm">
+<code class="sig-name descname">add_arm</code><span class="sig-paren">(</span><em class="sig-param">arm: NewType.&lt;locals&gt;.new_type</em>, <em class="sig-param">binarizer: Callable = None</em>, <em class="sig-param">scaler: Callable = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.base_mab.BaseMAB.add_arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Introduces a new arm to the bandit.</p>
+<p>Adds the new arm with zero expectations and
+calls the <code class="docutils literal notranslate"><span class="pre">_uptake_new_arm()</span></code> function of the sub-class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.base_mab.BaseMAB.fit">
+<em class="property">abstract </em><code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">decisions: numpy.ndarray</em>, <em class="sig-param">rewards: numpy.ndarray</em>, <em class="sig-param">contexts: Optional[numpy.ndarray] = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.base_mab.BaseMAB.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method.</p>
+<p>Fits the multi-armed bandit to the given
+decision and reward history and corresponding contexts if any.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.base_mab.BaseMAB.partial_fit">
+<em class="property">abstract </em><code class="sig-name descname">partial_fit</code><span class="sig-paren">(</span><em class="sig-param">decisions: numpy.ndarray</em>, <em class="sig-param">rewards: numpy.ndarray</em>, <em class="sig-param">contexts: Optional[numpy.ndarray] = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.base_mab.BaseMAB.partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method.</p>
+<p>Updates the multi-armed bandit with the given
+decision and reward history and corresponding contexts if any.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.base_mab.BaseMAB.predict">
+<em class="property">abstract </em><code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">contexts: Optional[numpy.ndarray] = None</em><span class="sig-paren">)</span> &#x2192; NewType.&lt;locals&gt;.new_type<a class="headerlink" href="#mabwiser.base_mab.BaseMAB.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method.</p>
+<p>Returns the predicted arm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.base_mab.BaseMAB.predict_expectations">
+<em class="property">abstract </em><code class="sig-name descname">predict_expectations</code><span class="sig-paren">(</span><em class="sig-param">contexts: Optional[numpy.ndarray] = None</em><span class="sig-paren">)</span> &#x2192; Dict[NewType.&lt;locals&gt;.new_type, Union[int, float]]<a class="headerlink" href="#mabwiser.base_mab.BaseMAB.predict_expectations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method.</p>
+<p>Returns a dictionary from arms (keys) to their expected rewards (values).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mabwiser.mab">
+<span id="mab"></span><h2>mab<a class="headerlink" href="#module-mabwiser.mab" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>FMR LLC</p>
+</dd>
+<dt class="field-even">Email</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
+</dd>
+<dt class="field-odd">Version</dt>
+<dd class="field-odd"><p>1.6.2 of October 21, 2019</p>
+</dd>
+</dl>
+<p>This module defines the public interface of the <strong>MABWiser Library</strong> providing access to the following modules:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MAB</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LearningPolicy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code></p></li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">LearningPolicy</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.EpsilonGreedy">
+<em class="property">class </em><code class="sig-name descname">EpsilonGreedy</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.EpsilonGreedy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Epsilon Greedy Learning Policy.</p>
+<p>This policy selects the arm with the highest expected reward with probability 1 - <span class="math notranslate nohighlight">\(\epsilon\)</span>,
+and with probability <span class="math notranslate nohighlight">\(\epsilon\)</span> it selects an arm at random for exploration.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.EpsilonGreedy.epsilon">
+<code class="sig-name descname">epsilon</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.EpsilonGreedy.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probability of selecting a random arm for exploration.
+Integer or float. Must be between 0 and 1.
+Default value is 0.05.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm1&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">epsilon</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.LinUCB">
+<em class="property">class </em><code class="sig-name descname">LinUCB</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinUCB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>LinUCB Learning Policy.</p>
+<p>This policy trains a ridge regression for each arm.
+Then, given a given context, it predicts a regression value
+and calculates the upper confidence bound of that prediction.
+The arm with the highest highest upper bound is selected.</p>
+<p>The UCB for each arm is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[UCB = x_i \beta + \alpha \sqrt{(x_i^{T}x_i + \lambda * I_d)^{-1}x_i}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\beta\)</span> is the matrix of the ridge regression coefficients, <span class="math notranslate nohighlight">\(\lambda\)</span> is the regularization
+strength, and I_d is a dxd identity matrix where d is the number of features in the context data.</p>
+<p><span class="math notranslate nohighlight">\(\alpha\)</span> is a factor used to adjust how conservative the estimate is.
+Higher <span class="math notranslate nohighlight">\(\alpha\)</span> values promote more exploration.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinUCB.alpha">
+<code class="sig-name descname">alpha</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinUCB.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameter to control the exploration.
+Integer or float. Cannot be negative.
+Default value is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinUCB.l2_lambda">
+<code class="sig-name descname">l2_lambda</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinUCB.l2_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>The regularization strength.
+Integer or float. Cannot be negative.
+Default value is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinUCB.arm_to_scaler">
+<code class="sig-name descname">arm_to_scaler</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinUCB.arm_to_scaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standardize context features by arm.
+Dictionary mapping each arm to a scaler object. It is assumed
+that the scaler objects are already fit and will only be used
+to transform context features.
+Default value is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[Arm, Callable]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">LinUCB</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">alpha</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">arm_to_scaler</code></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">l2_lambda</code></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.Random">
+<em class="property">class </em><code class="sig-name descname">Random</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.Random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Random Learning Policy.</p>
+<p>Returns a random arm for each prediction.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">Random</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.Softmax">
+<em class="property">class </em><code class="sig-name descname">Softmax</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.Softmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Softmax Learning Policy.</p>
+<p>This policy selects each arm with a probability proportionate to its average reward.
+The average reward is calculated as a logistic function with each probability as:</p>
+<div class="math notranslate nohighlight">
+\[P(arm) = \frac{ e ^  \frac{\mu_i - \max{\mu}}{ \tau * (\max{\mu} - \min{\mu})} }
+{ \Sigma{e ^  \frac{\mu - \max{\mu}}{ \tau * (\max{\mu} - \min{\mu})}}  }\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu_i\)</span> is the mean for that arm and <span class="math notranslate nohighlight">\(\tau\)</span> is the “temperature” to determine the degree of
+exploration.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.Softmax.tau">
+<code class="sig-name descname">tau</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.Softmax.tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>The temperature to control the exploration.
+Integer or float. Must be greater than zero.
+Default value is 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm1&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">tau</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.ThompsonSampling">
+<em class="property">class </em><code class="sig-name descname">ThompsonSampling</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.ThompsonSampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Thompson Sampling Learning Policy.</p>
+<p>This policy creates a beta distribution for each arm and
+then randomly samples from these distributions.
+The arm with the highest sample value is selected.</p>
+<p>Notice that rewards must be binary to create beta distributions.
+If rewards are not binary, see the <code class="docutils literal notranslate"><span class="pre">binarizer</span></code> function.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.ThompsonSampling.binarizer">
+<code class="sig-name descname">binarizer</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.ThompsonSampling.binarizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>If rewards are not binary, a binarizer function is required.
+Given an arm decision and its corresponding reward, the binarizer function
+returns <cite>True/False</cite> or <cite>0/1</cite> to denote whether the decision counts
+as a success, i.e., <cite>True/1</cite> based on the reward or <cite>False/0</cite> otherwise.</p>
+<p>The function signature of the binarizer is:</p>
+<p><code class="docutils literal notranslate"><span class="pre">binarize(arm:</span> <span class="pre">Arm,</span> <span class="pre">reward:</span> <span class="pre">Num)</span> <span class="pre">-&gt;</span> <span class="pre">True/False</span> <span class="pre">or</span> <span class="pre">0/1</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">ThompsonSampling</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arm_to_threshold</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Arm1&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">binarize</span><span class="p">(</span><span class="n">arm</span><span class="p">,</span> <span class="n">reward</span><span class="p">):</span> <span class="k">return</span> <span class="n">reward</span> <span class="o">&gt;</span> <span class="n">arm_to_threshold</span><span class="p">[</span><span class="n">arm</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">ThompsonSampling</span><span class="p">(</span><span class="n">binarizer</span><span class="o">=</span><span class="n">binarize</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">binarizer</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.UCB1">
+<em class="property">class </em><code class="sig-name descname">UCB1</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.UCB1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Upper Confidence Bound1 Learning Policy.</p>
+<p>This policy calculates an upper confidence bound for the mean reward of each arm.
+It greedily selects the arm with the highest upper confidence bound.</p>
+<p>The UCB for each arm is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[UCB = \mu_i + \alpha \times \sqrt[]{\frac{2 \times log(N)}{n_i}}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\mu_i\)</span> is the mean for that arm,
+<span class="math notranslate nohighlight">\(N\)</span> is the total number of trials, and
+<span class="math notranslate nohighlight">\(n_i\)</span> is the number of times the arm has been selected.</p>
+<p><span class="math notranslate nohighlight">\(\alpha\)</span> is a factor used to adjust how conservative the estimate is.
+Higher <span class="math notranslate nohighlight">\(\alpha\)</span> values promote more exploration.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.UCB1.alpha">
+<code class="sig-name descname">alpha</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.UCB1.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameter to control the exploration.
+Integer of float. Cannot be negative.
+Default value is 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">UCB1</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">alpha</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.MAB">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">MAB</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p><strong>MABWiser: Contextual Multi-Armed Bandit Library</strong></p>
+<p>MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
+It supports <strong>context-free</strong>, <strong>parametric</strong> and <strong>non-parametric</strong> <strong>contextual</strong> bandit models.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.arms">
+<code class="sig-name descname">arms</code><a class="headerlink" href="#mabwiser.mab.MAB.arms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of all of the arms available for decisions. Arms can be integers, strings, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.learning_policy">
+<code class="sig-name descname">learning_policy</code><a class="headerlink" href="#mabwiser.mab.MAB.learning_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The learning policy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mabwiser.mab.LearningPolicy" title="mabwiser.mab.LearningPolicy">LearningPolicy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.neighborhood_policy">
+<code class="sig-name descname">neighborhood_policy</code><a class="headerlink" href="#mabwiser.mab.MAB.neighborhood_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The neighborhood policy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy" title="mabwiser.mab.NeighborhoodPolicy">NeighborhoodPolicy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.is_contextual">
+<code class="sig-name descname">is_contextual</code><a class="headerlink" href="#mabwiser.mab.MAB.is_contextual" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if contextual policy is given, false otherwise. This is a read-only data field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.seed">
+<code class="sig-name descname">seed</code><a class="headerlink" href="#mabwiser.mab.MAB.seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The random seed to initialize the internal random number generator. This is a read-only data field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numbers.Rational</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.n_jobs">
+<code class="sig-name descname">n_jobs</code><a class="headerlink" href="#mabwiser.mab.MAB.n_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is used to specify how many concurrent processes/threads should be used for parallelized routines.
+Default value is set to 1.
+If set to -1, all CPUs are used.
+If set to -2, all CPUs but one are used, and so on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.MAB.backend">
+<code class="sig-name descname">backend</code><a class="headerlink" href="#mabwiser.mab.MAB.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a parallelization backend implementation supported in the joblib library. Supported options are:
+- “loky” used by default, can induce some communication and memory overhead when exchanging input and</p>
+<blockquote>
+<div><p>output data with the worker Python processes.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>“multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.</p></li>
+<li><p>“threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
+called function relies a lot on Python objects.</p></li>
+</ul>
+<p>Default value is None. In this case the default backend selected by joblib will be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">add_arm</span><span class="p">(</span><span class="s1">&#39;Arm3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">([</span><span class="s1">&#39;Arm3&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm3&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(),</span> <span class="n">NeighborhoodPolicy</span><span class="o">.</span><span class="n">KNearest</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="go">[&#39;Arm2&#39;, &#39;Arm2&#39;, &#39;Arm2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span><span class="o">.</span><span class="n">add_arm</span><span class="p">(</span><span class="s1">&#39;Arm3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">([</span><span class="s1">&#39;Arm3&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">&#39;Arm3&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mabwiser.mab.MAB.add_arm">
+<code class="sig-name descname">add_arm</code><span class="sig-paren">(</span><em class="sig-param">arm: NewType.&lt;locals&gt;.new_type</em>, <em class="sig-param">binarizer: Callable = None</em>, <em class="sig-param">scaler: Callable = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.mab.MAB.add_arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an _arm_ to the list of arms.</p>
+<p>Incorporates the arm into the learning and neighborhood policies with no training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arm</strong> (<em>Arm</em>) – The new arm to be added.</p></li>
+<li><p><strong>binarizer</strong> (<em>Callable</em>) – The new binarizer function for Thompson Sampling.</p></li>
+<li><p><strong>scaler</strong> (<em>Callable</em>) – A scaler object from sklearn.preprocessing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>No return.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – For ThompsonSampling, binarizer must be a callable function.:</p></li>
+<li><p><strong>TypeError</strong> – The standard scaler object must have a transform method.:</p></li>
+<li><p><strong>TypeError</strong> – The standard scaler object must be fit with calculated <a href="#id1"><span class="problematic" id="id2">mean_</span></a> and <a href="#id3"><span class="problematic" id="id4">var_</span></a> attributes.:</p></li>
+<li><p><strong>ValueError</strong> – A binarizer function was provided but the learning policy is not Thompson Sampling.:</p></li>
+<li><p><strong>ValueError</strong> – The arm already exists.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">None</span></code>.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">Infinity</span></code>.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.mab.MAB.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">decisions: Union[List[NewType.&lt;locals&gt;.new_type], numpy.ndarray, pandas.core.series.Series], rewards: Union[List[Union[int, float]], numpy.ndarray, pandas.core.series.Series], contexts: Union[None, List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.mab.MAB.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the multi-armed bandit to the given <em>decisions</em>, their corresponding <em>rewards</em>
+and <em>contexts</em>, if any.</p>
+<p>Validates arguments and raises exceptions in case there are violations.</p>
+<dl class="simple">
+<dt>This function makes the following assumptions:</dt><dd><ul class="simple">
+<li><p>each decision corresponds to an arm of the bandit.</p></li>
+<li><p>there are no <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Nan</span></code>, or <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> values in the contexts.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decisions</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>Arm</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>]</em>) – The decisions that are made.</p></li>
+<li><p><strong>rewards</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>]</em>) – The rewards that are received corresponding to the decisions.</p></li>
+<li><p><strong>contexts</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>, </em><em>pd.DataFrame</em><em>]</em>) – The context under which each decision is made. Default value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, i.e., no contexts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>No return.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – Decisions and rewards are not given as list, numpy array or pandas series.:</p></li>
+<li><p><strong>TypeError</strong> – Contexts is not given as <code class="docutils literal notranslate"><span class="pre">None</span></code>, list, numpy array, pandas series or data frames.:</p></li>
+<li><p><strong>ValueError</strong> – Length mismatch between decisions, rewards, and contexts.:</p></li>
+<li><p><strong>ValueError</strong> – Fitting contexts data when there is no contextual policy.:</p></li>
+<li><p><strong>ValueError</strong> – Contextual policy when fitting no contexts data.:</p></li>
+<li><p><strong>ValueError</strong> – Rewards contain <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Nan</span></code>, or <code class="docutils literal notranslate"><span class="pre">Infinity</span></code>.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.mab.MAB.partial_fit">
+<code class="sig-name descname">partial_fit</code><span class="sig-paren">(</span><em class="sig-param">decisions: Union[List[NewType.&lt;locals&gt;.new_type], numpy.ndarray, pandas.core.series.Series], rewards: Union[List[Union[int, float]], numpy.ndarray, pandas.core.series.Series], contexts: Union[None, List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.mab.MAB.partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the multi-armed bandit with the given <em>decisions</em>, their corresponding <em>rewards</em>
+and <em>contexts</em>, if any.</p>
+<p>Validates arguments and raises exceptions in case there are violations.</p>
+<dl class="simple">
+<dt>This function makes the following assumptions:</dt><dd><ul class="simple">
+<li><p>each decision corresponds to an arm of the bandit.</p></li>
+<li><p>there are no <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Nan</span></code>, or <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> values in the contexts.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decisions</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>Arm</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>]</em>) – The decisions that are made.</p></li>
+<li><p><strong>rewards</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>]</em>) – The rewards that are received corresponding to the decisions.</p></li>
+<li><p><strong>contexts</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>, </em><em>pd.DataFrame</em><em>] </em><em>=</em>) – The context under which each decision is made. Default value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, i.e., no contexts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>No return.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – Decisions, rewards are not given as list, numpy array or pandas series.:</p></li>
+<li><p><strong>TypeError</strong> – Contexts is not given as <code class="docutils literal notranslate"><span class="pre">None</span></code>, list, numpy array, pandas series or data frames.:</p></li>
+<li><p><strong>ValueError</strong> – Length mismatch between decisions, rewards, and contexts.:</p></li>
+<li><p><strong>ValueError</strong> – Fitting contexts data when there is no contextual policy.:</p></li>
+<li><p><strong>ValueError</strong> – Contextual policy when fitting no contexts data.:</p></li>
+<li><p><strong>ValueError</strong> – Rewards contain <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">Nan</span></code>, or <code class="docutils literal notranslate"><span class="pre">Infinity</span></code>:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.mab.MAB.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">contexts: Union[None, List[Union[int, float]], List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None</em><span class="sig-paren">)</span> &#x2192; Union[NewType.&lt;locals&gt;.new_type, List[NewType.&lt;locals&gt;.new_type]]<a class="headerlink" href="#mabwiser.mab.MAB.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the “best” arm (or arms list if multiple contexts are given) based on the expected reward.</p>
+<p>The definition of the <em>best</em> depends on the specified learning policy.
+Contextual learning policies and neighborhood policies require contexts data in training.
+In testing, they return the best arm given new context(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>contexts</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>, </em><em>pd.DataFrame</em><em>]</em>) – The context under which each decision is made. Default value is None.
+Contexts should be <code class="docutils literal notranslate"><span class="pre">None</span></code> for context-free bandits and is required for contextual bandits.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>The recommended arm or recommended arms list.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – Contexts is not given as <code class="docutils literal notranslate"><span class="pre">None</span></code>, list, numpy array, pandas series or data frames.:</p></li>
+<li><p><strong>ValueError</strong> – Predicting with contexts data when there is no contextual policy.:</p></li>
+<li><p><strong>ValueError</strong> – Contextual policy when predicting with no contexts data.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.mab.MAB.predict_expectations">
+<code class="sig-name descname">predict_expectations</code><span class="sig-paren">(</span><em class="sig-param">contexts: Union[None, List[Union[int, float]], List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None</em><span class="sig-paren">)</span> &#x2192; Union[Dict[NewType.&lt;locals&gt;.new_type, Union[int, float]], List[Dict[NewType.&lt;locals&gt;.new_type, Union[int, float]]]]<a class="headerlink" href="#mabwiser.mab.MAB.predict_expectations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of arms (key) to their expected rewards (value).</p>
+<p>Contextual learning policies and neighborhood policies require contexts data for expected rewards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>contexts</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>List</em><em>[</em><em>Num</em><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><em>Num</em><em>]</em><em>]</em><em>, </em><em>np.ndarray</em><em>, </em><em>pd.Series</em><em>, </em><em>pd.DataFrame</em><em>]</em>) – The context for the expected rewards. Default value is None.
+Contexts should be <code class="docutils literal notranslate"><span class="pre">None</span></code> for context-free bandits and is required for contextual bandits.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>The dictionary of arms (key) to their expected rewards (value), or a list of such dictionaries.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – Contexts is not given as <code class="docutils literal notranslate"><span class="pre">None</span></code>, list, numpy array or pandas data frames.:</p></li>
+<li><p><strong>ValueError</strong> – Predicting with contexts data when there is no contextual policy.:</p></li>
+<li><p><strong>ValueError</strong> – Contextual policy when predicting with no contexts data.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.NeighborhoodPolicy">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">NeighborhoodPolicy</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="class">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Clusters">
+<em class="property">class </em><code class="sig-name descname">Clusters</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Clusters Neighborhood Policy.</p>
+<p>Clusters is a k-means clustering approach that uses the observations
+from the closest <em>cluster</em> with a learning policy.
+Supports <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> and <code class="docutils literal notranslate"><span class="pre">MiniBatchKMeans</span></code>.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Clusters.n_clusters">
+<code class="sig-name descname">n_clusters</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Clusters.n_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of clusters. Integer. Must be at least 2. Default value is 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Clusters.is_minibatch">
+<code class="sig-name descname">is_minibatch</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Clusters.is_minibatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean flag to use <code class="docutils literal notranslate"><span class="pre">MiniBatchKMeans</span></code> or not. Default value is False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">NeighborhoodPolicy</span><span class="o">.</span><span class="n">Clusters</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">[3, 1]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">is_minibatch</code></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">n_clusters</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.NeighborhoodPolicy.KNearest">
+<em class="property">class </em><code class="sig-name descname">KNearest</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.KNearest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>KNearest Neighborhood Policy.</p>
+<p>KNearest is a nearest neighbors approach that selects the <em>k-nearest</em> observations
+to be used with a learning policy.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.KNearest.k">
+<code class="sig-name descname">k</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.KNearest.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of neighbors to select.
+Integer value. Must be greater than zero.
+Default value is 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.KNearest.metric">
+<code class="sig-name descname">metric</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.KNearest.metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metric used to calculate distance.
+Accepts any of the metrics supported by <code class="docutils literal notranslate"><span class="pre">scipy.spatial.distance.cdist</span></code>.
+Default value is Euclidean distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>                           <span class="n">NeighborhoodPolicy</span><span class="o">.</span><span class="n">KNearest</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">[1, 1]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">k</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">metric</code></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Radius">
+<em class="property">class </em><code class="sig-name descname">Radius</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Radius Neighborhood Policy.</p>
+<p>Radius is a nearest neighborhood approach that selects the observations
+within a given <em>radius</em> to be used with a learning policy.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Radius.radius">
+<code class="sig-name descname">radius</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius.radius" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum distance within which to select observations.
+Integer or Float. Must be greater than zero.
+Default value is 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Radius.metric">
+<code class="sig-name descname">metric</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius.metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metric used to calculate distance.
+Accepts any of the metrics supported by scipy.spatial.distance.cdist.
+Default value is Euclidean distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm">
+<code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probabilities associated with each arm.
+If not given, a uniform random distribution over all arms is assumed.
+The probabilities should sum up to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>None or List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>                           <span class="n">NeighborhoodPolicy</span><span class="o">.</span><span class="n">Radius</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">[3, 1]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">metric</code></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">no_nhood_prob_of_arm</code></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">radius</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mabwiser.simulator">
+<span id="simulator"></span><h2>simulator<a class="headerlink" href="#module-mabwiser.simulator" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>FMR LLC</p>
+</dd>
+<dt class="field-even">Email</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
+</dd>
+<dt class="field-odd">Version</dt>
+<dd class="field-odd"><p>1.6.0 of August 13, 2019</p>
+</dd>
+</dl>
+<p>This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.</p>
+<dl class="class">
+<dt id="mabwiser.simulator.Simulator">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.simulator.</code><code class="sig-name descname">Simulator</code><span class="sig-paren">(</span><em class="sig-param">bandits: List[tuple], decisions: Union[List[NewType.&lt;locals&gt;.new_type], numpy.ndarray, pandas.core.series.Series], rewards: Union[List[Union[int, float]], numpy.ndarray, pandas.core.series.Series], contexts: Union[None, List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None, scaler: callable = None, test_size: float = 0.3, is_ordered: bool = False, batch_size: int = 0, evaluator: callable = &lt;function default_evaluator&gt;, seed: int = 123456, is_quick: bool = False, log_file: str = None, log_format: str = '%(asctime)s %(levelname)s %(message)s'</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.simulator.Simulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Multi-Armed Bandit Simulator.</p>
+<p>This utility runs a simulation using historic data and a collection of multi-armed bandits from the MABWiser
+library or that extends the BaseMAB class in MABWiser.</p>
+<p>It can be used to run a simple simulation with a single bandit or to compare multiple bandits for policy selection,
+hyper-parameter tuning, etc.</p>
+<p>Nearest Neighbor bandits that use the default Radius and KNearest implementations from MABWiser are converted to
+custom versions that share distance calculations to speed up the simulation. These custom versions also track
+statistics about the neighborhoods that can be used in evaluation.</p>
+<p>The results can be accessed as the arms_to_stats, model_to_predictions, model_to_confusion_matrices, and
+models_to_evaluations properties.</p>
+<p>When using partial fitting, an additional confusion matrix is calculated for all predictions after all of the
+batches are processed.</p>
+<p>A log of the simulation tracks the experiment progress.</p>
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandits">
+<code class="sig-name descname">bandits</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandits" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of tuples of the name of each bandit and the bandit object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list[(str, bandit)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.decisions">
+<code class="sig-name descname">decisions</code><a class="headerlink" href="#mabwiser.simulator.Simulator.decisions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The complete decision history to be used in train and test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.rewards">
+<code class="sig-name descname">rewards</code><a class="headerlink" href="#mabwiser.simulator.Simulator.rewards" title="Permalink to this definition">¶</a></dt>
+<dd><p>The complete array history to be used in train and test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.contexts">
+<code class="sig-name descname">contexts</code><a class="headerlink" href="#mabwiser.simulator.Simulator.contexts" title="Permalink to this definition">¶</a></dt>
+<dd><p>The complete context history to be used in train and test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.scaler">
+<code class="sig-name descname">scaler</code><a class="headerlink" href="#mabwiser.simulator.Simulator.scaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>A scaler object from sklearn.preprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>scaler</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.test_size">
+<code class="sig-name descname">test_size</code><a class="headerlink" href="#mabwiser.simulator.Simulator.test_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the test set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.is_ordered">
+<code class="sig-name descname">is_ordered</code><a class="headerlink" href="#mabwiser.simulator.Simulator.is_ordered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to use a chronological division for the train-test split.
+If false, uses sklearn’s train_test_split.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.batch_size">
+<code class="sig-name descname">batch_size</code><a class="headerlink" href="#mabwiser.simulator.Simulator.batch_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of each batch for online learning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.evaluator">
+<code class="sig-name descname">evaluator</code><a class="headerlink" href="#mabwiser.simulator.Simulator.evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function for evaluating the bandits. Values are stored in bandit_to_arm_to_stats_avg.
+Must have the function signature function(arms_to_stats_train: dictionary, predictions: list,
+decisions: np.ndarray, rewards: np.ndarray, metric: str).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.is_quick">
+<code class="sig-name descname">is_quick</code><a class="headerlink" href="#mabwiser.simulator.Simulator.is_quick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to skip neighborhood statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.logger">
+<code class="sig-name descname">logger</code><a class="headerlink" href="#mabwiser.simulator.Simulator.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>The logger object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.arms">
+<code class="sig-name descname">arms</code><a class="headerlink" href="#mabwiser.simulator.Simulator.arms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of arms used by the bandits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.arm_to_stats_total">
+<code class="sig-name descname">arm_to_stats_total</code><a class="headerlink" href="#mabwiser.simulator.Simulator.arm_to_stats_total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the complete data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.arm_to_stats_train">
+<code class="sig-name descname">arm_to_stats_train</code><a class="headerlink" href="#mabwiser.simulator.Simulator.arm_to_stats_train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.arm_to_stats_test">
+<code class="sig-name descname">arm_to_stats_test</code><a class="headerlink" href="#mabwiser.simulator.Simulator.arm_to_stats_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the test data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_arm_to_stats_avg">
+<code class="sig-name descname">bandit_to_arm_to_stats_avg</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_arm_to_stats_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the predictions made by each bandit based on means from training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_arm_to_stats_min">
+<code class="sig-name descname">bandit_to_arm_to_stats_min</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_arm_to_stats_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the predictions made by each bandit based on minimums from training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_arm_to_stats_max">
+<code class="sig-name descname">bandit_to_arm_to_stats_max</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_arm_to_stats_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descriptive statistics for the predictions made by each bandit based on maximums from training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_confusion_matrices">
+<code class="sig-name descname">bandit_to_confusion_matrices</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_confusion_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>The confusion matrices for each bandit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_predictions">
+<code class="sig-name descname">bandit_to_predictions</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The prediction for each item in the test set for each bandit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_expectations">
+<code class="sig-name descname">bandit_to_expectations</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_expectations" title="Permalink to this definition">¶</a></dt>
+<dd><p>The arm_to_expectations for each item in the test set for each bandit.
+For context-free bandits, there is a single dictionary for each batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_neighborhood_size">
+<code class="sig-name descname">bandit_to_neighborhood_size</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_neighborhood_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of neighbors in each neighborhood for each row in the test set.
+Calculated when using a Radius neighborhood policy, or a custom class that inherits from it.
+Not calculated when is_quick is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.bandit_to_arm_to_stats_neighborhoods">
+<code class="sig-name descname">bandit_to_arm_to_stats_neighborhoods</code><a class="headerlink" href="#mabwiser.simulator.Simulator.bandit_to_arm_to_stats_neighborhoods" title="Permalink to this definition">¶</a></dt>
+<dd><p>The arm_to_stats for each neighborhood for each row in the test set.
+Calculated when using Radius or KNearest, or a custom class that inherits from one of them.
+Not calculated when is_quick is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.simulator.Simulator.test_indices">
+<code class="sig-name descname">test_indices</code><a class="headerlink" href="#mabwiser.simulator.Simulator.test_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>The indices of the rows in the test set.
+If input was not zero-indexed, these will reflect their position in the input rather than actual index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab1</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab2</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">0.30</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bandits</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;EG 25%&#39;</span><span class="p">,</span> <span class="n">mab1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;EG 30%&#39;</span><span class="p">,</span> <span class="n">mab2</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offline_sim</span> <span class="o">=</span> <span class="n">Simulator</span><span class="p">(</span><span class="n">bandits</span><span class="p">,</span> <span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offline_sim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offline_sim</span><span class="o">.</span><span class="n">bandit_to_arm_to_stats_avg</span><span class="p">[</span><span class="s1">&#39;EG 30%&#39;</span><span class="p">][</span><span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="go">{&#39;count&#39;: 1, &#39;sum&#39;: 9, &#39;min&#39;: 9, &#39;max&#39;: 9, &#39;mean&#39;: 9.0, &#39;std&#39;: 0.0}</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mabwiser.simulator.Simulator.get_arm_stats">
+<code class="sig-name descname">get_arm_stats</code><span class="sig-paren">(</span><em class="sig-param">decisions: numpy.ndarray</em>, <em class="sig-param">rewards: numpy.ndarray</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#mabwiser.simulator.Simulator.get_arm_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates descriptive statistics for each arm in the provided data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decisions</strong> (<em>np.ndarray</em>) – The decisions to filter the rewards.</p></li>
+<li><p><strong>rewards</strong> (<em>np.ndarray</em>) – The rewards to get statistics about.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>Arm_to_stats dictionary.</em></p></li>
+<li><p><em>Dictionary has the format {arm {‘count’, ‘sum’, ‘min’, ‘max’, ‘mean’, ‘std’}}</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.simulator.Simulator.get_stats">
+<em class="property">static </em><code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param">rewards: numpy.ndarray</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#mabwiser.simulator.Simulator.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates descriptive statistics for the given array of rewards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rewards</strong> (<em>nd.nparray</em>) – Array of rewards for a single arm.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>A dictionary of descriptive statistics.</em></p></li>
+<li><p><em>Dictionary has the format {‘count’, ‘sum’, ‘min’, ‘max’, ‘mean’, ‘std’}</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.simulator.Simulator.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">metric: str = 'avg'</em>, <em class="sig-param">is_per_arm: bool = False</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.simulator.Simulator.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a plot of the cumulative sum of the rewards for each bandit.
+Simulation must be run before calling this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<em>str</em>) – The bandit_to_arm_to_stats to use to generate the plot. Must be ‘avg’, ‘min’, or ‘max</p></li>
+<li><p><strong>is_per_arm</strong> (<em>bool</em>) – Whether to plot each arm separately or use an aggregate statistic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError  Descriptive statics for predictions are missing.</strong> – </p></li>
+<li><p><strong>TypeError       Metric must be a string.</strong> – </p></li>
+<li><p><strong>TypeError       The per_arm flag must be a boolean.</strong> – </p></li>
+<li><p><strong>ValueError      The metric must be one of avg</strong><strong>, </strong><strong>min</strong><strong> or </strong><strong>max.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mabwiser.simulator.Simulator.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.simulator.Simulator.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run simulator</p>
+<p>Runs a simulation concurrently for all bandits in the bandits list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mabwiser.simulator.default_evaluator">
+<code class="sig-prename descclassname">mabwiser.simulator.</code><code class="sig-name descname">default_evaluator</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], decisions: numpy.ndarray, rewards: numpy.ndarray, predictions: List[NewType.&lt;locals&gt;.new_type], arm_to_stats: dict, stat: str, start_index: int, nn: bool = False</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#mabwiser.simulator.default_evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default evaluation function.</p>
+<p>Calculates predicted rewards for the test batch based on predicted arms.
+When the predicted arm is the same as the historic decision, the historic reward is used.
+When the predicted arm is different, the mean, min or max reward from the training data is used.
+If using Radius or KNearest neighborhood policy, the statistics from the neighborhood are used
+instead of the entire training set.</p>
+<p>The simulator supports custom evaluation functions,
+but they must have this signature to work with the simulation pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arms</strong> (<em>list</em>) – The list of arms.</p></li>
+<li><p><strong>decisions</strong> (<em>np.ndarray</em>) – The historic decisions for the batch being evaluated.</p></li>
+<li><p><strong>rewards</strong> (<em>np.ndarray</em>) – The historic rewards for the batch being evaluated.</p></li>
+<li><p><strong>predictions</strong> (<em>list</em>) – The predictions for the batch being evaluated.</p></li>
+<li><p><strong>arm_to_stats</strong> (<em>dict</em>) – The dictionary of descriptive statistics for each arm to use in evaluation.</p></li>
+<li><p><strong>stat</strong> (<em>str</em>) – Which metric from arm_to_stats to use. Takes the values ‘min’, ‘max’, ‘mean’.</p></li>
+<li><p><strong>start_index</strong> (<em>int</em>) – The index of the first row in the batch.
+For offline simulations it is 0.
+For _online simulations it is batch size * batch number.
+Used to select the correct index from arm_to_stats if there are separate entries for each row in the test set.</p></li>
+<li><p><strong>nn</strong> (<em>bool</em>) – Whether the results are from one of the simulator custom nearest neighbors implementations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>An arm_to_stats dictionary for the predictions in the batch.</em></p></li>
+<li><p><em>Dictionary has the format {arm {‘count’, ‘sum’, ‘min’, ‘max’, ‘mean’, ‘std’}}</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mabwiser.utils">
+<span id="utils"></span><h2>utils<a class="headerlink" href="#module-mabwiser.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>FMR LLC</p>
+</dd>
+<dt class="field-even">Email</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
+</dd>
+</dl>
+<p>This module provides a number of constants and helper functions.</p>
+<dl class="function">
+<dt id="mabwiser.utils.Arm">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">Arm</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.utils.Arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arm type is defined as integer, float, or string.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.utils.Constants">
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">Constants</code><a class="headerlink" href="#mabwiser.utils.Constants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Constant values used by the modules.</p>
+<dl class="attribute">
+<dt id="mabwiser.utils.Constants.default_seed">
+<code class="sig-name descname">default_seed</code><em class="property"> = 123456</em><a class="headerlink" href="#mabwiser.utils.Constants.default_seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default random seed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.utils.Constants.distance_metrics">
+<code class="sig-name descname">distance_metrics</code><em class="property"> = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean']</em><a class="headerlink" href="#mabwiser.utils.Constants.distance_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>The distance metrics supported by neighborhood policies.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="mabwiser.utils.Num">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">Num</code><em class="property"> = typing.Union[int, float]</em><a class="headerlink" href="#mabwiser.utils.Num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Num type is defined as integer or float.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mabwiser.utils.argmax">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">argmax</code><span class="sig-paren">(</span><em class="sig-param">dictionary: Dict[NewType.&lt;locals&gt;.new_type, Union[int, float]]</em><span class="sig-paren">)</span> &#x2192; NewType.&lt;locals&gt;.new_type<a class="headerlink" href="#mabwiser.utils.argmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the first key with the maximum value.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mabwiser.utils.check_false">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">check_false</code><span class="sig-paren">(</span><em class="sig-param">expression: bool</em>, <em class="sig-param">exception: Exception</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.utils.check_false" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that given expression is false, otherwise raises the given exception.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mabwiser.utils.check_true">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">check_true</code><span class="sig-paren">(</span><em class="sig-param">expression: bool</em>, <em class="sig-param">exception: Exception</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.utils.check_true" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that given expression is true, otherwise raises the given exception.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mabwiser.utils.reset">
+<code class="sig-prename descclassname">mabwiser.utils.</code><code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dictionary: Dict</em>, <em class="sig-param">value</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.utils.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps every key to the given value.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, FMR LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
