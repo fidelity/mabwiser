@@ -59,8 +59,23 @@ For additional questions and feedback, please contact us at [mabwiser@fmr.com](m
 
 ## Citation
 
-If you use MABWiser in a publication, please cite it using the information available in our [documentation](https://fmr-llc.github.io/mabwiser).
+If you use MABWiser in a publication, please cite it as:
 
+E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python," in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.
+
+
+```bibtex
+
+    @inproceedings{mabwiser2019,
+      author    = {Strong, Emily and Kleynhans, Bernard and Kadioglu, Serdar},
+      title     = {MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python},
+      booktitle = {2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019)},
+      year      = {2019},
+      pages     = {885-890},
+      organization = {IEEE},
+      url       = {https://github.com/fmr-llc/mabwiser}
+    }
+```
 
 ## License
 
