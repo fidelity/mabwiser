@@ -7,7 +7,7 @@ setuptools.setup(
     name="mabwiser",
     description="MABWiser: Parallelizable Contextual Multi-Armed Bandits Library",
     long_description=long_description,
-    version="1.6.2",
+    version="1.6.3",
     author="FMR LLC",
     url="https://github.com/fmr-llc/mabwiser",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
@@ -17,6 +17,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     project_urls={
+        "Documentation": "https://fmr-llc.github.io/mabwiser/",
         "Source": "https://github.com/fmr-llc/mabwiser"
     }
 )

@@ -51,9 +51,27 @@ The source code is hosted on `GitHub`_.
 Bug Reports
 ===========
 
-You can send feedback, bug reports and feature requests to mabwiser@fmr.com.
+You can send feedback to mabwiser@fmr.com. Please use the GitHub `Issues`_ tracking for bug reports and feature requests.
 
-	   
+Citation
+========
+You can cite MABWiser as:
+
+E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python," in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.
+
+.. code-block:: bibtex
+
+    @inproceedings{mabwiser2019,
+      author    = {Strong, Emily and Kleynhans, Bernard and Kadioglu, Serdar},
+      title     = {MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python},
+      booktitle = {2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019)},
+      year      = {2019},
+      pages     = {885-890},
+      organization = {IEEE},
+      url       = {https://github.com/fmr-llc/mabwiser}
+    }
+
+
 Indices and tables
 ==================
 
@@ -62,3 +80,4 @@ Indices and tables
 
 .. _GitHub: https://github.com/fmr-llc/mabwiser
 .. _PEP-8 standards: https://www.python.org/dev/peps/pep-0008/
+.. _Issues: https://github.com/fmr-llc/mabwiser/issues

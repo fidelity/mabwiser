@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.6.2 of October 21, 2019
+:Version: 1.6.3 of November 14, 2019
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
