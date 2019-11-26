@@ -33,6 +33,12 @@ mab.fit(decisions, rewards)
 
 # Test
 mab.predict()
+
+# Serialize
+import pickle
+
+pickle.dump(mab, open('mab.pkl', 'wb'))
+mab = pickle.load(open('mab.pkl', 'rb'))
 ```
 
 ## Available Bandit Policies

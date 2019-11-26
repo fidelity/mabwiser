@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.6.3 of November 14, 2019
+:Version: 1.7.0 of November 27, 2019
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -18,6 +18,7 @@ from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.cluster import MiniBatchKMeans
 
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
@@ -473,17 +474,17 @@ class MAB:
     """
 
     def __init__(self,
-                 arms: List[Arm],  # The list of arms
+                 arms: List[Arm],                                                   # The list of arms
                  learning_policy: Union[LearningPolicy.EpsilonGreedy,
                                         LearningPolicy.Random,
                                         LearningPolicy.Softmax,
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
-                                        LearningPolicy.LinUCB],                     # The learning policy
+                                        LearningPolicy.LinUCB],                                       # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
-                                            NeighborhoodPolicy.Radius] = None,      # The context policy, optional
+                                            NeighborhoodPolicy.Radius] = None,                            # The context policy, optional
                  seed: int = Constants.default_seed,                                # The random seed
                  n_jobs: int = 1,                                                   # Number of parallel jobs
                  backend: str = None                                                # Parallel backend implementation
@@ -559,8 +560,8 @@ class MAB:
 
         # Save the arguments
         self.arms = arms.copy()
-        self.learning_policy = learning_policy
-        self.neighborhood_policy = neighborhood_policy
+        # self.learning_policy = learning_policy
+        # self.neighborhood_policy = neighborhood_policy
         self.seed = seed
         self.n_jobs = n_jobs
         self.backend = backend
@@ -572,15 +573,15 @@ class MAB:
         # Create the learning policy implementor
         lp = None
         if isinstance(learning_policy, LearningPolicy.EpsilonGreedy):
-            lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.epsilon)
+            lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.epsilon)
         elif isinstance(learning_policy, LearningPolicy.Random):
             lp = _Random(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Softmax):
-            lp = _Softmax(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.tau)
+            lp = _Softmax(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.tau)
         elif isinstance(learning_policy, LearningPolicy.ThompsonSampling):
-            lp = _ThompsonSampling(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.binarizer)
+            lp = _ThompsonSampling(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.binarizer)
         elif isinstance(learning_policy, LearningPolicy.UCB1):
-            lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, self.learning_policy.alpha)
+            lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
                          learning_policy.alpha, "ucb", learning_policy.arm_to_scaler)
@@ -596,19 +597,73 @@ class MAB:
 
             if isinstance(neighborhood_policy, NeighborhoodPolicy.Clusters):
                 self._imp = _Clusters(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                      self.neighborhood_policy.n_clusters, self.neighborhood_policy.is_minibatch)
+                                      neighborhood_policy.n_clusters, neighborhood_policy.is_minibatch)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.Radius):
                 self._imp = _Radius(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                    self.neighborhood_policy.radius, self.neighborhood_policy.metric,
-                                    self.neighborhood_policy.no_nhood_prob_of_arm)
+                                    neighborhood_policy.radius, neighborhood_policy.metric,
+                                    neighborhood_policy.no_nhood_prob_of_arm)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.KNearest):
                 self._imp = _KNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                      self.neighborhood_policy.k, self.neighborhood_policy.metric)
+                                      neighborhood_policy.k, neighborhood_policy.metric)
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
             self.is_contextual = isinstance(learning_policy, LearningPolicy.LinUCB)
             self._imp = lp
+
+    @property
+    def learning_policy(self):
+        """
+        Creates named tuple of the learning policy based on the implementor.
+
+        Returns
+        -------
+        The learning policy.
+
+        Raises
+        ------
+        NotImplementedError: MAB learning_policy property not implemented for this learning policy.
+
+        """
+        if isinstance(self._imp, (_Radius, _KNearest)):
+            lp = self._imp.lp
+        elif isinstance(self._imp, _Clusters):
+            lp = self._imp.lp_list[0]
+        else:
+            lp = self._imp
+
+        if isinstance(lp, _EpsilonGreedy):
+            return LearningPolicy.EpsilonGreedy(lp.epsilon)
+        elif isinstance(lp, _Linear):
+            return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda)
+        elif isinstance(lp, _Random):
+            return LearningPolicy.Random()
+        elif isinstance(lp, _Softmax):
+            return LearningPolicy.Softmax(lp.tau)
+        elif isinstance(lp, _ThompsonSampling):
+            return LearningPolicy.ThompsonSampling(lp.binarizer)
+        elif isinstance(lp, _UCB1):
+            return LearningPolicy.UCB1(lp.alpha)
+        else:
+            raise NotImplementedError("MAB learning_policy property not implemented for this learning policy.")
+
+    @property
+    def neighborhood_policy(self):
+        """
+        Creates named tuple of the neighborhood policy based on the implementor.
+
+        Returns
+        -------
+        The neighborhood policy
+        """
+        if isinstance(self._imp, _KNearest):
+            return NeighborhoodPolicy.KNearest(self._imp.k, self._imp.metric)
+        elif isinstance(self._imp, _Radius):
+            return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric)
+        elif isinstance(self._imp, _Clusters):
+            return NeighborhoodPolicy.Clusters(self._imp.n_clusters, isinstance(self._imp.kmeans, MiniBatchKMeans))
+        else:
+            return None
 
     def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
         """ Adds an _arm_ to the list of arms.
