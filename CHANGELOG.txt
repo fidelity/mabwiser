@@ -2,6 +2,12 @@
 MABWiser CHANGELOG
 =====================
 
+-------------------------------------------------------------------------------
+November, 27, 2019 1.7.0
+-------------------------------------------------------------------------------
+major:
+- The learning_policy and neighborhood_policy attributes have been changed to decorated properties.
+- MAB objects can now be serialized with the pickle module.
 
 -------------------------------------------------------------------------------
 November, 14, 2019 1.6.3

@@ -290,7 +290,7 @@ decision and reward history and corresponding contexts if any.</p>
 <dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
 </dd>
 <dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.6.2 of October 21, 2019</p>
+<dd class="field-odd"><p>1.7.0 of November 27, 2019</p>
 </dd>
 </dl>
 <p>This module defines the public interface of the <strong>MABWiser Library</strong> providing access to the following modules:</p>
@@ -804,6 +804,37 @@ and <em>contexts</em>, if any.</p>
 </dd></dl>
 
 <dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">learning_policy</code></dt>
+<dd><p>Creates named tuple of the learning policy based on the implementor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>The learning policy.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – MAB learning_policy property not implemented for this learning policy.:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">neighborhood_policy</code></dt>
+<dd><p>Creates named tuple of the neighborhood policy based on the implementor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>The neighborhood policy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="mabwiser.mab.MAB.partial_fit">
 <code class="sig-name descname">partial_fit</code><span class="sig-paren">(</span><em class="sig-param">decisions: Union[List[NewType.&lt;locals&gt;.new_type], numpy.ndarray, pandas.core.series.Series], rewards: Union[List[Union[int, float]], numpy.ndarray, pandas.core.series.Series], contexts: Union[None, List[List[Union[int, float]]], numpy.ndarray, pandas.core.series.Series, pandas.core.frame.DataFrame] = None</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#mabwiser.mab.MAB.partial_fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the multi-armed bandit with the given <em>decisions</em>, their corresponding <em>rewards</em>
@@ -1109,7 +1140,7 @@ The probabilities should sum up to 1.</p>
 <dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
 </dd>
 <dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.6.0 of August 13, 2019</p>
+<dd class="field-odd"><p>1.7.0 of November 27, 2019</p>
 </dd>
 </dl>
 <p>This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.</p>

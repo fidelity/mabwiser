@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.6.3 of November 14, 2019
+:Version: 1.7.0 of November 27, 2019
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """

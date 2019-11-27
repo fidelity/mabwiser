@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
+import pickle
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
-
 from sklearn.preprocessing import StandardScaler
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
@@ -10,6 +13,101 @@ from tests.test_base import BaseTest
 
 
 class MABTest(BaseTest):
+
+    #################################################
+    # Test property decorator methods
+    ################################################
+    def test_learning_policy_property(self):
+        for lp in BaseTest.lps:
+            mab = MAB([1, 2], lp)
+            test_lp = mab.learning_policy
+            self.assertTrue(type(test_lp) is type(lp))
+
+        for para_lp in BaseTest.para_lps:
+            mab = MAB([1, 2], para_lp)
+            test_lp = mab.learning_policy
+            self.assertTrue(type(test_lp) is type(para_lp))
+
+        for cp in BaseTest.cps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2], lp, cp)
+                test_lp = mab.learning_policy
+                self.assertTrue(type(test_lp) is type(lp))
+
+        for cp in BaseTest.cps:
+            for para_lp in BaseTest.lps:
+                mab = MAB([1, 2], para_lp, cp)
+                test_lp = mab.learning_policy
+                self.assertTrue(type(test_lp) is type(para_lp))
+
+    def test_learning_policy_values(self):
+        lp = LearningPolicy.EpsilonGreedy(epsilon=0.6)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.epsilon, mab.learning_policy.epsilon)
+
+        data = np.array([[1, 2, 3], [3, 2, 1]])
+        sc = StandardScaler()
+        sc.fit(data)
+        arm_to_scaler = {0: sc, 1: sc}
+
+        lp = LearningPolicy.LinUCB(alpha=2.0, l2_lambda=0.3, arm_to_scaler=arm_to_scaler)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.alpha, mab.learning_policy.alpha)
+        self.assertEqual(lp.l2_lambda, mab.learning_policy.l2_lambda)
+        self.assertIs(sc, mab.learning_policy.arm_to_scaler[0])
+        self.assertIs(sc, mab.learning_policy.arm_to_scaler[1])
+
+        lp = LearningPolicy.Softmax(tau=0.5)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.tau, mab.learning_policy.tau)
+
+        def binary(arm, reward):
+            return reward == 1
+
+        lp = LearningPolicy.ThompsonSampling(binarizer=binary)
+        mab = MAB([0, 1], lp)
+        self.assertIs(lp.binarizer, mab.learning_policy.binarizer)
+
+        lp = LearningPolicy.UCB1(alpha=0.7)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.alpha, mab.learning_policy.alpha)
+
+    def test_neighborhood_policy_property(self):
+        for cp in BaseTest.cps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2], lp, cp)
+                test_np = mab.neighborhood_policy
+                self.assertTrue(type(test_np) is type(cp))
+
+        for cp in BaseTest.cps:
+            for para_lp in BaseTest.lps:
+                mab = MAB([1, 2], para_lp, cp)
+                test_np = mab.neighborhood_policy
+                self.assertTrue(type(test_np) is type(cp))
+
+    def test_neighborhood_policy_values(self):
+        lp = LearningPolicy.EpsilonGreedy()
+        np = NeighborhoodPolicy.Clusters(n_clusters=3)
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.n_clusters, mab.neighborhood_policy.n_clusters)
+        self.assertFalse(mab.neighborhood_policy.is_minibatch)
+
+        np = NeighborhoodPolicy.Clusters(n_clusters=5, is_minibatch=True)
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.n_clusters, mab.neighborhood_policy.n_clusters)
+        self.assertTrue(mab.neighborhood_policy.is_minibatch)
+
+        np = NeighborhoodPolicy.KNearest(k=10, metric='cityblock')
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.k, mab.neighborhood_policy.k)
+        self.assertEqual(np.metric, mab.neighborhood_policy.metric)
+
+        np = NeighborhoodPolicy.Radius(radius=1.5, metric='canberra', no_nhood_prob_of_arm=[0.2, 0.8])
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.radius, mab.neighborhood_policy.radius)
+        self.assertEqual(np.metric, mab.neighborhood_policy.metric)
+        self.assertEqual(np.no_nhood_prob_of_arm, mab.neighborhood_policy.no_nhood_prob_of_arm)
+
 
     #################################################
     # Test context free predict() method
@@ -1211,3 +1309,300 @@ class MABTest(BaseTest):
         MAB._convert_matrix(c.loc[0], row=True)
         MAB._convert_matrix(d)
 
+    #################################################
+    # Test serialization
+    ################################################
+
+    def test_pickle_before_fit(self):
+        rng = np.random.RandomState(seed=9)
+        train_data = pd.DataFrame({'a': [rng.rand() for _ in range(20)],
+                                   'b': [rng.rand() for _ in range(20)],
+                                   'c': [rng.rand() for _ in range(20)],
+                                   'decision': [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                   'reward': [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1]})
+        test_data = pd.DataFrame({'a': [rng.rand() for _ in range(3)], 'b': [rng.rand() for _ in range(3)],
+                                  'c': [rng.rand() for _ in range(3)], 'decision': [1, 1, 2], 'reward': [0, 1, 1]})
+        context_columns = ['a', 'b', 'c']
+
+        for lp in BaseTest.lps:
+            mab = MAB([1, 2], lp)
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab, file)
+            file.close()
+
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+
+            new_mab.fit(train_data['decision'], train_data['reward'])
+            new_mab.predict()
+
+        for para_lp in BaseTest.para_lps:
+            mab = MAB([1, 2], para_lp)
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab, file)
+            file.close()
+
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+
+            new_mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            new_mab.predict(test_data[context_columns])
+
+        for cp in BaseTest.nps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2], lp, cp)
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab, file)
+                file.close()
+
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+
+                new_mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                new_mab.predict(test_data[context_columns])
+
+        for cp in BaseTest.nps:
+            for para_lp in BaseTest.para_lps:
+                mab = MAB([1, 2], para_lp, cp)
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab, file)
+                file.close()
+
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+
+                new_mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                new_mab.predict(test_data[context_columns])
+
+        os.remove('mab.pkl')
+
+    def test_pickle_fitted(self):
+        rng = np.random.RandomState(seed=9)
+        train_data = pd.DataFrame({'a': [rng.rand() for _ in range(20)],
+                                   'b': [rng.rand() for _ in range(20)],
+                                   'c': [rng.rand() for _ in range(20)],
+                                   'decision': [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                   'reward': [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1]})
+        test_data = pd.DataFrame({'a': [rng.rand() for _ in range(3)], 'b': [rng.rand() for _ in range(3)],
+                                  'c': [rng.rand() for _ in range(3)], 'decision': [1, 1, 2], 'reward': [0, 1, 1]})
+        context_columns = ['a', 'b', 'c']
+
+        for lp in BaseTest.lps:
+            mab = MAB([1, 2], lp)
+            mab.fit(train_data['decision'], train_data['reward'])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            new_mab.predict()
+
+        for para_lp in BaseTest.para_lps:
+            mab = MAB([1, 2], para_lp)
+            mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            new_mab.predict(test_data[context_columns])
+
+        for cp in BaseTest.nps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2], lp, cp)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                new_mab.predict(test_data[context_columns])
+
+        for cp in BaseTest.nps:
+            for para_lp in BaseTest.para_lps:
+                mab = MAB([1, 2], para_lp, cp)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                new_mab.predict(test_data[context_columns])
+
+        os.remove('mab.pkl')
+
+    def test_pickle_fitted_reproducibility(self):
+        rng = np.random.RandomState(seed=9)
+        train_data = pd.DataFrame({'a': [rng.rand() for _ in range(20)],
+                                   'b': [rng.rand() for _ in range(20)],
+                                   'c': [rng.rand() for _ in range(20)],
+                                   'decision': [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                   'reward': [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1]})
+        test_data = pd.DataFrame({'a': [rng.rand() for _ in range(3)], 'b': [rng.rand() for _ in range(3)],
+                                  'c': [rng.rand() for _ in range(3)], 'decision': [1, 1, 2], 'reward': [0, 1, 1]})
+        context_columns = ['a', 'b', 'c']
+
+        for lp in BaseTest.lps:
+            mab = MAB([1, 2, 3], lp, seed=11)
+            mab.fit(train_data['decision'], train_data['reward'])
+            p1 = mab.predict()
+
+            mab2 = MAB([1, 2, 3], lp, seed=11)
+            mab2.fit(train_data['decision'], train_data['reward'])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab2, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            p2 = new_mab.predict()
+
+            self.assertEqual(p1, p2)
+
+        for para_lp in BaseTest.para_lps:
+            mab = MAB([1, 2, 3], para_lp, seed=11)
+            mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            p1 = mab.predict(test_data[context_columns])
+
+            mab2 = MAB([1, 2, 3], para_lp, seed=11)
+            mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab2, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            p2 = new_mab.predict(test_data[context_columns])
+
+            self.assertEqual(p1, p2)
+
+        for cp in BaseTest.nps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2, 3], lp, cp, seed=11)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                p1 = mab.predict(test_data[context_columns])
+
+                mab2 = MAB([1, 2, 3], lp, cp, seed=11)
+                mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab2, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                p2 = new_mab.predict(test_data[context_columns])
+
+                self.assertEqual(p1, p2)
+
+        for cp in BaseTest.nps:
+            for para_lp in BaseTest.para_lps:
+                mab = MAB([1, 2, 3], para_lp, cp, seed=11)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                p1 = mab.predict(test_data[context_columns])
+
+                mab2 = MAB([1, 2, 3], para_lp, cp, seed=11)
+                mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab2, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                p2 = new_mab.predict(test_data[context_columns])
+
+                self.assertEqual(p1, p2)
+
+        os.remove('mab.pkl')
+
+    def test_pickle_fitted_reproducibile_expectations(self):
+        rng = np.random.RandomState(seed=9)
+        train_data = pd.DataFrame({'a': [0.1, 0, 0.1, 0, 0, 0.1, 0, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0],
+                                   'b': [0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0],
+                                   'c': [0, 0.1, 0.1, 0, 0, 0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0],
+                                   'd': [0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0, 0.1, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0],
+                                   'decision': [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                   'reward': [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1]})
+        test_data = pd.DataFrame({'a': [0, 0.1, 0], 'b': [0.1, 0, 0],
+                                  'c': [0, 0, 0], 'd': [0, 0, 0.1],
+                                  'decision': [1, 1, 2], 'reward': [0, 1, 1]})
+        context_columns = ['a', 'b', 'c', 'd']
+
+        for lp in BaseTest.lps:
+            mab = MAB([1, 2, 3], lp, seed=11)
+            mab.fit(train_data['decision'], train_data['reward'])
+            pe1 = mab.predict_expectations()
+
+            mab2 = MAB([1, 2, 3], lp, seed=11)
+            mab2.fit(train_data['decision'], train_data['reward'])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab2, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            pe2 = new_mab.predict_expectations()
+
+            self.assertDictEqual(pe1, pe2)
+
+        for para_lp in BaseTest.para_lps:
+            mab = MAB([1, 2, 3], para_lp, seed=11)
+            mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            pe1 = mab.predict_expectations(test_data[context_columns])
+
+            mab2 = MAB([1, 2, 3], para_lp, seed=11)
+            mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+            file = open('mab.pkl', 'wb')
+            pickle.dump(mab2, file)
+            file.close()
+            file2 = open('mab.pkl', 'rb')
+            new_mab = pickle.load(file2)
+            file2.close()
+            pe2 = new_mab.predict_expectations(test_data[context_columns])
+
+            self.assertListEqual(pe1, pe2)
+
+        for cp in BaseTest.nps:
+            for lp in BaseTest.lps:
+                mab = MAB([1, 2, 3], lp, cp, seed=11)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                pe1 = mab.predict_expectations(test_data[context_columns])
+
+                mab2 = MAB([1, 2, 3], lp, cp, seed=11)
+                mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab2, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                pe2 = new_mab.predict_expectations(test_data[context_columns])
+
+                self.assertListEqual(pe1, pe2)
+
+        for cp in BaseTest.nps:
+            for para_lp in BaseTest.para_lps:
+                mab = MAB([1, 2, 3], para_lp, cp, seed=11)
+                mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                pe1 = mab.predict_expectations(test_data[context_columns])
+
+                mab2 = MAB([1, 2, 3], para_lp, cp, seed=11)
+                mab2.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
+                file = open('mab.pkl', 'wb')
+                pickle.dump(mab2, file)
+                file.close()
+                file2 = open('mab.pkl', 'rb')
+                new_mab = pickle.load(file2)
+                file2.close()
+                pe2 = new_mab.predict_expectations(test_data[context_columns])
+
+                self.assertListEqual(pe1, pe2)
+
+        os.remove('mab.pkl')

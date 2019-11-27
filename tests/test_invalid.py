@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 
 from tests.test_base import BaseTest
 
+from mabwiser.base_mab import BaseMAB
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator
 
@@ -29,6 +30,41 @@ class InvalidTest(BaseTest):
     def test_invalid_learning_policy(self):
         with self.assertRaises(TypeError):
             MAB([0, 1], NeighborhoodPolicy.Radius(radius=12))
+
+    def test_incomplete_learning_policy_implementation(self):
+        class TestMAB(BaseMAB):
+            def __init__(self):
+                rng = np.random.RandomState(7)
+                arms = [0,1]
+                n_jobs = 1
+                backend = None
+                super().__init__(rng, arms, n_jobs, backend)
+
+            def _fit_arm(self, arm, decisions, rewards, contexts=None):
+                pass
+
+            def _predict_contexts(self, contexts, is_predict, seeds=None, start_index=None):
+                pass
+
+            def _uptake_new_arm(self, arm, binarizer=None, scaler=None):
+                pass
+
+            def fit(self, decisions, rewards, contexts=None):
+                pass
+
+            def partial_fit(self, decisions, rewards, contexts=None):
+                pass
+
+            def predict(self, contexts=None):
+                pass
+
+            def predict_expectations(self, contexts=None):
+                pass
+
+        mab = MAB([0, 1], learning_policy=LearningPolicy.EpsilonGreedy())
+        mab._imp = TestMAB()
+        with self.assertRaises(NotImplementedError):
+            mab.learning_policy
 
     def test_invalid_epsilon_type(self):
         with self.assertRaises(TypeError):
