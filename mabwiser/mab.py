@@ -560,8 +560,6 @@ class MAB:
 
         # Save the arguments
         self.arms = arms.copy()
-        # self.learning_policy = learning_policy
-        # self.neighborhood_policy = neighborhood_policy
         self.seed = seed
         self.n_jobs = n_jobs
         self.backend = backend
