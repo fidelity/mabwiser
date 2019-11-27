@@ -633,7 +633,10 @@ class MAB:
         if isinstance(lp, _EpsilonGreedy):
             return LearningPolicy.EpsilonGreedy(lp.epsilon)
         elif isinstance(lp, _Linear):
-            return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda)
+            arm_to_scaler = dict()
+            for arm in lp.arms:
+                arm_to_scaler[arm] = lp.arm_to_model[arm].scaler
+            return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, arm_to_scaler)
         elif isinstance(lp, _Random):
             return LearningPolicy.Random()
         elif isinstance(lp, _Softmax):
@@ -657,7 +660,7 @@ class MAB:
         if isinstance(self._imp, _KNearest):
             return NeighborhoodPolicy.KNearest(self._imp.k, self._imp.metric)
         elif isinstance(self._imp, _Radius):
-            return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric)
+            return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric, self._imp.no_nhood_prob_of_arm)
         elif isinstance(self._imp, _Clusters):
             return NeighborhoodPolicy.Clusters(self._imp.n_clusters, isinstance(self._imp.kmeans, MiniBatchKMeans))
         else:

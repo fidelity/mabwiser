@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
+import pickle
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
-import pickle
-import os
-
 from sklearn.preprocessing import StandardScaler
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
@@ -39,6 +40,38 @@ class MABTest(BaseTest):
                 test_lp = mab.learning_policy
                 self.assertTrue(type(test_lp) is type(para_lp))
 
+    def test_learning_policy_values(self):
+        lp = LearningPolicy.EpsilonGreedy(epsilon=0.6)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.epsilon, mab.learning_policy.epsilon)
+
+        data = np.array([[1, 2, 3], [3, 2, 1]])
+        sc = StandardScaler()
+        sc.fit(data)
+        arm_to_scaler = {0: sc, 1: sc}
+
+        lp = LearningPolicy.LinUCB(alpha=2.0, l2_lambda=0.3, arm_to_scaler=arm_to_scaler)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.alpha, mab.learning_policy.alpha)
+        self.assertEqual(lp.l2_lambda, mab.learning_policy.l2_lambda)
+        self.assertIs(sc, mab.learning_policy.arm_to_scaler[0])
+        self.assertIs(sc, mab.learning_policy.arm_to_scaler[1])
+
+        lp = LearningPolicy.Softmax(tau=0.5)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.tau, mab.learning_policy.tau)
+
+        def binary(arm, reward):
+            return reward == 1
+
+        lp = LearningPolicy.ThompsonSampling(binarizer=binary)
+        mab = MAB([0, 1], lp)
+        self.assertIs(lp.binarizer, mab.learning_policy.binarizer)
+
+        lp = LearningPolicy.UCB1(alpha=0.7)
+        mab = MAB([0, 1], lp)
+        self.assertEqual(lp.alpha, mab.learning_policy.alpha)
+
     def test_neighborhood_policy_property(self):
         for cp in BaseTest.cps:
             for lp in BaseTest.lps:
@@ -51,6 +84,30 @@ class MABTest(BaseTest):
                 mab = MAB([1, 2], para_lp, cp)
                 test_np = mab.neighborhood_policy
                 self.assertTrue(type(test_np) is type(cp))
+
+    def test_neighborhood_policy_values(self):
+        lp = LearningPolicy.EpsilonGreedy()
+        np = NeighborhoodPolicy.Clusters(n_clusters=3)
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.n_clusters, mab.neighborhood_policy.n_clusters)
+        self.assertFalse(mab.neighborhood_policy.is_minibatch)
+
+        np = NeighborhoodPolicy.Clusters(n_clusters=5, is_minibatch=True)
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.n_clusters, mab.neighborhood_policy.n_clusters)
+        self.assertTrue(mab.neighborhood_policy.is_minibatch)
+
+        np = NeighborhoodPolicy.KNearest(k=10, metric='cityblock')
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.k, mab.neighborhood_policy.k)
+        self.assertEqual(np.metric, mab.neighborhood_policy.metric)
+
+        np = NeighborhoodPolicy.Radius(radius=1.5, metric='canberra', no_nhood_prob_of_arm=[0.2, 0.8])
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.radius, mab.neighborhood_policy.radius)
+        self.assertEqual(np.metric, mab.neighborhood_policy.metric)
+        self.assertEqual(np.no_nhood_prob_of_arm, mab.neighborhood_policy.no_nhood_prob_of_arm)
+
 
     #################################################
     # Test context free predict() method
