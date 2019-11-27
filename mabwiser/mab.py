@@ -32,7 +32,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.6.2"
+__version__ = "1.7.0"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
@@ -480,11 +480,11 @@ class MAB:
                                         LearningPolicy.Softmax,
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
-                                        LearningPolicy.LinUCB],                                       # The learning policy
+                                        LearningPolicy.LinUCB],                     # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
-                                            NeighborhoodPolicy.Radius] = None,                            # The context policy, optional
+                                            NeighborhoodPolicy.Radius] = None,      # The context policy, optional
                  seed: int = Constants.default_seed,                                # The random seed
                  n_jobs: int = 1,                                                   # Number of parallel jobs
                  backend: str = None                                                # Parallel backend implementation
