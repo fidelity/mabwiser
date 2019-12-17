@@ -291,7 +291,7 @@ Simulator
 
     import random
     from sklearn.preprocessing import StandardScaler
-    from mabwiser.mab import MAB, LearningPolicy
+    from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
     from mabwiser.simulator import Simulator
 
     ######################################################################################
@@ -338,7 +338,7 @@ Simulator
         # Since the simulation is online, print the 'total' stats
         print('Worst Case Scenario:', sim.bandit_to_arm_to_stats_min[mab_name]['total'])
         print('Average Case Scenario:', sim.bandit_to_arm_to_stats_avg[mab_name]['total'])
-        print('Best Case Scenario:', sim.bandit_to_arm_to_stats_max[mab_name]['total'], "\n\n\")
+        print('Best Case Scenario:', sim.bandit_to_arm_to_stats_max[mab_name]['total'], "\n\n")
 
     # Plot the average case results per every arm for each bandit
     sim.plot(metric='avg', is_per_arm=True)
