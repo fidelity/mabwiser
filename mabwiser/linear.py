@@ -45,7 +45,12 @@ class _RidgeRegression:
 
         # Update A
         self.A = self.A + np.dot(Xt, X)
-        self.A_inv = np.linalg.inv(self.A)
+
+        #TODO or we don't allow l2_lambda = 0 for LinUCB?
+        try:
+            self.A_inv = np.linalg.inv(self.A)
+        except np.linalg.LinAlgError:
+            pass
 
         # Add new Xty values to old
         self.Xty = self.Xty + np.dot(Xt, y)
@@ -57,11 +62,30 @@ class _RidgeRegression:
 
         # Scale
         if self.scaler is not None:
-            x = x.reshape(1, -1)
-            x = self.scaler.transform(x.astype('float64')).reshape(-1)
+            x = self._scale_predict_context(x)
 
         # Calculate default expectation y = x * b
         return np.dot(x, self.beta)
+
+    def _scale_predict_context(self, x):
+        x = x.reshape(1, -1)
+        return self.scaler.transform(x.astype('float64')).reshape(-1)
+
+
+class _LinTS(_RidgeRegression):
+
+    def predict(self, x):
+
+        # Scale
+        if self.scaler is not None:
+            x = self._scale_predict_context(x)
+
+        # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
+        exploration = np.square(self.alpha) * self.A_inv
+        beta_sampled = self.rng.multivariate_normal(self.beta, exploration, method='cholesky')
+
+        # Calculate expectation y = x * beta_sampled
+        return np.dot(x, beta_sampled)
 
 
 class _LinUCB(_RidgeRegression):
@@ -70,8 +94,7 @@ class _LinUCB(_RidgeRegression):
 
         # Scale
         if self.scaler is not None:
-            x = x.reshape(1, -1)
-            x = self.scaler.transform(x.astype('float64')).reshape(-1)
+            x = self._scale_predict_context(x)
 
         # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
         ucb = (self.alpha * np.sqrt(np.dot(np.dot(x, self.A_inv), x)))
@@ -82,7 +105,7 @@ class _LinUCB(_RidgeRegression):
 
 class _Linear(BaseMAB):
 
-    factory = {"ucb": _LinUCB, "ridge": _RidgeRegression}
+    factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  l2_lambda: Num, alpha: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):

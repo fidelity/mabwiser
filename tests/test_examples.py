@@ -114,6 +114,42 @@ class ExampleTest(BaseTest):
         self.assertTrue(3 in mab.arms)
         self.assertTrue(3 in mab._imp.arm_to_expectation.keys())
 
+    def test_lints(self):
+        train_df = pd.DataFrame({'ad': [1, 1, 1, 2, 4, 5, 3, 3, 2, 1, 4, 5, 3, 2, 5],
+                                 'revenues': [10, 17, 22, 9, 4, 20, 7, 8, 20, 9, 50, 5, 7, 12, 10],
+                                 'age': [22, 27, 39, 48, 21, 20, 19, 37, 52, 26, 18, 42, 55, 57, 38],
+                                 'click_rate': [0.2, 0.6, 0.99, 0.68, 0.15, 0.23, 0.75, 0.17,
+                                                0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
+                                 'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
+                                )
+
+        # Test data to for new prediction
+        test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
+        test_df_revenue = pd.Series([7, 13])
+
+        # Scale the data
+        scaler = StandardScaler()
+        train = scaler.fit_transform(np.asarray(train_df[['age', 'click_rate', 'subscriber']], dtype='float64'))
+        test = scaler.transform(np.asarray(test_df, dtype='float64'))
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                 decisions=train_df['ad'],
+                                 rewards=train_df['revenues'],
+                                 learning_policy=LearningPolicy.LinTS(alpha=1.5),
+                                 context_history=train,
+                                 contexts=test,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+
+        self.assertEqual(arms, [5, 2])
+
+        mab.partial_fit(decisions=arms, rewards=test_df_revenue, contexts=test)
+
+        mab.add_arm(6)
+        self.assertTrue(6 in mab.arms)
+        self.assertTrue(6 in mab._imp.arm_to_expectation.keys())
+
     def test_ts(self):
 
         dec_to_threshold = {1: 10, 2: 20}
@@ -339,6 +375,68 @@ class ExampleTest(BaseTest):
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
                                  learning_policy=LearningPolicy.LinUCB(alpha=1.25),
+                                 neighborhood_policy=NeighborhoodPolicy.KNearest(k=4),
+                                 context_history=train,
+                                 contexts=test,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+
+        self.assertEqual(arms, [1, 2])
+
+    def test_lints_radius(self):
+
+        train_df = pd.DataFrame({'ad': [1, 1, 1, 2, 4, 5, 3, 3, 2, 1, 4, 5, 3, 2, 5],
+                                 'revenues': [10, 17, 22, 9, 4, 20, 7, 8, 20, 9, 50, 5, 7, 12, 10],
+                                 'age': [22, 27, 39, 48, 21, 20, 19, 37, 52, 26, 18, 42, 55, 57, 38],
+                                 'click_rate': [0.2, 0.6, 0.99, 0.68, 0.15, 0.23, 0.75, 0.17,
+                                                0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
+                                 'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
+                                )
+
+        # Test data to for new prediction
+        test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
+
+        # Scale the data
+        scaler = StandardScaler()
+        train = scaler.fit_transform(np.asarray(train_df[['age', 'click_rate', 'subscriber']], dtype='float64'))
+        test = scaler.transform(np.asarray(test_df, dtype='float64'))
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                 decisions=train_df['ad'],
+                                 rewards=train_df['revenues'],
+                                 learning_policy=LearningPolicy.LinTS(alpha=0.5),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
+                                 context_history=train,
+                                 contexts=test,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+
+        self.assertEqual(arms, [1, 2])
+
+    def test_lints_knearest(self):
+
+        train_df = pd.DataFrame({'ad': [1, 1, 1, 2, 4, 5, 3, 3, 2, 1, 4, 5, 3, 2, 5],
+                                 'revenues': [10, 17, 22, 9, 4, 20, 7, 8, 20, 9, 50, 5, 7, 12, 10],
+                                 'age': [22, 27, 39, 48, 21, 20, 19, 37, 52, 26, 18, 42, 55, 57, 38],
+                                 'click_rate': [0.2, 0.6, 0.99, 0.68, 0.15, 0.23, 0.75, 0.17,
+                                                0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
+                                 'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
+                                )
+
+        # Test data to for new prediction
+        test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
+
+        # Scale the data
+        scaler = StandardScaler()
+        train = scaler.fit_transform(np.asarray(train_df[['age', 'click_rate', 'subscriber']], dtype='float64'))
+        test = scaler.transform(np.asarray(test_df, dtype='float64'))
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                 decisions=train_df['ad'],
+                                 rewards=train_df['revenues'],
+                                 learning_policy=LearningPolicy.LinTS(alpha=1),
                                  neighborhood_policy=NeighborhoodPolicy.KNearest(k=4),
                                  context_history=train,
                                  contexts=test,

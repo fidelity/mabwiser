@@ -1,5 +1,5 @@
 joblib
-numpy
+numpy>=1.18.0
 pandas
 scikit-learn
 scipy
