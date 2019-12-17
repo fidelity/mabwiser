@@ -63,6 +63,8 @@ class _UCB1(BaseMAB):
             self.arm_to_sum[arm] += arm_rewards.sum()
             self.arm_to_count[arm] += arm_rewards.size
             self.arm_to_mean[arm] = self.arm_to_sum[arm] / self.arm_to_count[arm]
+
+        if self.arm_to_count[arm]:
             self.arm_to_expectation[arm] = _UCB1._get_ucb(self.arm_to_mean[arm], self.alpha,
                                                           self.total_count, self.arm_to_count[arm])
 

@@ -310,28 +310,36 @@ class UCBTest(BaseTest):
 
         mean = mab._imp.arm_to_mean[1]
         ci = mab._imp.arm_to_expectation[1]
+        mean1 = mab._imp.arm_to_mean[2]
+        ci1 = mab._imp.arm_to_expectation[2]
         self.assertAlmostEqual(0.3333333333333333, mean)
         self.assertAlmostEqual(1.5723073962832794, ci)
-
-        mean1 = mab._imp.arm_to_mean[4]
-        ci1 = mab._imp.arm_to_expectation[4]
         self.assertEqual(mean1, 0)
-        self.assertEqual(ci1, 0)
+        self.assertAlmostEqual(ci1, 1.5174271293851465)
+
+        mean2 = mab._imp.arm_to_mean[4]
+        ci2 = mab._imp.arm_to_expectation[4]
+        self.assertEqual(mean2, 0)
+        self.assertEqual(ci2, 0)
 
         # Fit again
         decisions2 = [1, 3, 4]
         rewards2 = [0, 1, 1]
         mab.partial_fit(decisions2, rewards2)
 
-        mean2 = mab._imp.arm_to_mean[1]
-        ci2 = mab._imp.arm_to_expectation[1]
-        mean3 = mab._imp.arm_to_mean[4]
-        ci3 = mab._imp.arm_to_expectation[4]
+        mean3 = mab._imp.arm_to_mean[1]
+        ci3 = mab._imp.arm_to_expectation[1]
+        mean4 = mab._imp.arm_to_mean[4]
+        ci4 = mab._imp.arm_to_expectation[4]
+        mean5 = mab._imp.arm_to_mean[2]
+        ci5 = mab._imp.arm_to_expectation[2]
 
-        self.assertEqual(mean2, 0.25)
-        self.assertAlmostEqual(1.3824639856219572, ci2)
-        self.assertEqual(mean3, 1)
-        self.assertAlmostEqual(3.2649279712439143, ci3)
+        self.assertEqual(mean3, 0.25)
+        self.assertAlmostEqual(1.3824639856219572, ci3)
+        self.assertEqual(mean4, 1)
+        self.assertAlmostEqual(3.2649279712439143, ci4)
+        self.assertEqual(mean5, 0)
+        self.assertAlmostEqual(ci5, 1.6015459273656616)
 
     def test_add_arm(self):
 
