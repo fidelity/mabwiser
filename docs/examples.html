@@ -436,7 +436,7 @@
 <h2>Simulator<a class="headerlink" href="#simulator" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
 <span class="kn">from</span> <span class="nn">mabwiser.simulator</span> <span class="kn">import</span> <span class="n">Simulator</span>
 
 <span class="c1">######################################################################################</span>
@@ -483,7 +483,7 @@
     <span class="c1"># Since the simulation is online, print the &#39;total&#39; stats</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Worst Case Scenario:&#39;</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">bandit_to_arm_to_stats_min</span><span class="p">[</span><span class="n">mab_name</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">])</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Average Case Scenario:&#39;</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">bandit_to_arm_to_stats_avg</span><span class="p">[</span><span class="n">mab_name</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">])</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Best Case Scenario:&#39;</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">bandit_to_arm_to_stats_max</span><span class="p">[</span><span class="n">mab_name</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n\n\&quot;</span><span class="s2">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Best Case Scenario:&#39;</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">bandit_to_arm_to_stats_max</span><span class="p">[</span><span class="n">mab_name</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Plot the average case results per every arm for each bandit</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;avg&#39;</span><span class="p">,</span> <span class="n">is_per_arm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
