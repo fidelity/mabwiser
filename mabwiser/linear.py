@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, argmax
+from mabwiser.utils import Arm, Num, RandomGenerator, argmax
 
 
 class _RidgeRegression:
@@ -46,7 +46,6 @@ class _RidgeRegression:
         # Update A
         self.A = self.A + np.dot(Xt, X)
 
-        #TODO or we don't allow l2_lambda = 0 for LinUCB?
         try:
             self.A_inv = np.linalg.inv(self.A)
         except np.linalg.LinAlgError:
@@ -58,7 +57,7 @@ class _RidgeRegression:
         # Recalculate beta coefficients
         self.beta = np.dot(self.A_inv, self.Xty)
 
-    def predict(self, x):
+    def predict(self, x, generator=None):
 
         # Scale
         if self.scaler is not None:
@@ -74,7 +73,7 @@ class _RidgeRegression:
 
 class _LinTS(_RidgeRegression):
 
-    def predict(self, x):
+    def predict(self, x, generator=None):
 
         # Scale
         if self.scaler is not None:
@@ -82,7 +81,7 @@ class _LinTS(_RidgeRegression):
 
         # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
         exploration = np.square(self.alpha) * self.A_inv
-        beta_sampled = self.rng.multivariate_normal(self.beta, exploration, method='cholesky')
+        beta_sampled = generator.rng.multivariate_normal(self.beta, exploration, method='cholesky')
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
@@ -90,7 +89,7 @@ class _LinTS(_RidgeRegression):
 
 class _LinUCB(_RidgeRegression):
 
-    def predict(self, x):
+    def predict(self, x, generator=None):
 
         # Scale
         if self.scaler is not None:
@@ -185,10 +184,15 @@ class _Linear(BaseMAB):
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
+            generator = None
+            if self.regression == "ts":
+                generator = RandomGenerator(seed=seeds[index])
 
             for arm in arms:
+
                 # Get the expectation of each arm from its trained model
-                arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+                arm_to_expectation[arm] = arm_to_model[arm].predict(row, generator)
+
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)
             else:

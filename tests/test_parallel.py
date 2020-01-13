@@ -615,6 +615,125 @@ class ParallelTest(BaseTest):
         for i in range(len(expected_pred)):
             self.assertListAlmostEqual(exps[i].values(), expected_pred[i])
 
+    def test_linTS(self):
+
+        rng = np.random.RandomState(seed=111)
+        contexts = rng.randint(0, 5, (10, 5))
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=1)
+
+        self.assertEqual(arm, [3, 4, 3, 4, 4, 3, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2)
+
+        self.assertEqual(arm, [3, 4, 3, 4, 4, 3, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=-1)
+
+        self.assertEqual(arm, [3, 4, 3, 4, 4, 3, 4, 3, 4, 3])
+
+    def test_linTS_expectations(self):
+
+        rng = np.random.RandomState(seed=111)
+        contexts = rng.randint(0, 5, (5, 5))
+        expected_pred = [[0.8084115427218359, -0.24982075764667167, 1.5635548830598076,
+                         1.0618638953118769, -0.9098185691164795],
+                         [0.5336079108763945, 0.01616549902224485, 0.564989212779574,
+                          1.1180495741003063, 0.5149770103118427],
+                         [0.048191141112942246, -0.2971954837405739, 0.3695335234444185,
+                          0.15868306616590883, -0.02290552096875853],
+                         [-0.9723965195647908, -0.22149262971948042, 0.6748600240196365,
+                          0.8925218151514871, -0.17421103171300958],
+                         [-0.6100755537028626, 0.3000225581482465, 0.6879962025574144,
+                          2.072393797871009, -0.526088281183828]]
+
+        exps, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                 rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                 learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=contexts,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=False,
+                                 n_jobs=1)
+
+        for i in range(len(expected_pred)):
+            self.assertListAlmostEqual(exps[i].values(), expected_pred[i])
+
+        exps, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False,
+                                n_jobs=2)
+
+        for i in range(len(expected_pred)):
+            self.assertListAlmostEqual(exps[i].values(), expected_pred[i])
+
+        exps, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False,
+                                n_jobs=-1)
+
+        for i in range(len(expected_pred)):
+            self.assertListAlmostEqual(exps[i].values(), expected_pred[i])
+
     def test_UCB1_c2_backend(self):
         rng = np.random.RandomState(seed=111)
         contexts_history = rng.randint(0, 5, (10, 5))
@@ -759,10 +878,27 @@ class ParallelTest(BaseTest):
 
         self.assertListEqual(arms, [3, 3, 1, 1, 3, 1, 1, 2, 2, 3])
 
-    def test_linUCB(self):
+    def test_linUCB_backend(self):
 
         rng = np.random.RandomState(seed=111)
         contexts = rng.randint(0, 5, (10, 5))
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=1,
+                                backend=None)
+
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 3])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
@@ -814,3 +950,59 @@ class ParallelTest(BaseTest):
                                 backend='threading')
 
         self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 3])
+
+    def test_linTS_backend(self):
+
+        rng = np.random.RandomState(seed=111)
+        contexts = rng.randint(0, 5, (10, 5))
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend=None)
+
+        self.assertEqual(arm, [4, 4, 3, 4, 4, 3, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='loky')
+
+        self.assertEqual(arm, [4, 4, 3, 4, 4, 3, 4, 3, 4, 3])
+
+        arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
+                                decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=contexts,
+                                seed=123456,
+                                num_run=1,
+                                is_predict=True,
+                                n_jobs=2,
+                                backend='threading')
+
+        self.assertEqual(arm, [4, 4, 3, 4, 4, 3, 4, 3, 4, 3])  # [3, 4, 3, 4, 4, 3, 4, 3, 4, 3]

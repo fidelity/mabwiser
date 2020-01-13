@@ -4,21 +4,21 @@ MABWiser CHANGELOG
 
 
 -------------------------------------------------------------------------------
+TBD
+-------------------------------------------------------------------------------
+major:
+- Numpy version dependency on 1.18.0 or greater
+- Linear Thompson Sampling (LinTS) algorithm is now available.
+- LinTS implementation uses deterministic sampling of a multivariate normal distribution of the regression coefficients.
+
+minor:
+- Exception handling in ridge regression if matrix is not invertible
+
+-------------------------------------------------------------------------------
 December, 17, 2019 1.7.1
 -------------------------------------------------------------------------------
 minor:
 - Bug fix for partial fitting in UCB1 reported in #10 by @harisankarh
-
--------------------------------------------------------------------------------
-TBD 1.8.0
--------------------------------------------------------------------------------
-major:
-- Linear Thompson Sampling (LinTS) algorithm is now available.
-- LinTS implementation uses deterministic sampling of a multivariate normal distribution of the regression coefficients.
-- Numpy version dependency on 1.18.0 or greater
-
-minor:
-- Exception handling in ridge regression if matrix is not invertible
 
 -------------------------------------------------------------------------------
 November, 27, 2019 1.7.0

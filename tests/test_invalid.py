@@ -96,7 +96,7 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinTS(alpha=-1),
+                         learning_policy=LearningPolicy.LinTS(alpha=0),
                          neighborhood_policy=NeighborhoodPolicy.KNearest(2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),

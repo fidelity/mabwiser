@@ -67,7 +67,6 @@ class LearningPolicy(NamedTuple):
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("The value of epsilon must be between 0 and 1."))
 
-    # TODO is this equation correct?
     class LinTS(NamedTuple):
         """ LinTS Learning Policy
 
@@ -76,7 +75,7 @@ class LearningPolicy(NamedTuple):
         calculated coefficients as the mean and the covariance as:
 
         .. math::
-            \\alpha^{2} (x^{T}x + I_x)^{-1}
+            \\alpha^{2} (x_i^{T}x_i + \\lambda * I_d)^{-1}
 
         The normal distribution is randomly sampled to obtain
         expected coefficients for the ridge regression for each
@@ -85,11 +84,15 @@ class LearningPolicy(NamedTuple):
         :math:`\\alpha` is a factor used to adjust how conservative the estimate is.
         Higher :math:`\\alpha` values promote more exploration.
 
+        The multivariate normal distribution uses Cholesky decomposition to guarantee deterministic behavior.
+        This method requires that the covariance is a positive definite matrix.
+        To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
+
         Attributes
         ----------
         alpha: Num
             The multiplier to determine the degree of exploration.
-            Integer or float. Cannot be negative.
+            Integer or float. Must be greater than zero.
             Default value is 1.0.
         l2_lambda: Num
             The regularization strength.
@@ -120,7 +123,7 @@ class LearningPolicy(NamedTuple):
 
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
-            check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
+            check_true(0 < self.alpha, ValueError("The value of alpha must be greater than zero."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_norm must be an integer or float."))
             check_true(0 < self.l2_lambda, ValueError("The value of l2_lambda must be greater than zero."))
             if self.arm_to_scaler is not None:

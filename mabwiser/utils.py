@@ -8,6 +8,8 @@
 This module provides a number of constants and helper functions.
 """
 
+import numpy.random as random
+
 from typing import Dict, Union, NamedTuple, NewType, NoReturn
 
 Arm = NewType('Arm', Union[int, float, str])
@@ -29,6 +31,11 @@ class Constants(NamedTuple):
                         "euclidean", "hamming", "jaccard", "kulsinski", "mahalanobis", "matching", "minkowski",
                         "rogerstanimoto", "russellrao", "seuclidean", "sokalmichener", "sokalsneath", "sqeuclidean"]
     """The distance metrics supported by neighborhood policies."""
+
+
+class RandomGenerator:
+    def __init__(self, seed):
+        self.rng = random.default_rng(seed=seed)
 
 
 def argmax(dictionary: Dict[Arm, Num]) -> Arm:
