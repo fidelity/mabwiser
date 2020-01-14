@@ -8,6 +8,7 @@ TBD
 -------------------------------------------------------------------------------
 major:
 - Numpy version dependency on 1.18.0 or greater
+- Scikit-learn version dependency on 0.22.0 or greater
 - Linear Thompson Sampling (LinTS) algorithm is now available.
 - LinTS implementation uses deterministic sampling of a multivariate normal distribution of the regression coefficients.
 
