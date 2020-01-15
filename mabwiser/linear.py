@@ -81,9 +81,13 @@ class _LinTS(_RidgeRegression):
 
         # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
         exploration = np.square(self.alpha) * self.A_inv
+
+        # Multivariate Normal Sampling
+        # Adapted from the implementation in numpy.random.generator.multivariate_normal
+        # Use of the cholesky implementation from numpy.linalg instead of numpy.dual ensures
+        # reproducibility in serial vs parallel settings
         sampled_norm = generator.standard_normal(self.beta.shape[0])
         covar_decomposed = np.linalg.cholesky(exploration)
-
         beta_sampled = self.beta + np.dot(sampled_norm, covar_decomposed)
 
         # Calculate expectation y = x * beta_sampled

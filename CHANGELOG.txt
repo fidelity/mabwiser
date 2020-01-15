@@ -9,10 +9,11 @@ TBD
 major:
 - New Algorithm: Linear Thompson Sampling (LinTS)
 - LinTS implementation uses deterministic sampling of a multivariate normal distribution of the regression coefficients.
+- Adapted from Agrawal, Shipra and Navin Goyal. "Thompson Sampling for Contextual Bandits with Linear Payoffs." ICML 2013.
 
 minor:
 - Scikit-learn version dependency on 0.22.0 or greater
-- Wrapper class for random generator 
+- Wrapper class for random generator
 - Exception handling in ridge regression if matrix is not invertible
 
 -------------------------------------------------------------------------------
