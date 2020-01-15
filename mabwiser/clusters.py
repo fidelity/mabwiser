@@ -14,7 +14,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset
+from mabwiser.utils import Arm, Num, RandomGenerator, reset
 
 
 class _Clusters(BaseMAB):
@@ -27,9 +27,9 @@ class _Clusters(BaseMAB):
         self.n_clusters = n_clusters
 
         if is_minibatch:
-            self.kmeans = MiniBatchKMeans(n_clusters, random_state=rng.get_state()[1][0])
+            self.kmeans = MiniBatchKMeans(n_clusters, random_state=RandomGenerator.get_state(rng))
         else:
-            self.kmeans = KMeans(n_clusters, random_state=rng.get_state()[1][0])
+            self.kmeans = KMeans(n_clusters, random_state=RandomGenerator.get_state(rng))
 
         # Create the list of learning policies for each cluster
         # Deep copy all parameters of the lp objects, except refer to the originals of rng and arms

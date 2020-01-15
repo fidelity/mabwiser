@@ -110,33 +110,32 @@ expectations = knearest.predict_expectations(test)
 print("KNearest: ", prediction, " ", expectations)
 assert(prediction == [1, 2])
 
-#TODO update outputs to be accurate
 ##################################################
 # Linear Thompson Sampling Learning Policy
 ##################################################
 
 # LinUCB learning policy with alpha 1.25 and l2_lambda 1
-linucb = MAB(arms=ads,
+lints = MAB(arms=ads,
              learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
 
 # Learn from previous ads shown and revenues generated
-linucb.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+lints.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
 
 # Predict the next best ad to show
-prediction = linucb.predict(test)
+prediction = lints.predict(test)
 
 # Expectation of each ad based on learning from past ad revenues
-expectations = linucb.predict_expectations(test)
+expectations = lints.predict_expectations(test)
 
 # Results
-print("LinUCB: ", prediction, " ", expectations)
+print("LinTS: ", prediction, " ", expectations)
 assert(prediction == [5, 2])
 
 # Online update of model
-linucb.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+lints.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
 
 # Update the model with new arm
-linucb.add_arm(6)
+lints.add_arm(6)
 
 ###################################################################
 # LinTS Learning Policy combined with Radius Neighborhood Policy

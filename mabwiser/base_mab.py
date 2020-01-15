@@ -167,6 +167,10 @@ class BaseMAB(metaclass=abc.ABCMeta):
         # Get seed value for each context
         seeds = self.rng.randint(np.iinfo(np.int32).max, size=total_contexts)
 
+        # Note: To change to use np.random.Generator
+        # seedseq = np.random.SeedSequence(7)
+        # seeds = seedseq.spawn(total_contexts)
+
         # Perform parallel predictions
         predictions = Parallel(n_jobs=n_jobs, backend=self.backend)(
                           delayed(self._predict_contexts)(

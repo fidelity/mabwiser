@@ -81,7 +81,10 @@ class _LinTS(_RidgeRegression):
 
         # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
         exploration = np.square(self.alpha) * self.A_inv
-        beta_sampled = generator.rng.multivariate_normal(self.beta, exploration, method='cholesky')
+        sampled_norm = generator.standard_normal(self.beta.shape[0])
+        covar_decomposed = np.linalg.cholesky(exploration)
+
+        beta_sampled = self.beta + np.dot(sampled_norm, covar_decomposed)
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
@@ -186,7 +189,7 @@ class _Linear(BaseMAB):
         for index, row in enumerate(contexts):
             generator = None
             if self.regression == "ts":
-                generator = RandomGenerator(seed=seeds[index])
+                generator = RandomGenerator.get_random_generator(seed=seeds[index])
 
             for arm in arms:
 

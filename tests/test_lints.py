@@ -11,7 +11,6 @@ from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 
-#TODO what other tests are needed?
 class LinTSTest(BaseTest):
 
     def test_alpha0_0001(self):
@@ -55,9 +54,9 @@ class LinTSTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [-0.2851934234355956, -3.371795832772336e-05, 0.573634894650083])
-        self.assertListAlmostEqual(exps[1].values(), [-0.14875592643742336, -6.421377547956682e-05,
-                                                      -0.0011022828720010924])
+        self.assertListAlmostEqual(exps[0].values(), [-0.2852681756217596, 0.0001269279506370147, 0.5734779916654011])
+        self.assertListAlmostEqual(exps[1].values(), [-0.1488528807976609, 0.00028205004183544743,
+                                                      -0.0009460383561853969])
 
     def test_alpha1(self):
         scaler = StandardScaler()
@@ -79,7 +78,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 2)
-        self.assertEqual(arm, [3, 2])
+        self.assertEqual(arm, [2, 2])
 
     def test_alpha1_expectations(self):
         scaler = StandardScaler()
@@ -100,8 +99,8 @@ class LinTSTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [0.22366026139685308, -0.6353551982650527, 1.285498663709648])
-        self.assertListAlmostEqual(exps[1].values(), [-0.5938707531272158, -0.5698972035691672, -0.6492998645146565])
+        self.assertListAlmostEqual(exps[0].values(), [-0.618418632428363, 1.1600087200810658, -0.148480961237692])
+        self.assertListAlmostEqual(exps[1].values(), [-1.6287076121839272, 2.9053467335602328, 0.6164306211104512])
 
     def test_np(self):
 
@@ -119,7 +118,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 3], [3, 1], [2, 3]])
+        self.assertEqual(arm, [[2, 2], [3, 3], [3, 1]])
 
     def test_df(self):
 
@@ -140,7 +139,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 3], [3, 1], [2, 3]])
+        self.assertEqual(arm, [[2, 2], [3, 3], [3, 1]])
 
     def test_df_list(self):
 
@@ -161,7 +160,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 3], [3, 1], [2, 3]])
+        self.assertEqual(arm, [[2, 2], [3, 3], [3, 1]])
 
     def test_lints_t1(self):
 
@@ -179,7 +178,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[3, 1], [2, 1], [2, 3], [2, 2]])
+        self.assertEqual(arm, [[2, 2], [2, 1], [2, 1], [3, 1]])
 
     def test_lints_t2(self):
 
@@ -197,7 +196,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[1, 1], [1, 1], [1, 2], [3, 3]])
+        self.assertEqual(arm, [[2, 1], [2, 1], [3, 1], [3, 1]])
 
     def test_lints_t3(self):
 
@@ -216,7 +215,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[4, 4], [4, 4], [4, 4], [1, 4]])
+        self.assertEqual(arm, [[1, 4], [4, 4], [4, 4], [4, 4]])
 
     def test_lints_t4(self):
 
@@ -235,7 +234,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[4, 1], [4, 4], [4, 4], [4, 4]])
+        self.assertEqual(arm, [[4, 4], [1, 4], [1, 4], [1, 1]])
 
     def test_lints_t5(self):
 
@@ -253,7 +252,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [['two', 'two'], ['three', 'two'], ['one', 'three'], ['two', 'one']])
+        self.assertEqual(arm, [['two', 'two'], ['one', 'three'], ['one', 'two'], ['two', 'one']])
 
     def test_lints_t6(self):
 
@@ -272,7 +271,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [['three', 'one'], ['three', 'one'], ['three', 'one'], ['three', 'one']])
+        self.assertEqual(arm, [['three', 'one'], ['three', 'one'], ['one', 'one'], ['three', 'one']])
 
     def test_lints_t7(self):
 
@@ -349,7 +348,7 @@ class LinTSTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[b, b], [c, b], [b, b], [c, b]])
+        self.assertEqual(arm, [[b, b], [b, b], [b, b], [c, b]])
 
     def test_unused_arm(self):
 
@@ -366,10 +365,10 @@ class LinTSTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [-0.04803872686071298, -1.1337030920990394,
-                                                      2.2246728279677135, -3.9501437962934203])
-        self.assertListAlmostEqual(exps[1].values(), [-0.23517586158580184, -0.3425015572133122,
-                                                      0.345649510429914, 0.9738926145138382])
+        self.assertListAlmostEqual(exps[0].values(), [1.943920889537664, 2.3259348581158514,
+                                                      -1.7656101524215249, -3.099383515532611])
+        self.assertListAlmostEqual(exps[1].values(), [-0.1417357823059726, 2.0027723033565548,
+                                                      -0.1287605889503184, 1.245813654386704])
 
     def test_unused_arm2(self):
 
@@ -387,7 +386,7 @@ class LinTSTest(BaseTest):
                                  is_predict=True)
 
 
-        self.assertEqual(arms, [3, 4])
+        self.assertEqual(arms, [2, 2])
 
     def test_unused_arm_scaled(self):
 
@@ -409,10 +408,10 @@ class LinTSTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [0.22366026139685308, -0.6353551982650527,
-                                                      1.285498663709648, -0.9267382562624752])
-        self.assertListAlmostEqual(exps[1].values(), [-0.5938707531272158, -0.5698972035691672,
-                                                      -0.6492998645146565, 1.6460568126496122])
+        self.assertListAlmostEqual(exps[0].values(), [-0.618418632428363, 1.1600087200810658,
+                                                      -0.148480961237692, -1.24318738139598])
+        self.assertListAlmostEqual(exps[1].values(), [-1.6287076121839272, 2.9053467335602328,
+                                                      0.6164306211104512, -2.4277896722556145])
 
 
     def test_unused_arm_scaled2(self):
@@ -435,7 +434,7 @@ class LinTSTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 1])
+        self.assertEqual(arms, [4, 4])
 
     def test_fit_twice(self):
 
@@ -452,7 +451,7 @@ class LinTSTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, [3, 4])
+        self.assertEqual(arm, [2, 2])
 
         b_1 = mab._imp.arm_to_model[1].beta
         self.assertTrue(math.isclose(-0.0825688, b_1[0], abs_tol=0.00001))
@@ -495,7 +494,7 @@ class LinTSTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, [3, 4])
+        self.assertEqual(arm, [2, 2])
 
         b_1 = mab._imp.arm_to_model[1].beta
         self.assertTrue(math.isclose(-0.0825688, b_1[0], abs_tol=0.00001))

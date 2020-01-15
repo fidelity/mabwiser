@@ -8,7 +8,7 @@
 This module provides a number of constants and helper functions.
 """
 
-import numpy.random as random
+import numpy as np
 
 from typing import Dict, Union, NamedTuple, NewType, NoReturn
 
@@ -35,7 +35,20 @@ class Constants(NamedTuple):
 
 class RandomGenerator:
     def __init__(self, seed):
-        self.rng = random.default_rng(seed=seed)
+
+        self.rng = np.random.RandomState(seed=seed)
+
+        # Note: To change to use np.random.Generator
+        # self.rng = np.random.default_rng(seed=seed_sequence.generate_state(1)[0])
+
+    @staticmethod
+    def get_random_generator(seed):
+        rng_generator = RandomGenerator(seed)
+        return rng_generator.rng
+
+    @staticmethod
+    def get_state(rng):
+        return rng.get_state()[1][0]
 
 
 def argmax(dictionary: Dict[Arm, Num]) -> Arm:
