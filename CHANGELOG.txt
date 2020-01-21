@@ -10,7 +10,7 @@ major:
 - New Algorithm: Linear Thompson Sampling (LinTS)
 - LinTS implementation uses deterministic sampling of a multivariate normal distribution of the regression coefficients.
 - Adapted from Agrawal, Shipra and Navin Goyal. "Thompson Sampling for Contextual Bandits with Linear Payoffs." ICML 2013.
-- The implementation is based on a design by Anshuman Pradhan (anshuman.pradhan@frm.com) and Pramod R (pramod.r@fmr.com)
+- The implementation is based on a design by Anshuman Pradhan (anshuman.pradhan@fmr.com) and Pramod R (pramod.r@fmr.com)
 
 minor:
 - Scikit-learn version dependency on 0.22.0 or greater which provides a bug fix for sklearn.cluster.KMeans
