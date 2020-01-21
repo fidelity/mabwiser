@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, RandomGenerator, argmax
+from mabwiser.utils import Arm, Num, argmax
 
 
 class _RidgeRegression:
@@ -46,10 +46,7 @@ class _RidgeRegression:
         # Update A
         self.A = self.A + np.dot(Xt, X)
 
-        try:
-            self.A_inv = np.linalg.inv(self.A)
-        except np.linalg.LinAlgError:
-            pass
+        self.A_inv = np.linalg.inv(self.A)
 
         # Add new Xty values to old
         self.Xty = self.Xty + np.dot(Xt, y)
@@ -57,7 +54,7 @@ class _RidgeRegression:
         # Recalculate beta coefficients
         self.beta = np.dot(self.A_inv, self.Xty)
 
-    def predict(self, x, generator=None):
+    def predict(self, x):
 
         # Scale
         if self.scaler is not None:
@@ -73,7 +70,7 @@ class _RidgeRegression:
 
 class _LinTS(_RidgeRegression):
 
-    def predict(self, x, generator=None):
+    def predict(self, x):
 
         # Scale
         if self.scaler is not None:
@@ -82,21 +79,26 @@ class _LinTS(_RidgeRegression):
         # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
         exploration = np.square(self.alpha) * self.A_inv
 
-        # Multivariate Normal Sampling
-        # Adapted from the implementation in numpy.random.generator.multivariate_normal
-        # Use of the cholesky implementation from numpy.linalg instead of numpy.dual ensures
-        # reproducibility in serial vs parallel settings
-        sampled_norm = generator.standard_normal(self.beta.shape[0])
-        covar_decomposed = np.linalg.cholesky(exploration)
-        beta_sampled = self.beta + np.dot(sampled_norm, covar_decomposed)
+        beta_sampled = self._multivariate_normal(exploration)
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
 
+    def _multivariate_normal(self, exploration):
+        # Multivariate Normal Sampling
+        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
+        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
+
+        sampled_norm = self.rng.standard_normal(self.beta.shape[0])
+
+        covar_decomposed = np.linalg.cholesky(exploration)
+
+        return self.beta + np.dot(sampled_norm, covar_decomposed)
+
 
 class _LinUCB(_RidgeRegression):
 
-    def predict(self, x, generator=None):
+    def predict(self, x):
 
         # Scale
         if self.scaler is not None:
@@ -191,14 +193,13 @@ class _Linear(BaseMAB):
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
-            generator = None
-            if self.regression == "ts":
-                generator = RandomGenerator.get_random_generator(seed=seeds[index])
+            rng = np.random.RandomState(seed=seeds[index])
 
             for arm in arms:
+                arm_to_model[arm].rng = rng
 
                 # Get the expectation of each arm from its trained model
-                arm_to_expectation[arm] = arm_to_model[arm].predict(row, generator)
+                arm_to_expectation[arm] = arm_to_model[arm].predict(row)
 
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)

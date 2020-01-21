@@ -1007,4 +1007,4 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend='threading')
 
-        self.assertEqual(arm, [1, 4, 4, 3, 3, 4, 4, 3, 4, 5])  # [3, 4, 3, 4, 4, 3, 4, 3, 4, 3]
+        self.assertEqual(arm, [1, 4, 4, 3, 3, 4, 4, 3, 4, 5])

@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.7.1 of December 17, 2019
+:Version: 1.8.0 of January 21, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -28,11 +28,11 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Constants, Arm, Num, RandomGenerator, check_true, check_false
+from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.7.1"
+__version__ = "1.8.0"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
@@ -124,7 +124,7 @@ class LearningPolicy(NamedTuple):
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 < self.alpha, ValueError("The value of alpha must be greater than zero."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_norm must be an integer or float."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 < self.l2_lambda, ValueError("The value of l2_lambda must be greater than zero."))
             if self.arm_to_scaler is not None:
                 check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
@@ -184,7 +184,7 @@ class LearningPolicy(NamedTuple):
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_norm must be an integer or float."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
             if self.arm_to_scaler is not None:
                 check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
@@ -632,8 +632,7 @@ class MAB:
         self.backend = backend
 
         # Create the random number generator
-        # self._rng = np.random.RandomState(seed=self.seed)
-        self._rng = RandomGenerator.get_random_generator(seed=self.seed)
+        self._rng = np.random.RandomState(seed=self.seed)
         self._is_initial_fit = False
 
         # Create the learning policy implementor

@@ -21,7 +21,7 @@ packages. The following packages are used currently:
 	joblib
 	numpy
 	pandas
-	scikit-learn
+	scikit-learn>=0.22.0
 	scipy
 	seaborn>=0.9.0
 

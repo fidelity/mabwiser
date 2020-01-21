@@ -16,7 +16,7 @@ import multiprocessing as mp
 from joblib import Parallel, delayed
 import numpy as np
 
-from mabwiser.utils import Arm, Num, RandomGenerator
+from mabwiser.utils import Arm, Num
 
 
 class BaseMAB(metaclass=abc.ABCMeta):
@@ -165,7 +165,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         total_contexts = sum(n_contexts)
 
         # Get seed value for each context
-        seeds = RandomGenerator.get_rng_seeds(self.rng, total_contexts)
+        seeds = self.rng.randint(np.iinfo(np.int32).max, size=total_contexts)
 
         # Perform parallel predictions
         predictions = Parallel(n_jobs=n_jobs, backend=self.backend)(
