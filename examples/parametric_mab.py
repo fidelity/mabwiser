@@ -114,7 +114,7 @@ assert(prediction == [1, 2])
 # Linear Thompson Sampling Learning Policy
 ##################################################
 
-# LinUCB learning policy with alpha 1.25 and l2_lambda 1
+# LinTS learning policy with alpha 1.25 and l2_lambda 1
 lints = MAB(arms=ads,
              learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
 
@@ -141,7 +141,7 @@ lints.add_arm(6)
 # LinTS Learning Policy combined with Radius Neighborhood Policy
 ###################################################################
 
-# Radius context policy with radius equals to 1 and LinUCB learning with alpha of 1
+# Radius context policy with radius equals to 1 and LinTS learning with alpha of 1
 radius = MAB(arms=ads,
              learning_policy=LearningPolicy.LinTS(alpha=0.5),
              neighborhood_policy=NeighborhoodPolicy.Radius(radius=1))
@@ -163,7 +163,7 @@ assert(prediction == [1, 2])
 # LinTS Learning Policy combined with KNearest Neighborhood Policy
 #####################################################################
 
-# KNearest context policy with k equals to 4 and LinUCB learning with alpha of 1.25
+# KNearest context policy with k equals to 4 and LinTS learning with alpha of 1.25
 knearest = MAB(arms=ads,
                learning_policy=LearningPolicy.LinTS(alpha=1),
                neighborhood_policy=NeighborhoodPolicy.KNearest(k=4))

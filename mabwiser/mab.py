@@ -609,7 +609,7 @@ class MAB:
         ValueError: Duplicate values in arms.
         ValueError: Number of parallel jobs is 0.
         ValueError: For EpsilonGreedy, epsilon must be between 0 and 1.
-        ValueError: For LinTS, alpha cannot be negative.
+        ValueError: For LinTS, alpha must be greater than zero.
         ValueError: For LinTS, l2_lambda must be greater than zero.
         ValueError: For LinUCB, alpha cannot be negative.
         ValueError: For LinUCB, l2_lambda cannot be negative.
