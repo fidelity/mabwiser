@@ -118,7 +118,6 @@ class _Radius(_Neighbors):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            # lp.rng = np.random.RandomState(seeds[index])
             lp.rng = np.random.RandomState(seed=seeds[index])
 
             # Calculate the distances from the historical contexts

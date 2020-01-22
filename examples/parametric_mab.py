@@ -116,7 +116,7 @@ assert(prediction == [1, 2])
 
 # LinTS learning policy with alpha 1.25 and l2_lambda 1
 lints = MAB(arms=ads,
-             learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
+            learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
 
 # Learn from previous ads shown and revenues generated
 lints.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)

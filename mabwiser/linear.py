@@ -45,7 +45,6 @@ class _RidgeRegression:
 
         # Update A
         self.A = self.A + np.dot(Xt, X)
-
         self.A_inv = np.linalg.inv(self.A)
 
         # Add new Xty values to old
@@ -64,7 +63,10 @@ class _RidgeRegression:
         return np.dot(x, self.beta)
 
     def _scale_predict_context(self, x):
+        # Reshape 1D array to 2D
         x = x.reshape(1, -1)
+
+        # Transform and return to previous shape. Convert to float64 to suppress any type warnings.
         return self.scaler.transform(x.astype('float64')).reshape(-1)
 
 
@@ -76,9 +78,10 @@ class _LinTS(_RidgeRegression):
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
-        # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
+        # Calculate the covariance matrix multiplied by alpha squred
         exploration = np.square(self.alpha) * self.A_inv
 
+        # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
         beta_sampled = self._multivariate_normal(exploration)
 
         # Calculate expectation y = x * beta_sampled
@@ -91,6 +94,7 @@ class _LinTS(_RidgeRegression):
 
         sampled_norm = self.rng.standard_normal(self.beta.shape[0])
 
+        # Use exploration factor of covariance * alpha^2
         covar_decomposed = np.linalg.cholesky(exploration)
 
         return self.beta + np.dot(sampled_norm, covar_decomposed)
@@ -193,9 +197,11 @@ class _Linear(BaseMAB):
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
+            # Each row needs a separately seeded rng for reproducibility in parallel
             rng = np.random.RandomState(seed=seeds[index])
 
             for arm in arms:
+                # Copy the row rng to the deep copied model in arm_to_model
                 arm_to_model[arm].rng = rng
 
                 # Get the expectation of each arm from its trained model
