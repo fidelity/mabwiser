@@ -10,8 +10,6 @@ different policies and performing hyper-parameter tuning. MABWiser follows a sci
 MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments.
 
 ## Quick Start
-MABWiser can be installed from the wheel file or building from source by following the instructions in 
-our [documentation](https://fmr-llc.github.io/mabwiser/installation.html).
 
 ```python
 # An example that shows how to use the UCB1 learning policy
@@ -39,6 +37,7 @@ mab.predict()
 
 Available Learning Policies:
 * Epsilon Greedy
+* LinTS
 * LinUCB
 * Softmax
 * Thompson Sampling (TS)
@@ -49,6 +48,10 @@ Available Neighborhood Policies:
 * K-Nearest
 * Radius
 
+## Installation
+
+MABWiser can be installed from the wheel file or building from source by following the instructions in 
+our [documentation](https://fmr-llc.github.io/mabwiser/installation.html).
 
 ## Support
 

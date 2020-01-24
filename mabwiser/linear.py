@@ -57,11 +57,47 @@ class _RidgeRegression:
 
         # Scale
         if self.scaler is not None:
-            x = x.reshape(1, -1)
-            x = self.scaler.transform(x.astype('float64')).reshape(-1)
+            x = self._scale_predict_context(x)
 
         # Calculate default expectation y = x * b
         return np.dot(x, self.beta)
+
+    def _scale_predict_context(self, x):
+        # Reshape 1D array to 2D
+        x = x.reshape(1, -1)
+
+        # Transform and return to previous shape. Convert to float64 to suppress any type warnings.
+        return self.scaler.transform(x.astype('float64')).reshape(-1)
+
+
+class _LinTS(_RidgeRegression):
+
+    def predict(self, x):
+
+        # Scale
+        if self.scaler is not None:
+            x = self._scale_predict_context(x)
+
+        # Calculate the covariance matrix multiplied by alpha squred
+        exploration = np.square(self.alpha) * self.A_inv
+
+        # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
+        beta_sampled = self._multivariate_normal(exploration)
+
+        # Calculate expectation y = x * beta_sampled
+        return np.dot(x, beta_sampled)
+
+    def _multivariate_normal(self, exploration):
+        # Multivariate Normal Sampling
+        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
+        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
+
+        sampled_norm = self.rng.standard_normal(self.beta.shape[0])
+
+        # Use exploration factor of covariance * alpha^2
+        covar_decomposed = np.linalg.cholesky(exploration)
+
+        return self.beta + np.dot(sampled_norm, covar_decomposed)
 
 
 class _LinUCB(_RidgeRegression):
@@ -70,8 +106,7 @@ class _LinUCB(_RidgeRegression):
 
         # Scale
         if self.scaler is not None:
-            x = x.reshape(1, -1)
-            x = self.scaler.transform(x.astype('float64')).reshape(-1)
+            x = self._scale_predict_context(x)
 
         # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
         ucb = (self.alpha * np.sqrt(np.dot(np.dot(x, self.A_inv), x)))
@@ -82,7 +117,7 @@ class _LinUCB(_RidgeRegression):
 
 class _Linear(BaseMAB):
 
-    factory = {"ucb": _LinUCB, "ridge": _RidgeRegression}
+    factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  l2_lambda: Num, alpha: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
@@ -162,10 +197,16 @@ class _Linear(BaseMAB):
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
+            # Each row needs a separately seeded rng for reproducibility in parallel
+            rng = np.random.RandomState(seed=seeds[index])
 
             for arm in arms:
+                # Copy the row rng to the deep copied model in arm_to_model
+                arm_to_model[arm].rng = rng
+
                 # Get the expectation of each arm from its trained model
                 arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)
             else:

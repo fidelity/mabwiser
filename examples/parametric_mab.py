@@ -109,3 +109,74 @@ expectations = knearest.predict_expectations(test)
 # Results
 print("KNearest: ", prediction, " ", expectations)
 assert(prediction == [1, 2])
+
+##################################################
+# Linear Thompson Sampling Learning Policy
+##################################################
+
+# LinTS learning policy with alpha 1.25 and l2_lambda 1
+lints = MAB(arms=ads,
+            learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
+
+# Learn from previous ads shown and revenues generated
+lints.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+
+# Predict the next best ad to show
+prediction = lints.predict(test)
+
+# Expectation of each ad based on learning from past ad revenues
+expectations = lints.predict_expectations(test)
+
+# Results
+print("LinTS: ", prediction, " ", expectations)
+assert(prediction == [5, 2])
+
+# Online update of model
+lints.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+
+# Update the model with new arm
+lints.add_arm(6)
+
+###################################################################
+# LinTS Learning Policy combined with Radius Neighborhood Policy
+###################################################################
+
+# Radius context policy with radius equals to 1 and LinTS learning with alpha of 1
+radius = MAB(arms=ads,
+             learning_policy=LearningPolicy.LinTS(alpha=0.5),
+             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1))
+
+# Learn from previous ads shown and revenues generated
+radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+
+# Predict the next best ad to show
+prediction = radius.predict(test)
+
+# Expectation of each ad based on learning from past ad revenues
+expectations = radius.predict_expectations(test)
+
+# Results
+print("Radius: ", prediction, " ", expectations)
+assert(prediction == [1, 2])
+
+#####################################################################
+# LinTS Learning Policy combined with KNearest Neighborhood Policy
+#####################################################################
+
+# KNearest context policy with k equals to 4 and LinTS learning with alpha of 1.25
+knearest = MAB(arms=ads,
+               learning_policy=LearningPolicy.LinTS(alpha=1),
+               neighborhood_policy=NeighborhoodPolicy.KNearest(k=4))
+
+# Learn from previous ads shown and revenues generated
+knearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+
+# Predict the next best ad to show
+prediction = knearest.predict(test)
+
+# Expectation of each ad based on learning from past ad revenues
+expectations = knearest.predict_expectations(test)
+
+# Results
+print("KNearest: ", prediction, " ", expectations)
+assert(prediction == [1, 2])

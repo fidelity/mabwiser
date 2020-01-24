@@ -102,7 +102,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [2, 3])
+        self.assertListEqual(arms, [2, 2])
         self.assertEqual(mab._imp.kmeans.n_clusters, 3)
 
     def test_greedy1_n3(self):
@@ -231,7 +231,7 @@ class ClustersTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp_list[0].is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [3, 4])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -271,7 +271,7 @@ class ClustersTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp_list[0].is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [3, 4])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)

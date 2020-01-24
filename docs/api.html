@@ -173,7 +173,7 @@
 <p>This module defines the abstract base class for contextual multi-armed bandit algorithms.</p>
 <dl class="class">
 <dt id="mabwiser.base_mab.BaseMAB">
-<em class="property">class </em><code class="sig-prename descclassname">mabwiser.base_mab.</code><code class="sig-name descname">BaseMAB</code><span class="sig-paren">(</span><em class="sig-param">rng: mtrand.RandomState, arms: List[NewType.&lt;locals&gt;.new_type], n_jobs: int, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.base_mab.</code><code class="sig-name descname">BaseMAB</code><span class="sig-paren">(</span><em class="sig-param">rng: numpy.random.mtrand.RandomState, arms: List[NewType.&lt;locals&gt;.new_type], n_jobs: int, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract base class for multi-armed bandits.</p>
 <p>This module is not intended to be used directly, instead it declares
@@ -290,7 +290,7 @@ decision and reward history and corresponding contexts if any.</p>
 <dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
 </dd>
 <dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.7.0 of November 27, 2019</p>
+<dd class="field-odd"><p>1.8.0 of January 21, 2020</p>
 </dd>
 </dl>
 <p>This module defines the public interface of the <strong>MABWiser Library</strong> providing access to the following modules:</p>
@@ -326,7 +326,7 @@ Default value is 0.05.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -340,6 +340,97 @@ Default value is 0.05.</p>
 <dt>
 <em class="property">property </em><code class="sig-name descname">epsilon</code></dt>
 <dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.LinTS">
+<em class="property">class </em><code class="sig-name descname">LinTS</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>LinTS Learning Policy</p>
+<p>For each arm LinTS trains a ridge regression and
+creates a multivariate normal distribution for the coefficients using the
+calculated coefficients as the mean and the covariance as:</p>
+<div class="math notranslate nohighlight">
+\[\alpha^{2} (x_i^{T}x_i + \lambda * I_d)^{-1}\]</div>
+<p>The normal distribution is randomly sampled to obtain
+expected coefficients for the ridge regression for each
+prediction.</p>
+<p><span class="math notranslate nohighlight">\(\alpha\)</span> is a factor used to adjust how conservative the estimate is.
+Higher <span class="math notranslate nohighlight">\(\alpha\)</span> values promote more exploration.</p>
+<p>The multivariate normal distribution uses Cholesky decomposition to guarantee deterministic behavior.
+This method requires that the covariance is a positive definite matrix.
+To ensure this is the case, alpha and l2_lambda are required to be greater than zero.</p>
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinTS.alpha">
+<code class="sig-name descname">alpha</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinTS.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>The multiplier to determine the degree of exploration.
+Integer or float. Must be greater than zero.
+Default value is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinTS.l2_lambda">
+<code class="sig-name descname">l2_lambda</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinTS.l2_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>The regularization strength.
+Integer or float. Must be greater than zero.
+Default value is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mabwiser.mab.LearningPolicy.LinTS.arm_to_scaler">
+<code class="sig-name descname">arm_to_scaler</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinTS.arm_to_scaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standardize context features by arm.
+Dictionary mapping each arm to a scaler object. It is assumed
+that the scaler objects are already fit and will only be used
+to transform context features.
+Default value is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[Arm, Callable]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">LinTS</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">alpha</code></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">arm_to_scaler</code></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">l2_lambda</code></dt>
+<dd><p>Alias for field number 1</p>
 </dd></dl>
 
 </dd></dl>
@@ -402,7 +493,7 @@ Default value is None.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -440,7 +531,7 @@ Default value is None.</p>
 <p>Random Learning Policy.</p>
 <p>Returns a random arm for each prediction.</p>
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -478,7 +569,7 @@ Default value is 1.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -523,7 +614,7 @@ as a success, i.e., <cite>True/1</cite> based on the reward or <cite>False/0</ci
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -533,7 +624,7 @@ as a success, i.e., <cite>True/1</cite> based on the reward or <cite>False/0</ci
 <span class="go">&#39;Arm2&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arm_to_threshold</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Arm1&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
@@ -582,7 +673,7 @@ Default value is 1.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -604,7 +695,7 @@ Default value is 1.</p>
 
 <dl class="class">
 <dt id="mabwiser.mab.MAB">
-<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">MAB</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">MAB</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinTS, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>MABWiser: Contextual Multi-Armed Bandit Library</strong></p>
 <p>MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
@@ -700,7 +791,7 @@ called function relies a lot on Python objects.</p></li>
 </dd></dl>
 
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -714,7 +805,7 @@ called function relies a lot on Python objects.</p></li>
 <span class="go">&#39;Arm3&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>
@@ -965,7 +1056,7 @@ Supports <code class="docutils literal notranslate"><span class="pre">KMeans</sp
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
@@ -1024,7 +1115,7 @@ Default value is Euclidean distance.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
@@ -1096,7 +1187,7 @@ The probabilities should sum up to 1.</p>
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
@@ -1140,7 +1231,7 @@ The probabilities should sum up to 1.</p>
 <dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
 </dd>
 <dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.7.0 of November 27, 2019</p>
+<dd class="field-odd"><p>1.8.0 of January 21, 2020</p>
 </dd>
 </dl>
 <p>This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.</p>
@@ -1435,7 +1526,7 @@ If input was not zero-indexed, these will reflect their position in the input ra
 </dd></dl>
 
 <p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>

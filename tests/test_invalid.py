@@ -92,12 +92,36 @@ class InvalidTest(BaseTest):
                          num_run=1,
                          is_predict=True)
 
+        with self.assertRaises(ValueError):
+            self.predict(arms=[1, 2, 3],
+                         decisions=[1, 1, 1],
+                         rewards=[0, 0, 0],
+                         learning_policy=LearningPolicy.LinTS(alpha=0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         context_history=np.array([1, 1, 1]),
+                         contexts=np.array([[1, 1]]),
+                         seed=123456,
+                         num_run=1,
+                         is_predict=True)
+
     def test_invalid_ridge_alpha_type(self):
         with self.assertRaises(TypeError):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinUCB(alpha=None),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         context_history=np.array([1, 1, 1]),
+                         contexts=np.array([[1, 1]]),
+                         seed=123456,
+                         num_run=1,
+                         is_predict=True)
+
+        with self.assertRaises(TypeError):
+            self.predict(arms=[1, 2, 3],
+                         decisions=[1, 1, 1],
+                         rewards=[0, 0, 0],
+                         learning_policy=LearningPolicy.LinTS(alpha=None),
                          neighborhood_policy=NeighborhoodPolicy.KNearest(2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
@@ -118,12 +142,36 @@ class InvalidTest(BaseTest):
                          num_run=1,
                          is_predict=True)
 
+        with self.assertRaises(ValueError):
+            self.predict(arms=[1, 2, 3],
+                         decisions=[1, 1, 1],
+                         rewards=[0, 0, 0],
+                         learning_policy=LearningPolicy.LinTS(alpha=1, l2_lambda=0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         context_history=np.array([1, 1, 1]),
+                         contexts=np.array([[1, 1]]),
+                         seed=123456,
+                         num_run=1,
+                         is_predict=True)
+
     def test_invalid_ridge_l2_lambda_type(self):
         with self.assertRaises(TypeError):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinUCB(alpha=1, l2_lambda=None),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         context_history=np.array([1, 1, 1]),
+                         contexts=np.array([[1, 1]]),
+                         seed=123456,
+                         num_run=1,
+                         is_predict=True)
+
+        with self.assertRaises(TypeError):
+            self.predict(arms=[1, 2, 3],
+                         decisions=[1, 1, 1],
+                         rewards=[0, 0, 0],
+                         learning_policy=LearningPolicy.LinTS(alpha=1, l2_lambda=None),
                          neighborhood_policy=NeighborhoodPolicy.KNearest(2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
@@ -162,6 +210,9 @@ class InvalidTest(BaseTest):
 
         with self.assertRaises(TypeError):
             MAB(['a', 'b'], LearningPolicy.LinUCB(tau=1))
+
+        with self.assertRaises(TypeError):
+            MAB(['a', 'b'], LearningPolicy.LinTS(epsilon=1))
 
     def test_invalid_context_policy(self):
         with self.assertRaises(TypeError):

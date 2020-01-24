@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.7.1 of December 17, 2019
+:Version: 1.8.0 of January 21, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -32,7 +32,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.7.1"
+__version__ = "1.8.0"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
@@ -66,6 +66,68 @@ class LearningPolicy(NamedTuple):
         def _validate(self):
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("The value of epsilon must be between 0 and 1."))
+
+    class LinTS(NamedTuple):
+        """ LinTS Learning Policy
+
+        For each arm LinTS trains a ridge regression and
+        creates a multivariate normal distribution for the coefficients using the
+        calculated coefficients as the mean and the covariance as:
+
+        .. math::
+            \\alpha^{2} (x_i^{T}x_i + \\lambda * I_d)^{-1}
+
+        The normal distribution is randomly sampled to obtain
+        expected coefficients for the ridge regression for each
+        prediction.
+
+        :math:`\\alpha` is a factor used to adjust how conservative the estimate is.
+        Higher :math:`\\alpha` values promote more exploration.
+
+        The multivariate normal distribution uses Cholesky decomposition to guarantee deterministic behavior.
+        This method requires that the covariance is a positive definite matrix.
+        To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
+
+        Attributes
+        ----------
+        alpha: Num
+            The multiplier to determine the degree of exploration.
+            Integer or float. Must be greater than zero.
+            Default value is 1.0.
+        l2_lambda: Num
+            The regularization strength.
+            Integer or float. Must be greater than zero.
+            Default value is 1.0.
+        arm_to_scaler: Dict[Arm, Callable]
+            Standardize context features by arm.
+            Dictionary mapping each arm to a scaler object. It is assumed
+            that the scaler objects are already fit and will only be used
+            to transform context features.
+            Default value is None.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+            >>> mab = MAB(list_of_arms, LearningPolicy.LinTS(alpha=0.25))
+            >>> mab.fit(decisions, rewards, contexts)
+            >>> mab.predict([[3, 2, 0, 1]])
+            'Arm2'
+        """
+        alpha: Num = 1.0
+        l2_lambda: Num = 1.0
+        arm_to_scaler: Dict[Arm, Callable] = None
+
+        def _validate(self):
+            check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
+            check_true(0 < self.alpha, ValueError("The value of alpha must be greater than zero."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
+            check_true(0 < self.l2_lambda, ValueError("The value of l2_lambda must be greater than zero."))
+            if self.arm_to_scaler is not None:
+                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
 
     class LinUCB(NamedTuple):
         """LinUCB Learning Policy.
@@ -122,7 +184,7 @@ class LearningPolicy(NamedTuple):
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_norm must be an integer or float."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
             if self.arm_to_scaler is not None:
                 check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
@@ -480,6 +542,7 @@ class MAB:
                                         LearningPolicy.Softmax,
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
+                                        LearningPolicy.LinTS,
                                         LearningPolicy.LinUCB],                     # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.Clusters,
@@ -528,6 +591,8 @@ class MAB:
         TypeError:  Number of parallel jobs is not an integer.
         TypeError:  Parallel backend is not a string.
         TypeError:  For EpsilonGreedy, epsilon must be integer or float.
+        TypeError:  For LinTS, alpha must be an integer or float.
+        TypeError:  For LinTS, l2_lambda must be an integer or float.
         TypeError:  For LinUCB, alpha must be an integer or float.
         TypeError:  For LinUCB, l2_lambda must be an integer or float.
         TypeError:  For Softmax, tau must be an integer or float.
@@ -544,8 +609,10 @@ class MAB:
         ValueError: Duplicate values in arms.
         ValueError: Number of parallel jobs is 0.
         ValueError: For EpsilonGreedy, epsilon must be between 0 and 1.
-        ValueError: For LinUCB, alpha must be greater than zero.
-        ValueError: For LinUCB, l2_lambda must be greater than zero.
+        ValueError: For LinTS, alpha must be greater than zero.
+        ValueError: For LinTS, l2_lambda must be greater than zero.
+        ValueError: For LinUCB, alpha cannot be negative.
+        ValueError: For LinUCB, l2_lambda cannot be negative.
         ValueError: For Softmax, tau must be greater than zero.
         ValueError: For UCB, alpha must be greater than zero.
         ValueError: For Clusters, n_clusters cannot be less than 2.
@@ -580,6 +647,9 @@ class MAB:
             lp = _ThompsonSampling(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.binarizer)
         elif isinstance(learning_policy, LearningPolicy.UCB1):
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
+        elif isinstance(learning_policy, LearningPolicy.LinTS):
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
+                         learning_policy.alpha, "ts", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
                          learning_policy.alpha, "ucb", learning_policy.arm_to_scaler)
@@ -606,7 +676,7 @@ class MAB:
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
-            self.is_contextual = isinstance(learning_policy, LearningPolicy.LinUCB)
+            self.is_contextual = isinstance(learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB))
             self._imp = lp
 
     @property
@@ -636,7 +706,10 @@ class MAB:
             arm_to_scaler = dict()
             for arm in lp.arms:
                 arm_to_scaler[arm] = lp.arm_to_model[arm].scaler
-            return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, arm_to_scaler)
+            if lp.regression == 'ts':
+                return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, arm_to_scaler)
+            else:
+                return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, arm_to_scaler)
         elif isinstance(lp, _Random):
             return LearningPolicy.Random()
         elif isinstance(lp, _Softmax):
@@ -924,7 +997,8 @@ class MAB:
         # Learning Policy type
         check_true(isinstance(learning_policy,
                               (LearningPolicy.EpsilonGreedy, LearningPolicy.Random, LearningPolicy.Softmax,
-                               LearningPolicy.ThompsonSampling, LearningPolicy.UCB1, LearningPolicy.LinUCB)),
+                               LearningPolicy.ThompsonSampling, LearningPolicy.UCB1, LearningPolicy.LinTS,
+                               LearningPolicy.LinUCB)),
                    TypeError("Learning Policy type mismatch."))
 
         # Learning policy value
@@ -1098,7 +1172,7 @@ class MAB:
 
             else:  # For predictions, compare the shape to the stored context history
 
-                if isinstance(self.learning_policy, LearningPolicy.LinUCB):
+                if isinstance(self.learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size
