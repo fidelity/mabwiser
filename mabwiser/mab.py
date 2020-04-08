@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.8.0 of January 21, 2020
+:Version: 1.8.1 of April 8, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -32,7 +32,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
