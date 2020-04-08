@@ -2,6 +2,12 @@
 MABWiser CHANGELOG
 =====================
 
+-------------------------------------------------------------------------------
+April, 8, 2020 1.8.1
+-------------------------------------------------------------------------------
+minor:
+- Correction for how Softmax normalizes exponents to prevent overflow.
+- Removal of Simulator matplotlib backend specification to eliminate Mac OS error.
 
 -------------------------------------------------------------------------------
 January, 21, 2020 1.8.0

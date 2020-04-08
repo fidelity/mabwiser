@@ -68,7 +68,7 @@ sfm.fit(decisions=layouts, rewards=revenues)
 prediction = sfm.predict()
 expectations = sfm.predict_expectations()
 print("Softmax: ", prediction, " ", expectations)
-assert(prediction == 1)
+assert(prediction == 2)
 
 # Online updating of the model
 sfm.partial_fit(additional_layouts, additional_revenues)

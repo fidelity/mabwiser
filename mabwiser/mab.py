@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.8.0 of January 21, 2020
+:Version: 1.8.1 of April 8, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -32,7 +32,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 __copyright__ = "Copyright (C) 2019, FMR LLC"
 
 
@@ -216,8 +216,8 @@ class LearningPolicy(NamedTuple):
         The average reward is calculated as a logistic function with each probability as:
 
         .. math::
-            P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau * (\\max{\\mu} - \\min{\\mu})} }
-            { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau * (\\max{\\mu} - \\min{\\mu})}}  }
+            P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
+            { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
 
         where :math:`\\mu_i` is the mean for that arm and :math:`\\tau` is the "temperature" to determine the degree of
         exploration.
@@ -238,7 +238,7 @@ class LearningPolicy(NamedTuple):
             >>> mab = MAB(list_of_arms, LearningPolicy.Softmax(tau=1))
             >>> mab.fit(decisions, rewards)
             >>> mab.predict()
-            'Arm1'
+            'Arm2'
         """
         tau: Num = 1
 

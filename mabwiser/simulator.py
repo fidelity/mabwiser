@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.8.0 of January 21, 2020
+:Version: 1.8.1 of April 8, 2020
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -15,7 +15,6 @@ from itertools import chain
 from typing import Union, List, Optional, NoReturn
 
 import matplotlib
-matplotlib.use('TkAgg')
 
 import math
 import matplotlib.pyplot as plt

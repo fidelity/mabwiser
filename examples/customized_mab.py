@@ -31,9 +31,9 @@ from mabwiser.utils import argmax, Arm, Num
 
 class CustomGreedy(_EpsilonGreedy):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, margin: Num):
+    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, margin: Num, backend: str = None):
         # initialize the parent class as is
-        super().__init__(rng, arms, n_jobs)
+        super().__init__(rng, arms, n_jobs, backend)
 
         # save the given operational cost margin
         self.margin = margin
@@ -118,9 +118,9 @@ assert(prediction == 2)
 
 
 class LinUCBColdStart(_Linear):
-    def __init__(self, rng, arms, n_jobs, alpha, l2_lambda=1.0, features=None):
+    def __init__(self, rng, arms, n_jobs, backend, alpha, l2_lambda=1.0, features=None):
         # initialize the parent class as is
-        super().__init__(rng, arms, n_jobs, alpha, l2_lambda, 'ucb')
+        super().__init__(rng, arms, n_jobs, backend, alpha, l2_lambda, 'ucb')
 
         # save the feature vectors
         self.features = features
@@ -211,7 +211,8 @@ contexts = np.array([[0, 0.5, 0.7, 0.15], [1, 0.25, -0.7, 1.0], [0, -0.5, 0.7, 1
 article_content = {1: [1, 1, 1], 2: [0, 0, 0.01], 3: [0.1, 0, 1], 4: [1, .5, .2], 5: [0.2, 0, 0.1], 6: [1, 1, 1]}
 
 # Custom LinUCB with content features
-linucb = LinUCBColdStart(rng=rng, arms=articles, n_jobs=1, alpha=1.0, l2_lambda=1.0, features=article_content)
+linucb = LinUCBColdStart(rng=rng, arms=articles, n_jobs=1, backend=None, alpha=1.0, l2_lambda=1.0,
+                         features=article_content)
 
 # Learn from previous article decisions and clicks
 linucb.fit(decisions=shown, rewards=clicked, contexts=contexts)

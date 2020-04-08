@@ -58,7 +58,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=1,
                                 is_predict=False)
 
-        self.assertDictEqual(arm, {1: 0.4400020160666845, 2: 0.16186769578491988, 3: 0.39813028814839563})
+        self.assertDictEqual(arm, {1: 0.4083425853583662, 2: 0.20965007375301267, 3: 0.3820073408886212})
 
     def test_tau1_np(self):
 
@@ -134,7 +134,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 4, 2, 4])
+        self.assertEqual(arm, [4, 4, 4, 4])
 
     def test_softmax_t4(self):
 
@@ -146,7 +146,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [2, 4, 4, 2])
+        self.assertEqual(arm, [4, 4, 4, 4])
 
     def test_softmax_t5(self):
 
@@ -170,7 +170,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, ['one', 'three', 'one', 'one'])
+        self.assertEqual(arm, ['two', 'three', 'one', 'one'])
 
     def test_softmax_t7(self):
 
@@ -194,7 +194,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, ['a', 'c', 'c', 'a', 'b'])
+        self.assertEqual(arm, ['c', 'c', 'c', 'c', 'c'])
 
     def test_softmax_t9(self):
 
@@ -211,7 +211,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [a, c, a, c])
+        self.assertEqual(arm, [c, c, c, c])
 
     def test_softmax_t10(self):
 
@@ -228,7 +228,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [b, b, b, b, c])
+        self.assertEqual(arm, [b, b, b, b, b])
 
     def test2_unused_arm(self):
 
@@ -241,13 +241,13 @@ class SoftmaxTest(BaseTest):
                                 is_predict=True)
 
         self.assertTrue(4 in mab._imp.arm_to_expectation.keys())
-        self.assertEqual(arm[13], 3)
+        self.assertEqual(arm[13], 4)
 
         e_x = mab._imp.arm_to_exponent[4]
         prob = mab._imp.arm_to_expectation[4]
 
-        self.assertTrue(math.isclose(e_x, 0.368, abs_tol=0.001))
-        self.assertTrue(math.isclose(prob, 0.139, abs_tol=0.001))
+        self.assertTrue(math.isclose(e_x, 0.513, abs_tol=0.001))
+        self.assertTrue(math.isclose(prob, 0.173, abs_tol=0.001))
 
     def test_fit_twice(self):
 
@@ -265,7 +265,7 @@ class SoftmaxTest(BaseTest):
 
         self.assertTrue(math.isclose(mean, 0.667, abs_tol=0.001))
         self.assertTrue(math.isclose(ex, 1))
-        self.assertTrue(math.isclose(prob, 0.379, abs_tol=0.001))
+        self.assertTrue(math.isclose(prob, 0.338, abs_tol=0.001))
 
         self.assertTrue(4 in arm.keys())
         mean1 = mab._imp.arm_to_mean[4]
@@ -273,8 +273,8 @@ class SoftmaxTest(BaseTest):
         prob1 = arm[4]
 
         self.assertEqual(mean1, 0)
-        self.assertTrue(math.isclose(ex1, 0.368, abs_tol=0.001))
-        self.assertTrue(math.isclose(prob1, 0.139, abs_tol=0.001))
+        self.assertTrue(math.isclose(ex1, 0.513, abs_tol=0.001))
+        self.assertTrue(math.isclose(prob1, 0.173, abs_tol=0.001))
 
         decisions2 = [1, 3, 4]
         rewards2 = [0, 1, 1]
@@ -309,8 +309,8 @@ class SoftmaxTest(BaseTest):
         prob = arm[1]
 
         self.assertTrue(math.isclose(mean, 0.667, abs_tol=0.001))
-        self.assertTrue(math.isclose(ex, 1))
-        self.assertTrue(math.isclose(prob, 0.379, abs_tol=0.001))
+        self.assertTrue(math.isclose(ex, 1.0, abs_tol=0.001))
+        self.assertTrue(math.isclose(prob, 0.338, abs_tol=0.001))
 
         self.assertTrue(4 in arm.keys())
         mean1 = mab._imp.arm_to_mean[4]
@@ -318,8 +318,8 @@ class SoftmaxTest(BaseTest):
         prob1 = arm[4]
 
         self.assertEqual(mean1, 0)
-        self.assertTrue(math.isclose(ex1, 0.368, abs_tol=0.001))
-        self.assertTrue(math.isclose(prob1, 0.139, abs_tol=0.001))
+        self.assertTrue(math.isclose(ex1, 0.513, abs_tol=0.001))
+        self.assertTrue(math.isclose(prob1, 0.173, abs_tol=0.001))
 
         decisions2 = [1, 3, 4]
         rewards2 = [0, 1, 1]
