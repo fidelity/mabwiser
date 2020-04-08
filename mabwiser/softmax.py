@@ -63,14 +63,11 @@ class _Softmax(BaseMAB):
 
         # Scaling range
         max_mean = max(self.arm_to_mean.values())
-        min_mean = min(self.arm_to_mean.values())
-        scaling_range = max_mean - min_mean
-        if scaling_range == 0:
-            scaling_range = 1
 
         # Scale the means and calculate the natural exponents --decrement max to avoid overflow from np.exp(x)
+        # Reference: https://stackoverflow.com/questions/42599498/numercially-stable-softmax
         for arm in self.arm_to_exponent:
-            self.arm_to_exponent[arm] = math.exp((self.arm_to_mean[arm] - max_mean) / (scaling_range * self.tau))
+            self.arm_to_exponent[arm] = math.exp((self.arm_to_mean[arm] - max_mean) / self.tau)
 
         # Total exponent sum
         total_exponent = sum(self.arm_to_exponent.values())

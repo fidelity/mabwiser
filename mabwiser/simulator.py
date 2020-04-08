@@ -15,7 +15,6 @@ from itertools import chain
 from typing import Union, List, Optional, NoReturn
 
 import matplotlib
-matplotlib.use('TkAgg')
 
 import math
 import matplotlib.pyplot as plt

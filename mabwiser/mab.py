@@ -216,8 +216,8 @@ class LearningPolicy(NamedTuple):
         The average reward is calculated as a logistic function with each probability as:
 
         .. math::
-            P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau * (\\max{\\mu} - \\min{\\mu})} }
-            { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau * (\\max{\\mu} - \\min{\\mu})}}  }
+            P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
+            { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
 
         where :math:`\\mu_i` is the mean for that arm and :math:`\\tau` is the "temperature" to determine the degree of
         exploration.
@@ -238,7 +238,7 @@ class LearningPolicy(NamedTuple):
             >>> mab = MAB(list_of_arms, LearningPolicy.Softmax(tau=1))
             >>> mab.fit(decisions, rewards)
             >>> mab.predict()
-            'Arm1'
+            'Arm2'
         """
         tau: Num = 1
 

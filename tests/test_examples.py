@@ -103,7 +103,7 @@ class ExampleTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 1)
+        self.assertEqual(arm, 2)
 
         layout_partial = [1, 2, 1, 2]
         revenue_partial = [0, 12, 7, 19]
