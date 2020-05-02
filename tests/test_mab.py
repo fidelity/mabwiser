@@ -19,8 +19,11 @@ class MABTest(BaseTest):
     ################################################
     def test_learning_policy_property(self):
         for lp in BaseTest.lps:
+            print("Testing: ", lp)
             mab = MAB([1, 2], lp)
             test_lp = mab.learning_policy
+            print("test_lp:", type(test_lp))
+            print("lp:", type(lp))
             self.assertTrue(type(test_lp) is type(lp))
 
         for para_lp in BaseTest.para_lps:

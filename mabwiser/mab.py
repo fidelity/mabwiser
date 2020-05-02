@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.8.1 of April 8, 2020
+:Version: 1.9.0 of May 2, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -24,6 +24,7 @@ from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.neighbors import _KNearest, _Radius
+from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
@@ -32,8 +33,8 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.8.1"
-__copyright__ = "Copyright (C) 2019, FMR LLC"
+__version__ = "1.9.0"
+__copyright__ = "Copyright (C), FMR LLC"
 
 
 class LearningPolicy(NamedTuple):
@@ -188,6 +189,26 @@ class LearningPolicy(NamedTuple):
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
             if self.arm_to_scaler is not None:
                 check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+
+    class Popularity(NamedTuple):
+        """Randomized Popularity Learning Policy.
+
+        Returns a randomized popular arm for each prediction.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> mab = MAB(list_of_arms, LearningPolicy.Popularity())
+            >>> mab.fit(decisions, rewards)
+            >>> mab.predict()
+            'Arm2'
+        """
+
+        def _validate(self):
+            pass
 
     class Random(NamedTuple):
         """Random Learning Policy.
@@ -538,6 +559,7 @@ class MAB:
     def __init__(self,
                  arms: List[Arm],                                                   # The list of arms
                  learning_policy: Union[LearningPolicy.EpsilonGreedy,
+                                        LearningPolicy.Popularity,
                                         LearningPolicy.Random,
                                         LearningPolicy.Softmax,
                                         LearningPolicy.ThompsonSampling,
@@ -639,6 +661,8 @@ class MAB:
         lp = None
         if isinstance(learning_policy, LearningPolicy.EpsilonGreedy):
             lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.epsilon)
+        elif isinstance(learning_policy, LearningPolicy.Popularity):
+            lp = _Popularity(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Random):
             lp = _Random(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Softmax):
@@ -701,7 +725,10 @@ class MAB:
             lp = self._imp
 
         if isinstance(lp, _EpsilonGreedy):
-            return LearningPolicy.EpsilonGreedy(lp.epsilon)
+            if issubclass(type(lp), _Popularity):
+                return LearningPolicy.Popularity()
+            else:
+                return LearningPolicy.EpsilonGreedy(lp.epsilon)
         elif isinstance(lp, _Linear):
             arm_to_scaler = dict()
             for arm in lp.arms:
@@ -996,9 +1023,9 @@ class MAB:
 
         # Learning Policy type
         check_true(isinstance(learning_policy,
-                              (LearningPolicy.EpsilonGreedy, LearningPolicy.Random, LearningPolicy.Softmax,
-                               LearningPolicy.ThompsonSampling, LearningPolicy.UCB1, LearningPolicy.LinTS,
-                               LearningPolicy.LinUCB)),
+                              (LearningPolicy.EpsilonGreedy, LearningPolicy.Popularity, LearningPolicy.Random,
+                               LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
+                               LearningPolicy.LinTS, LearningPolicy.LinUCB)),
                    TypeError("Learning Policy type mismatch."))
 
         # Learning policy value
