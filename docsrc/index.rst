@@ -48,6 +48,26 @@ Source Code
 ===========
 The source code is hosted on `GitHub`_.
 
+Available Bandit Policies
+=========================
+
+Available Learning Policies:
+
+* Epsilon Greedy
+* LinTS
+* LinUCB
+* Popularity
+* Random
+* Softmax
+* Thompson Sampling (TS)
+* Upper Confidence Bound (UCB1)
+
+Available Neighborhood Policies:
+
+* Clusters
+* K-Nearest
+* Radius
+
 Bug Reports
 ===========
 

@@ -294,7 +294,7 @@ decision and reward history and corresponding contexts if any.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Email:</th><td class="field-body"><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.8.1 of April 8, 2020</td>
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.9.0 of May 2, 2020</td>
 </tr>
 </tbody>
 </table>
@@ -551,11 +551,32 @@ Default value is None.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="mabwiser.mab.LearningPolicy.Popularity">
+<em class="property">class </em><code class="descname">Popularity</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.Popularity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Randomized Popularity Learning Policy.</p>
+<p>Returns a randomized popular arm for each prediction.
+The probability of selection for each arm is weighted by their mean reward.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">Popularity</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
 <dt id="mabwiser.mab.LearningPolicy.Random">
 <em class="property">class </em><code class="descname">Random</code><a class="headerlink" href="#mabwiser.mab.LearningPolicy.Random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <p>Random Learning Policy.</p>
-<p>Returns a random arm for each prediction.</p>
+<p>Returns a random arm for each prediction.
+The probability of selection for each arm is uniformly at random.</p>
 <p class="rubric">Example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
@@ -730,7 +751,7 @@ Default value is 1.</p>
 
 <dl class="class">
 <dt id="mabwiser.mab.MAB">
-<em class="property">class </em><code class="descclassname">mabwiser.mab.</code><code class="descname">MAB</code><span class="sig-paren">(</span><em>arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinTS, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mabwiser.mab.</code><code class="descname">MAB</code><span class="sig-paren">(</span><em>arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Popularity, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinTS, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>MABWiser: Contextual Multi-Armed Bandit Library</strong></p>
 <p>MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.

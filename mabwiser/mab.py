@@ -194,6 +194,7 @@ class LearningPolicy(NamedTuple):
         """Randomized Popularity Learning Policy.
 
         Returns a randomized popular arm for each prediction.
+        The probability of selection for each arm is weighted by their mean reward.
 
         Example
         -------
@@ -214,6 +215,7 @@ class LearningPolicy(NamedTuple):
         """Random Learning Policy.
 
         Returns a random arm for each prediction.
+        The probability of selection for each arm is uniformly at random.
 
         Example
         -------
