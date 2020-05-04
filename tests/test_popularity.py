@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
+import numpy as np
+from mabwiser.mab import LearningPolicy, NeighborhoodPolicy, _Popularity
 from tests.test_base import BaseTest
 
 
 class PopularityTest(BaseTest):
+
+    def test(self):
+        import mabwiser.mab as mab
+        print(mab.__version__)
 
     def test_2arm_equal_prob(self):
         arm, mab = self.predict(arms=[1, 2],
@@ -193,3 +198,31 @@ class PopularityTest(BaseTest):
         # Check that normalized probabilities are equal and sum up to 1.0
         self.assertAlmostEqual(1.0, exp[1] + exp[2])
         self.assertAlmostEqual(exp[1], exp[2])
+
+    def test_epsilon_has_no_impact(self):
+
+        # This is super hack test to check that epsilon has no impact
+        # on popularity results
+        arms = ['Arm1', 'Arm2']
+        mab = _Popularity(rng=np.random.RandomState(seed=123456),
+                          arms=arms, n_jobs=1, backend=None)
+        decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+        rewards = [20, 17, 25, 9]
+        mab.fit(np.array(decisions), np.array(rewards))
+
+        # Original result
+        self.assertDictEqual({'Arm1': 0.38016528925619836, 'Arm2': 0.6198347107438016},
+                             mab.predict_expectations())
+
+        # Hack into epsilon from underlying greedy bandit
+        mab.epsilon = 5
+        mab.fit(np.array(decisions), np.array(rewards))
+
+        # Assert epsilon change has no impact
+        # self.assertEqual("Arm1", mab.predict())
+        self.assertDictEqual({'Arm1': 0.38016528925619836, 'Arm2': 0.6198347107438016},
+                             mab.predict_expectations())
+
+
+
+

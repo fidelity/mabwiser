@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MABWiser Public API &mdash; MABWiser 1.8.1 documentation</title>
+  <title>MABWiser Public API &mdash; MABWiser 1.9.0 documentation</title>
   
 
   
@@ -556,7 +556,12 @@ Default value is None.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <p>Randomized Popularity Learning Policy.</p>
 <p>Returns a randomized popular arm for each prediction.
-The probability of selection for each arm is weighted by their mean reward.</p>
+The probability of selection for each arm is weighted by their mean reward.
+It assumes that the rewards are non-negative.</p>
+<p>The probability of selection is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[P(arm) = \frac{ \mu_i } { \Sigma{ \mu }  }\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu_i\)</span> is the mean reward for that arm.</p>
 <p class="rubric">Example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="k">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
@@ -600,7 +605,7 @@ The average reward is calculated as a logistic function with each probability as
 <div class="math notranslate nohighlight">
 \[P(arm) = \frac{ e ^  \frac{\mu_i - \max{\mu}}{ \tau } }
 { \Sigma{e ^  \frac{\mu - \max{\mu}}{ \tau }}  }\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mu_i\)</span> is the mean for that arm and <span class="math notranslate nohighlight">\(\tau\)</span> is the “temperature” to determine the degree of
+<p>where <span class="math notranslate nohighlight">\(\mu_i\)</span> is the mean reward for that arm and <span class="math notranslate nohighlight">\(\tau\)</span> is the “temperature” to determine the degree of
 exploration.</p>
 <dl class="attribute">
 <dt id="mabwiser.mab.LearningPolicy.Softmax.tau">

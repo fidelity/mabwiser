@@ -3,6 +3,14 @@ MABWiser CHANGELOG
 =====================
 
 -------------------------------------------------------------------------------
+May, 1, 2020 1.9.0
+-------------------------------------------------------------------------------
+major:
+- New Algorithm: Randomized Popularity (Popularity)
+- This bandit uses a probabilistically weighted selection based on mean arm rewards
+- Currently, it assumes that the rewards are non-negative
+
+-------------------------------------------------------------------------------
 April, 8, 2020 1.8.1
 -------------------------------------------------------------------------------
 minor:

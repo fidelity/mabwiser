@@ -56,6 +56,29 @@ greedy.partial_fit(additional_layouts, additional_revenues)
 # Adding a new layout option
 greedy.add_arm(3)
 
+#################################################
+# Randomized Popularity Learning Policy
+#################################################
+
+# Randomized Popularity learning policy that select arms
+# with weighted probability based on the mean reward for each arm
+popularity = MAB(arms=options,
+                 learning_policy=LearningPolicy.Popularity(),
+                 seed=123456)
+
+# Learn from previous layouts decisions and revenues generated
+popularity.fit(decisions=layouts, rewards=revenues)
+
+# Predict the next best layouts decision
+prediction = popularity.predict()
+
+# Expected revenues of each layouts learnt from historical data
+expectations = popularity.predict_expectations()
+
+# Results
+print("Randomized Popularity: ", prediction, " ", expectations)
+assert(prediction == 1)
+
 ###################################
 # Softmax Learning Policy
 ###################################
@@ -100,7 +123,6 @@ thompson.add_arm(3)
 # Thompson Sampling with Non-Binary Rewards Learning Policy
 #############################################################
 
-
 # Thompson Sampling learning policy with function for converting rewards to binary
 def binary_func(decision, reward):
     decision_to_threshold = {1: 10, 2: 10}
@@ -121,16 +143,13 @@ assert(prediction == 2)
 # Online updating of the model
 thompson.partial_fit(additional_layouts, additional_revenues)
 
-
 # Update the model with new arm
 def binary_func2(decision, reward):
     decision_to_threshold = {1: 10, 2: 10, 3: 15}
     return 1 if reward > decision_to_threshold[decision] else 0
 
-
 thompson.add_arm(3, binary_func2)
 assert(3 in thompson.arms)
-
 
 ##############################################
 # Upper Confidence Bound1 Learning Policy

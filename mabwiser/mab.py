@@ -195,6 +195,14 @@ class LearningPolicy(NamedTuple):
 
         Returns a randomized popular arm for each prediction.
         The probability of selection for each arm is weighted by their mean reward.
+        It assumes that the rewards are non-negative.
+
+        The probability of selection is calculated as:
+
+        .. math::
+            P(arm) = \\frac{ \\mu_i } { \\Sigma{ \\mu }  }
+
+        where :math:`\\mu_i` is the mean reward for that arm.
 
         Example
         -------
@@ -242,7 +250,7 @@ class LearningPolicy(NamedTuple):
             P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
             { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
 
-        where :math:`\\mu_i` is the mean for that arm and :math:`\\tau` is the "temperature" to determine the degree of
+        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine the degree of
         exploration.
 
         Attributes
