@@ -383,3 +383,18 @@ class PopularityTest(BaseTest):
         self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
         self.assertAlmostEqual(exp["one"], 0.6)
         self.assertAlmostEqual(exp["two"], 0.4)
+
+    def test_negative_rewards(self):
+
+        try:
+            arm, mab = self.predict(arms=[1, 2],
+                                    decisions=[1, 1, 1, 2, 2, 2],
+                                    rewards=[-1, -1, 1, 1, 1, 1],
+                                    learning_policy=LearningPolicy.Popularity(),
+                                    seed=123456,
+                                    num_run=5,
+                                    is_predict=True)
+        except ValueError:
+            # Negative rewards should not work with generating probabilities
+            pass
+

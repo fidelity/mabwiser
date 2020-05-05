@@ -17,6 +17,7 @@ logging.disable(logging.CRITICAL)
 class ExampleTest(BaseTest):
 
     def test_popularity(self):
+
         list_of_arms = ['Arm1', 'Arm2']
         decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
         rewards = [20, 17, 25, 9]

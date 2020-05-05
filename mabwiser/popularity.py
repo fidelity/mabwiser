@@ -34,6 +34,7 @@ class _Popularity(_EpsilonGreedy):
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
         # Select an arm randomized by expectation probability
+        # TODO: this would not work for negative rewards!
         return self.rng.choice(self.arms, p=list(self.arm_to_expectation.values()))
 
     def _normalize_expectations(self):

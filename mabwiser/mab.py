@@ -213,7 +213,7 @@ class LearningPolicy(NamedTuple):
             >>> mab = MAB(list_of_arms, LearningPolicy.Popularity())
             >>> mab.fit(decisions, rewards)
             >>> mab.predict()
-            'Arm2'
+            'Arm1'
         """
 
         def _validate(self):
