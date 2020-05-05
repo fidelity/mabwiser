@@ -22,7 +22,6 @@ class _Popularity(_EpsilonGreedy):
 
         # Make sure expectations sum up to 1 like probabilities
         self._normalize_expectations()
-
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Fit as usual greedy
@@ -46,4 +45,3 @@ class _Popularity(_EpsilonGreedy):
         else:
             for k, v in self.arm_to_expectation.items():
                 self.arm_to_expectation[k] = v / total
-

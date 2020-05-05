@@ -386,7 +386,8 @@ class PopularityTest(BaseTest):
 
     def test_negative_rewards(self):
 
-        try:
+        with self.assertRaises(ValueError):
+            # Negative rewards should not work with generating probabilities
             arm, mab = self.predict(arms=[1, 2],
                                     decisions=[1, 1, 1, 2, 2, 2],
                                     rewards=[-1, -1, 1, 1, 1, 1],
@@ -394,7 +395,4 @@ class PopularityTest(BaseTest):
                                     seed=123456,
                                     num_run=5,
                                     is_predict=True)
-        except ValueError:
-            # Negative rewards should not work with generating probabilities
-            pass
 
