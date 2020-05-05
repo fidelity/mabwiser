@@ -42,6 +42,7 @@ Quick Start
     quick
     examples
     contributing
+    new_bandit
     api
 
 Source Code

@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Adding a New Bandit &mdash; MABWiser 1.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MABWiser Public API" href="api.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MABWiser
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Multi-Armed Bandits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Usage Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding a New Bandit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#exposing-the-public-api">1. Exposing the Public API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-the-bandit-algorithm">2. Implementing the Bandit Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-the-bandit-algorithm">3. Testing the Bandit Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sending-a-pull-request">4. Sending a Pull Request</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MABWiser</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Adding a New Bandit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/new_bandit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-a-new-bandit">
+<span id="new-bandit"></span><h1>Adding a New Bandit<a class="headerlink" href="#adding-a-new-bandit" title="Permalink to this headline">¶</a></h1>
+<p>We provide some guidelines on how to introduce a new bandit algorithm in MABWiser.</p>
+<div class="admonition-high-level-overview admonition">
+<p class="first admonition-title">High-Level Overview</p>
+<p>Adding a new bandit algorithm to MABWiser consists of three main steps:</p>
+<ol class="arabic simple">
+<li>Exposing the new bandit policy within the Public API</li>
+<li>Developing the underlying bandit algorithm</li>
+<li>Testing the behavior of the bandit policy</li>
+</ol>
+<p class="last">These steps can be followed by a Pull Request to include your new policy in the MABWiser library. In the following, the details of each of step are provided.</p>
+</div>
+<div class="section" id="exposing-the-public-api">
+<h2>1. Exposing the Public API<a class="headerlink" href="#exposing-the-public-api" title="Permalink to this headline">¶</a></h2>
+<p>Imagine you would like to introduce a new bandit algorithm, called <code class="docutils literal notranslate"><span class="pre">MyCoolPolicy</span></code>
+with an hyper-parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code>.</p>
+<p>First and foremost, the users of MABWiser need to be able to access your cool bandit algorithm. This is how it would look:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import MABWiser Library</span>
+<span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+
+<span class="c1"># Data</span>
+<span class="n">arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+
+<span class="c1"># Model</span>
+<span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">MyCoolPolicy</span><span class="p">(</span><span class="n">my_parameter</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="c1"># Train</span>
+<span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+
+<span class="c1"># Test</span>
+<span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can enable public access to your bandit policy in <code class="docutils literal notranslate"><span class="pre">mab.py</span></code> with the following changes:</p>
+<ul class="simple">
+<li>Introduce the new bandit algorithm as an inner namedtuple class as part of the <code class="docutils literal notranslate"><span class="pre">LearningPolicy</span></code> class. See existing bandit policies as an example.</li>
+<li>The parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> will be a class member of this new inner class. Make sure to add type hinting. If possible, set a default value.</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">_validate()</span></code> function for error checking on input values.</li>
+<li>Add your pydoc string to this inner class to provide a description of the new bandit policy. You can even use <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">math::</span></code> to express formulas.</li>
+<li>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</li>
+</ul>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Make sure to complete the following steps in a new feature branch via <code class="docutils literal notranslate"><span class="pre">`git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">mycoolpolicy`</span></code>. Later on, you can create a pull request to make your contributions part of the library.</p>
+</div>
+<p>You now have an entry point to your new bandit algorithm.
+The next step is to connect this bandit to an implementor object in the constructor of the <code class="docutils literal notranslate"><span class="pre">MAB</span></code> class:</p>
+<ul class="simple">
+<li>Go to <code class="docutils literal notranslate"><span class="pre">MAB</span></code> class constructor</li>
+<li>Set the value of the <code class="docutils literal notranslate"><span class="pre">lp</span></code> to your internal implementor class, in this case <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code>.</li>
+<li>Pass down the parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> to the internal implementor as well.</li>
+<li>Make sure to update the decorator <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> to be able to return the <code class="docutils literal notranslate"><span class="pre">learning_policy</span></code> back to the user.</li>
+<li>In the <code class="docutils literal notranslate"><span class="pre">_validate_mab_args</span></code> function, register your new policy as a valid bandit so that it passes input validation.</li>
+<li>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</li>
+</ul>
+<p><strong>Congratulations!!</strong> You can now increment the version of library <code class="docutils literal notranslate"><span class="pre">__version__</span></code>.
+Now, let’s move on to implementing your cool bandit algorithm!</p>
+</div>
+<div class="section" id="implementing-the-bandit-algorithm">
+<h2>2. Implementing the Bandit Algorithm<a class="headerlink" href="#implementing-the-bandit-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>The previous section allowed users to access your new cool bandit policy.
+What remains is to implement the learning algorithm behind your bandit policy.</p>
+<p>Start by creating a new Python file named <code class="docutils literal notranslate"><span class="pre">mycoolpolicy.py</span></code> under the /mabwiser folder
+to implement a class called <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code>. This is where the bandit implementation will live.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The prefix <code class="docutils literal notranslate"><span class="pre">_</span></code> in the class denotes a private class in Python. That is, the users do not need to directly access to this implementor class.</p>
+</div>
+<p>Here is what you need to implement your bandit policy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">_MyCoolPolicy</span><span class="p">(</span><span class="n">BaseMAB</span><span class="p">):</span>
+<span class="c1"># Your new bandit class will most likely inherit from the abstract BaseMAB class</span>
+<span class="c1"># The BaseMAB is an abstract meta class which defines the public interface for all bandit algorithms</span>
+<span class="c1"># It dictates the functionality to implement which includes:</span>
+<span class="c1">#       fit(), partial_fit(),  _fit_arm()</span>
+<span class="c1">#       predict() and predict_expectations()</span>
+<span class="c1">#       _predict_contexts() and _uptake_new_arm()</span>
+
+<span class="c1"># In case your new bandit policy is similar to an exiting algorithm</span>
+<span class="c1"># it can take advantage of its implementation</span>
+<span class="c1"># See for example how Popularity bandit inherits</span>
+<span class="c1"># from Greedy bandit and leverages its training algorithm</span>
+
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">,</span> <span class="n">arms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Arm</span><span class="p">],</span> <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="c1"># The ``BaseMAB`` provides every bandit policy with the list of arms, arms</span>
+    <span class="c1"># the dictionary that stores the expectation of each arm, arm_to_expectation, and</span>
+    <span class="c1"># a random number generator, rng, in case it is needed</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">arms</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+
+    <span class="c1"># TODO:</span>
+    <span class="c1"># Decide what other fields your new policy might need to store for expectation calculation</span>
+    <span class="c1"># Declare those fields as class members in your constructor</span>
+    <span class="c1"># For example, the greedy policy needs a counter and total sum for each arm</span>
+    <span class="c1"># These are declared in the constructor and set to zero initially</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arms</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="c1"># TODO:</span>
+    <span class="c1"># You might need to reset internal fields</span>
+    <span class="c1"># So that we can train from scratch with new data</span>
+    <span class="n">reset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Call _parallel_fit() here from the base class</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="c1"># Unlike fit, partial_fit typically does not reset internal fields</span>
+    <span class="c1"># So that we can continue learning online</span>
+
+    <span class="c1"># Call _parallel_fit() here from the base class</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Arm</span><span class="p">:</span>
+    <span class="c1"># TODO: returns the best arm according to your policy</span>
+    <span class="c1"># based on the arm_to_expectation that is calculated in the _fit_arm</span>
+    <span class="n">best_arm</span> <span class="o">=</span> <span class="o">...</span>
+
+    <span class="k">return</span> <span class="n">best_arm</span>
+
+<span class="k">def</span> <span class="nf">predict_expectations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Num</span><span class="p">]:</span>
+    <span class="c1"># Return a copy of expectations dictionary from arms (key) to expectations (values)</span>
+    <span class="c1"># Make sure return a copy of the internal object</span>
+    <span class="c1"># so that the user cannot accidentally break your policy</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">_fit_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># TODO: This is the MOST IMPORTANT function to implement</span>
+    <span class="c1"># This is where you implement how your bandit algorithm works</span>
+    <span class="c1"># Based on the input decisions and rewards</span>
+    <span class="c1"># This function calculates arm_to_expectation</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="k">def</span> <span class="nf">_predict_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_predict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                      <span class="n">seeds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">start_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">_uptake_new_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">binarizer</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># TODO: if you declared addition fields in the constructor</span>
+    <span class="c1"># Make sure new arms has these fields too</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span><span class="p">[</span><span class="n">arm</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p><strong>Congratulations!!</strong> You have now implemented your cool new bandit policy. Now, let’s move onto action!</p>
+</div>
+<div class="section" id="testing-the-bandit-algorithm">
+<h2>3. Testing the Bandit Algorithm<a class="headerlink" href="#testing-the-bandit-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>The previous sections introduced the new bandit algorithm to the public API and implemented the underlying policy.
+What remains is to use the new algorithm and see how it performs in action.</p>
+<p>Start by creating a new Python file called <code class="docutils literal notranslate"><span class="pre">test_mycoolbandit.py</span></code> under /tests folder to implement a class called <code class="docutils literal notranslate"><span class="pre">MyCoolBanditTest</span></code>.
+This class inherits from the <code class="docutils literal notranslate"><span class="pre">BaseTest</span></code> class which extends the <code class="docutils literal notranslate"><span class="pre">unittest</span></code> framework.</p>
+<p>This is where we will implement unit tests to make sure our new bandit policy performs as expected. Every test starts with the <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix followed by some descriptive name.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tests.test_base</span> <span class="kn">import</span> <span class="n">BaseTest</span>
+
+<span class="k">class</span> <span class="nc">PopularityTest</span><span class="p">(</span><span class="n">BaseTest</span><span class="p">):</span>
+
+    <span class="c1"># First, implement a simple case using the Public API you created in the first section</span>
+    <span class="c1"># Utilize the predict() utility from base test to create test cases quickly</span>
+    <span class="c1"># When is_predict flag is set to True it returns the predicted arm</span>
+    <span class="k">def</span> <span class="nf">test_simple_usecase_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arm</span><span class="p">,</span> <span class="n">mab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">arms</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                <span class="n">decisions</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                <span class="n">rewards</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                <span class="n">learning_policy</span><span class="o">=</span><span class="n">LearningPolicy</span><span class="o">.</span><span class="n">_MyCoolPolicy</span><span class="p">(),</span>
+                                <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">,</span>
+                                <span class="n">num_run</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">is_predict</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c1"># Assert the predicted arm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">arm</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># When is_predict flag is set to False it returns the arm_to_prediction</span>
+    <span class="k">def</span> <span class="nf">test_simple_usecase_expectation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exp</span><span class="p">,</span> <span class="n">mab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">arms</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                <span class="n">decisions</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                <span class="n">rewards</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                <span class="n">learning_policy</span><span class="o">=</span><span class="n">LearningPolicy</span><span class="o">.</span><span class="n">_MyCoolPolicy</span><span class="p">(),</span>
+                                <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">,</span>
+                                <span class="n">num_run</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">is_predict</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Assert the arm expectations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertDictEqual</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span> <span class="n">exp</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_zero_rewards</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test zero/negative rewards</span>
+
+    <span class="k">def</span> <span class="nf">test_my_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test how you parameters such as my_parameter</span>
+        <span class="c1"># effect the behavior of your policy</span>
+
+    <span class="k">def</span> <span class="nf">test_within_neighborhood_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test your new learning policy within a</span>
+        <span class="c1"># neighborhood policy when contexts are available.</span>
+
+    <span class="k">def</span> <span class="nf">test_fit_twice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test for two successive fit operation</span>
+        <span class="c1"># Assert that training from scratch is done properly</span>
+
+    <span class="k">def</span> <span class="nf">test_partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test for one fit operation followed by partial_fit operation</span>
+        <span class="c1"># Assert that online training is done properly</span>
+
+    <span class="k">def</span> <span class="nf">test_unused_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test the case when an arm remains unused</span>
+        <span class="c1"># Or when an arm has no corresponding decision or reward</span>
+
+    <span class="k">def</span> <span class="nf">test_add_new_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test adding a new arm and assert that it is handled properly</span>
+
+    <span class="k">def</span> <span class="nf">test_input_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test different input types such as</span>
+        <span class="c1"># strings for arms, data series or numpy arrays for decisions and rewards</span>
+</pre></div>
+</div>
+<p>To strengthen your test suite, try other unittests with different number of arms, decisions and rewards and assert that your bandit behaves correctly.</p>
+<p><strong>Congratulations!!</strong> You are ready to share your new cool policy with everyone. Now, let’s move onto sending a pull request~</p>
+</div>
+<div class="section" id="sending-a-pull-request">
+<h2>4. Sending a Pull Request<a class="headerlink" href="#sending-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<p>The previous sections finalized the implementation of your cool new policy. It’s time to share it with the world by sending a pull request to merge your code with the master branch.</p>
+<p>Preparing for a pull request typically involves the following steps:</p>
+<ul class="simple">
+<li>Add a note about your changes in the CHANGELOG.txt</li>
+<li>Update the library version. You can use a keyword search for “version” to make sure you cover all fields.</li>
+<li>Update the README.md, in necessary</li>
+<li>Update the documentation rst files under the /docsrc folder , if necessary</li>
+<li>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder.</li>
+<li>Build a new wheel package and remove the old one in /dist folder</li>
+</ul>
+<p><strong>Congratulations!!</strong> You are now ready to send a Pull Request to include your changes in the MABWiser library.
+How cool is that? :)</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="MABWiser Public API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, FMR LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
