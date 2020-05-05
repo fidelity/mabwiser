@@ -4,7 +4,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.8.1 of April 8, 2020
+:Version: 1.9.0 of May 2, 2020
 
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
@@ -13,8 +13,6 @@ import logging
 from copy import deepcopy
 from itertools import chain
 from typing import Union, List, Optional, NoReturn
-
-import matplotlib
 
 import math
 import matplotlib.pyplot as plt
@@ -31,6 +29,7 @@ from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.mab import MAB
 from mabwiser.neighbors import _Neighbors, _Radius, _KNearest
+from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
@@ -118,7 +117,7 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
 class _NeighborsSimulator(_Neighbors):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
         self.is_quick = is_quick
@@ -247,7 +246,7 @@ class _NeighborsSimulator(_Neighbors):
 class _RadiusSimulator(_NeighborsSimulator):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
         self.radius = radius
@@ -308,7 +307,7 @@ class _RadiusSimulator(_NeighborsSimulator):
 class _KNearestSimulator(_NeighborsSimulator):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear, _Random],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  k: int, metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
         self.k = k
