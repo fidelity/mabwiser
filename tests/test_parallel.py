@@ -43,6 +43,41 @@ class ParallelTest(BaseTest):
 
         self.assertEqual(arms, [1, 1, 1, 1])
 
+    def test_popularity(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True,
+                                 n_jobs=1)
+
+        self.assertEqual(arms, [1, 3, 1, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True,
+                                 n_jobs=2)
+
+        self.assertEqual(arms, [1, 3, 1, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True,
+                                 n_jobs=3)
+
+        self.assertEqual(arms, [1, 3, 1, 3])
+
     def test_greedy_t2(self):
 
         arms, mab = self.predict(arms=[1, 2, 3],

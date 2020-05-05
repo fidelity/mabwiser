@@ -13,14 +13,14 @@ from mabwiser.base_mab import BaseMAB
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator, _NeighborsSimulator, _RadiusSimulator, _KNearestSimulator, default_evaluator
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.neighbors import _Radius
 
 logging.disable(logging.CRITICAL)
 
 
 class TestSimulator(unittest.TestCase):
 
-    lps = [LearningPolicy.EpsilonGreedy(), LearningPolicy.Random(),
+    lps = [LearningPolicy.EpsilonGreedy(),
+           LearningPolicy.Popularity(), LearningPolicy.Random(),
            LearningPolicy.UCB1(), LearningPolicy.ThompsonSampling(),
            LearningPolicy.Softmax()]
 

@@ -10,6 +10,7 @@ from scipy.spatial.distance import cdist
 from mabwiser.base_mab import BaseMAB
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
+from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
@@ -20,7 +21,7 @@ from mabwiser.utils import Arm, Num, reset
 class _Neighbors(BaseMAB):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1], metric: str):
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1], metric: str):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.metric = metric
@@ -98,7 +99,7 @@ class _Neighbors(BaseMAB):
 class _Radius(_Neighbors):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Softmax, _ThompsonSampling, _UCB1, _Linear],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  radius: Num, metric: str, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
 
@@ -155,7 +156,7 @@ class _Radius(_Neighbors):
 class _KNearest(_Neighbors):
 
     def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _ThompsonSampling, _UCB1, _Softmax, _Linear],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  k: int, metric: str):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
 

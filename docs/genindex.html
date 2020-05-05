@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; MABWiser 1.8.1 documentation</title>
+  <title>Index &mdash; MABWiser 1.9.0 documentation</title>
   
 
   
@@ -22,11 +22,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -87,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Usage Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_bandit.html">Adding a New Bandit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a></li>
 </ul>
 
@@ -181,40 +182,26 @@
         <li><a href="api.html#mabwiser.mab.MAB.add_arm">(mabwiser.mab.MAB method)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.alpha">alpha (mabwiser.mab.LearningPolicy.LinTS attribute)</a>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.alpha">alpha (mabwiser.mab.LearningPolicy.LinTS attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinTS.alpha">[1]</a>
 
       <ul>
-        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.alpha">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>
+        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.alpha">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.alpha">[1]</a>
 </li>
-        <li><a href="api.html#mabwiser.mab.LearningPolicy.UCB1.alpha">(mabwiser.mab.LearningPolicy.UCB1 attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#id1">alpha() (mabwiser.mab.LearningPolicy.LinTS property)</a>
-
-      <ul>
-        <li><a href="api.html#id4">(mabwiser.mab.LearningPolicy.LinUCB property)</a>
-</li>
-        <li><a href="api.html#id9">(mabwiser.mab.LearningPolicy.UCB1 property)</a>
+        <li><a href="api.html#mabwiser.mab.LearningPolicy.UCB1.alpha">(mabwiser.mab.LearningPolicy.UCB1 attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.UCB1.alpha">[1]</a>
 </li>
       </ul></li>
       <li><a href="api.html#mabwiser.utils.argmax">argmax() (in module mabwiser.utils)</a>
 </li>
       <li><a href="api.html#mabwiser.utils.Arm">Arm() (in module mabwiser.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mabwiser.base_mab.BaseMAB.arm_to_expectation">arm_to_expectation (mabwiser.base_mab.BaseMAB attribute)</a>
 </li>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.arm_to_scaler">arm_to_scaler (mabwiser.mab.LearningPolicy.LinTS attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.arm_to_scaler">arm_to_scaler (mabwiser.mab.LearningPolicy.LinTS attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinTS.arm_to_scaler">[1]</a>
 
       <ul>
-        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.arm_to_scaler">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#id2">arm_to_scaler() (mabwiser.mab.LearningPolicy.LinTS property)</a>
-
-      <ul>
-        <li><a href="api.html#id5">(mabwiser.mab.LearningPolicy.LinUCB property)</a>
+        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.arm_to_scaler">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.arm_to_scaler">[1]</a>
 </li>
       </ul></li>
       <li><a href="api.html#mabwiser.simulator.Simulator.arm_to_stats_test">arm_to_stats_test (mabwiser.simulator.Simulator attribute)</a>
@@ -267,9 +254,7 @@
 </li>
       <li><a href="api.html#mabwiser.simulator.Simulator.batch_size">batch_size (mabwiser.simulator.Simulator attribute)</a>
 </li>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.ThompsonSampling.binarizer">binarizer (mabwiser.mab.LearningPolicy.ThompsonSampling attribute)</a>
-</li>
-      <li><a href="api.html#id8">binarizer() (mabwiser.mab.LearningPolicy.ThompsonSampling property)</a>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.ThompsonSampling.binarizer">binarizer (mabwiser.mab.LearningPolicy.ThompsonSampling attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.ThompsonSampling.binarizer">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -309,12 +294,10 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.EpsilonGreedy.epsilon">epsilon (mabwiser.mab.LearningPolicy.EpsilonGreedy attribute)</a>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.EpsilonGreedy.epsilon">epsilon (mabwiser.mab.LearningPolicy.EpsilonGreedy attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.EpsilonGreedy.epsilon">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#id0">epsilon() (mabwiser.mab.LearningPolicy.EpsilonGreedy property)</a>
-</li>
       <li><a href="api.html#mabwiser.simulator.Simulator.evaluator">evaluator (mabwiser.simulator.Simulator attribute)</a>
 </li>
   </ul></td>
@@ -349,12 +332,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mabwiser.mab.MAB.is_contextual">is_contextual (mabwiser.mab.MAB attribute)</a>
 </li>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.is_minibatch">is_minibatch (mabwiser.mab.NeighborhoodPolicy.Clusters attribute)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.is_minibatch">is_minibatch (mabwiser.mab.NeighborhoodPolicy.Clusters attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.is_minibatch">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#id12">is_minibatch() (mabwiser.mab.NeighborhoodPolicy.Clusters property)</a>
-</li>
       <li><a href="api.html#mabwiser.simulator.Simulator.is_ordered">is_ordered (mabwiser.simulator.Simulator attribute)</a>
 </li>
       <li><a href="api.html#mabwiser.simulator.Simulator.is_quick">is_quick (mabwiser.simulator.Simulator attribute)</a>
@@ -365,11 +346,7 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.k">k (mabwiser.mab.NeighborhoodPolicy.KNearest attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#id14">k() (mabwiser.mab.NeighborhoodPolicy.KNearest property)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.k">k (mabwiser.mab.NeighborhoodPolicy.KNearest attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.k">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -377,31 +354,25 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.l2_lambda">l2_lambda (mabwiser.mab.LearningPolicy.LinTS attribute)</a>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS.l2_lambda">l2_lambda (mabwiser.mab.LearningPolicy.LinTS attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinTS.l2_lambda">[1]</a>
 
       <ul>
-        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.l2_lambda">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>
+        <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.l2_lambda">(mabwiser.mab.LearningPolicy.LinUCB attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.LinUCB.l2_lambda">[1]</a>
 </li>
       </ul></li>
-      <li><a href="api.html#id3">l2_lambda() (mabwiser.mab.LearningPolicy.LinTS property)</a>
-
-      <ul>
-        <li><a href="api.html#id6">(mabwiser.mab.LearningPolicy.LinUCB property)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#mabwiser.mab.MAB.learning_policy">learning_policy (mabwiser.mab.MAB attribute)</a>
-</li>
-      <li><a href="api.html#id10">learning_policy() (mabwiser.mab.MAB property)</a>
+      <li><a href="api.html#mabwiser.mab.MAB.learning_policy">learning_policy (mabwiser.mab.MAB attribute)</a>, <a href="api.html#mabwiser.mab.MAB.learning_policy">[1]</a>
 </li>
       <li><a href="api.html#mabwiser.mab.LearningPolicy">LearningPolicy (class in mabwiser.mab)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mabwiser.mab.LearningPolicy.EpsilonGreedy">LearningPolicy.EpsilonGreedy (class in mabwiser.mab)</a>
 </li>
       <li><a href="api.html#mabwiser.mab.LearningPolicy.LinTS">LearningPolicy.LinTS (class in mabwiser.mab)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mabwiser.mab.LearningPolicy.LinUCB">LearningPolicy.LinUCB (class in mabwiser.mab)</a>
+</li>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.Popularity">LearningPolicy.Popularity (class in mabwiser.mab)</a>
 </li>
       <li><a href="api.html#mabwiser.mab.LearningPolicy.Random">LearningPolicy.Random (class in mabwiser.mab)</a>
 </li>
@@ -421,59 +392,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mabwiser.mab.MAB">MAB (class in mabwiser.mab)</a>
 </li>
-      <li>
-    mabwiser.base_mab
-
-      <ul>
-        <li><a href="api.html#module-mabwiser.base_mab">module</a>
+      <li><a href="api.html#module-mabwiser.base_mab">mabwiser.base_mab (module)</a>
 </li>
-      </ul></li>
-      <li>
-    mabwiser.mab
-
-      <ul>
-        <li><a href="api.html#module-mabwiser.mab">module</a>
+      <li><a href="api.html#module-mabwiser.mab">mabwiser.mab (module)</a>
 </li>
-      </ul></li>
-      <li>
-    mabwiser.simulator
-
-      <ul>
-        <li><a href="api.html#module-mabwiser.simulator">module</a>
-</li>
-      </ul></li>
-      <li>
-    mabwiser.utils
-
-      <ul>
-        <li><a href="api.html#module-mabwiser.utils">module</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.metric">metric (mabwiser.mab.NeighborhoodPolicy.KNearest attribute)</a>
+      <li><a href="api.html#module-mabwiser.simulator">mabwiser.simulator (module)</a>
+</li>
+      <li><a href="api.html#module-mabwiser.utils">mabwiser.utils (module)</a>
+</li>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.metric">metric (mabwiser.mab.NeighborhoodPolicy.KNearest attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest.metric">[1]</a>
 
       <ul>
-        <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.metric">(mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#id15">metric() (mabwiser.mab.NeighborhoodPolicy.KNearest property)</a>
-
-      <ul>
-        <li><a href="api.html#id16">(mabwiser.mab.NeighborhoodPolicy.Radius property)</a>
-</li>
-      </ul></li>
-      <li>
-    module
-
-      <ul>
-        <li><a href="api.html#module-mabwiser.base_mab">mabwiser.base_mab</a>
-</li>
-        <li><a href="api.html#module-mabwiser.mab">mabwiser.mab</a>
-</li>
-        <li><a href="api.html#module-mabwiser.simulator">mabwiser.simulator</a>
-</li>
-        <li><a href="api.html#module-mabwiser.utils">mabwiser.utils</a>
+        <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.metric">(mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.metric">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -482,9 +414,7 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.n_clusters">n_clusters (mabwiser.mab.NeighborhoodPolicy.Clusters attribute)</a>
-</li>
-      <li><a href="api.html#id13">n_clusters() (mabwiser.mab.NeighborhoodPolicy.Clusters property)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.n_clusters">n_clusters (mabwiser.mab.NeighborhoodPolicy.Clusters attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters.n_clusters">[1]</a>
 </li>
       <li><a href="api.html#mabwiser.base_mab.BaseMAB.n_jobs">n_jobs (mabwiser.base_mab.BaseMAB attribute)</a>
 
@@ -492,23 +422,19 @@
         <li><a href="api.html#mabwiser.mab.MAB.n_jobs">(mabwiser.mab.MAB attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#mabwiser.mab.MAB.neighborhood_policy">neighborhood_policy (mabwiser.mab.MAB attribute)</a>
+      <li><a href="api.html#mabwiser.mab.MAB.neighborhood_policy">neighborhood_policy (mabwiser.mab.MAB attribute)</a>, <a href="api.html#mabwiser.mab.MAB.neighborhood_policy">[1]</a>
 </li>
-      <li><a href="api.html#id11">neighborhood_policy() (mabwiser.mab.MAB property)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy">NeighborhoodPolicy (class in mabwiser.mab)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy">NeighborhoodPolicy (class in mabwiser.mab)</a>
-</li>
       <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Clusters">NeighborhoodPolicy.Clusters (class in mabwiser.mab)</a>
 </li>
       <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.KNearest">NeighborhoodPolicy.KNearest (class in mabwiser.mab)</a>
 </li>
       <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius">NeighborhoodPolicy.Radius (class in mabwiser.mab)</a>
 </li>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm">no_nhood_prob_of_arm (mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>
-</li>
-      <li><a href="api.html#id17">no_nhood_prob_of_arm() (mabwiser.mab.NeighborhoodPolicy.Radius property)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm">no_nhood_prob_of_arm (mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm">[1]</a>
 </li>
       <li><a href="api.html#mabwiser.utils.Num">Num (in module mabwiser.utils)</a>
 </li>
@@ -546,9 +472,7 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.radius">radius (mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>
-</li>
-      <li><a href="api.html#id18">radius() (mabwiser.mab.NeighborhoodPolicy.Radius property)</a>
+      <li><a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.radius">radius (mabwiser.mab.NeighborhoodPolicy.Radius attribute)</a>, <a href="api.html#mabwiser.mab.NeighborhoodPolicy.Radius.radius">[1]</a>
 </li>
       <li><a href="api.html#mabwiser.utils.reset">reset() (in module mabwiser.utils)</a>
 </li>
@@ -580,9 +504,7 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mabwiser.mab.LearningPolicy.Softmax.tau">tau (mabwiser.mab.LearningPolicy.Softmax attribute)</a>
-</li>
-      <li><a href="api.html#id7">tau() (mabwiser.mab.LearningPolicy.Softmax property)</a>
+      <li><a href="api.html#mabwiser.mab.LearningPolicy.Softmax.tau">tau (mabwiser.mab.LearningPolicy.Softmax attribute)</a>, <a href="api.html#mabwiser.mab.LearningPolicy.Softmax.tau">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>

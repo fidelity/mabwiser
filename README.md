@@ -39,6 +39,8 @@ Available Learning Policies:
 * Epsilon Greedy
 * LinTS
 * LinUCB
+* Popularity
+* Random
 * Softmax
 * Thompson Sampling (TS)
 * Upper Confidence Bound (UCB1)

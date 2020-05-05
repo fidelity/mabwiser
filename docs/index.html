@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MABWiser Contextual Multi-Armed Bandits &mdash; MABWiser 1.8.1 documentation</title>
+  <title>MABWiser Contextual Multi-Armed Bandits &mdash; MABWiser 1.9.0 documentation</title>
   
 
   
@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -87,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Usage Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_bandit.html">Adding a New Bandit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a></li>
 </ul>
 
@@ -184,8 +185,8 @@ MABWiser is released by Fidelity Investments Artificial Intelligence Center of E
 </pre></div>
 </div>
 <div class="sidebar">
-<p class="sidebar-title">Contents</p>
-<div class="toctree-wrapper compound">
+<p class="first sidebar-title">Contents</p>
+<div class="toctree-wrapper last compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Multi-Armed Bandits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -206,6 +207,13 @@ MABWiser is released by Fidelity Investments Artificial Intelligence Center of E
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_bandit.html">Adding a New Bandit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="new_bandit.html#exposing-the-public-api">1. Exposing the Public API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_bandit.html#implementing-the-bandit-algorithm">2. Implementing the Bandit Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_bandit.html#testing-the-bandit-algorithm">3. Testing the Bandit Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_bandit.html#sending-a-pull-request">4. Sending a Pull Request</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-mabwiser.base_mab">base_mab</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-mabwiser.mab">mab</a></li>
@@ -221,6 +229,26 @@ MABWiser is released by Fidelity Investments Artificial Intelligence Center of E
 <h1>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h1>
 <p>The source code is hosted on <a class="reference external" href="https://github.com/fmr-llc/mabwiser">GitHub</a>.</p>
 </div>
+<div class="section" id="available-bandit-policies">
+<h1>Available Bandit Policies<a class="headerlink" href="#available-bandit-policies" title="Permalink to this headline">¶</a></h1>
+<p>Available Learning Policies:</p>
+<ul class="simple">
+<li>Epsilon Greedy</li>
+<li>LinTS</li>
+<li>LinUCB</li>
+<li>Popularity</li>
+<li>Random</li>
+<li>Softmax</li>
+<li>Thompson Sampling (TS)</li>
+<li>Upper Confidence Bound (UCB1)</li>
+</ul>
+<p>Available Neighborhood Policies:</p>
+<ul class="simple">
+<li>Clusters</li>
+<li>K-Nearest</li>
+<li>Radius</li>
+</ul>
+</div>
 <div class="section" id="bug-reports">
 <h1>Bug Reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
 <p>You can send feedback to <a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a>. Please use the GitHub <a class="reference external" href="https://github.com/fmr-llc/mabwiser/issues">Issues</a> tracking for bug reports and feature requests.</p>
@@ -229,7 +257,7 @@ MABWiser is released by Fidelity Investments Artificial Intelligence Center of E
 <h1>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h1>
 <p>You can cite MABWiser as:</p>
 <ol class="upperalpha simple" start="5">
-<li><p>Strong,  B. Kleynhans, and S. Kadioglu, “MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python,” in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.</p></li>
+<li>Strong,  B. Kleynhans, and S. Kadioglu, “MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python,” in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.</li>
 </ol>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">mabwiser2019</span><span class="p">,</span>
   <span class="na">author</span>    <span class="p">=</span> <span class="s">{Strong, Emily and Kleynhans, Bernard and Kadioglu, Serdar}</span><span class="p">,</span>
@@ -246,8 +274,8 @@ MABWiser is released by Fidelity Investments Artificial Intelligence Center of E
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
 </ul>
 </div>
 

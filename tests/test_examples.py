@@ -16,6 +16,18 @@ logging.disable(logging.CRITICAL)
 
 class ExampleTest(BaseTest):
 
+    def test_popularity(self):
+
+        list_of_arms = ['Arm1', 'Arm2']
+        decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+        rewards = [20, 17, 25, 9]
+        mab = MAB(list_of_arms, LearningPolicy.Popularity())
+        mab.fit(decisions, rewards)
+        mab.predict()
+        self.assertEqual("Arm2", mab.predict())
+        self.assertDictEqual({'Arm1': 0.38016528925619836, 'Arm2': 0.6198347107438016},
+                             mab.predict_expectations())
+
     def test_random(self):
 
         arm, mab = self.predict(arms=[1, 2],
