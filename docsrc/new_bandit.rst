@@ -252,12 +252,12 @@ The previous sections finalized the implementation of your cool new policy. It's
 
 Preparing for a pull request typically involves the following steps: 
 
-* Add a note about your changes in the CHANGELOG.txt
-* Update the library version. You can use a keyword search for "version" to make sure you cover all fields.
-* Update the README.md, in necessary
-* Update the documentation rst files under the /docsrc folder , if necessary
-* If you update any documentation, make sure to recompile the docs by running ``make github`` under the /docsrc folder.
-* Build a new wheel package and remove the old one in /dist folder
+a. Add a note about your changes in the CHANGELOG.txt
+b. Update the library version. You can use a keyword search for "version" to make sure you cover all fields.
+c. Update the README.md, in necessary
+d. Update the documentation rst files under the /docsrc folder , if necessary
+e. If you update any documentation, make sure to recompile the docs by running ``make github`` under the /docsrc folder.
+f. Build a new wheel package and remove the old one in /dist folder
 
 **Congratulations!!** You are now ready to send a Pull Request to include your changes in the MABWiser library.
 How cool is that? :)

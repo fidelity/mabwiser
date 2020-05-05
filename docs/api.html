@@ -37,7 +37,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Contributing" href="contributing.html" /> 
+    <link rel="prev" title="Adding a New Bandit" href="new_bandit.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Usage Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_bandit.html">Adding a New Bandit</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MABWiser Public API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.base_mab">base_mab</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-mabwiser.mab">mab</a></li>
@@ -570,7 +571,7 @@ It assumes that the rewards are non-negative.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">Popularity</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
-<span class="go">&#39;Arm2&#39;</span>
+<span class="go">&#39;Arm1&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1358,7 +1359,7 @@ The probabilities should sum up to 1.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Email:</th><td class="field-body"><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.8.1 of April 8, 2020</td>
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">1.9.0 of May 2, 2020</td>
 </tr>
 </tbody>
 </table>
@@ -1958,7 +1959,7 @@ Used to select the correct index from arm_to_stats if there are separate entries
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="new_bandit.html" class="btn btn-neutral float-left" title="Adding a New Bandit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
