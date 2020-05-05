@@ -318,6 +318,39 @@ class PopularityTest(BaseTest):
         self.assertAlmostEqual(exp["one"], 0.6)
         self.assertAlmostEqual(exp["two"], 0.4)
 
+    def test_different_seeds(self):
+
+        exp, mab = self.predict(arms=["one", "two"],
+                                decisions=["one", "one", "one", "two", "two", "two"],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities and arm decision
+        arm = mab.predict()
+        self.assertEqual("one", arm)
+        self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
+        self.assertAlmostEqual(exp["one"], 0.6)
+        self.assertAlmostEqual(exp["two"], 0.4)
+
+        # Same setup but change seed that prefers the other arm
+        exp, mab = self.predict(arms=["one", "two"],
+                                decisions=["one", "one", "one", "two", "two", "two"],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=16543221,
+                                num_run=1,
+                                is_predict=False)
+
+        # Assert that the other arm is chose with the same expectations
+        arm = mab.predict()
+        self.assertEqual("two", arm)
+        self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
+        self.assertAlmostEqual(exp["one"], 0.6)
+        self.assertAlmostEqual(exp["two"], 0.4)
+
     def test_numpy_rewards(self):
 
         exp, mab = self.predict(arms=["one", "two"],

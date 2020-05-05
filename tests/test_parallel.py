@@ -65,7 +65,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=2)
 
-        self.assertEqual(arms, [1, 1, 1, 1])
+        self.assertEqual(arms, [1, 3, 1, 3])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
@@ -76,7 +76,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=3)
 
-        self.assertEqual(arms, [1, 1, 1, 1])
+        self.assertEqual(arms, [1, 3, 1, 3])
 
     def test_greedy_t2(self):
 
