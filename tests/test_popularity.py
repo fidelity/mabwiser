@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pandas as pd
 from mabwiser.mab import LearningPolicy, NeighborhoodPolicy, _Popularity
 from tests.test_base import BaseTest
 
 
 class PopularityTest(BaseTest):
-
-    def test(self):
-        import mabwiser.mab as mab
-        print(mab.__version__)
 
     def test_2arm_equal_prob(self):
         arm, mab = self.predict(arms=[1, 2],
@@ -223,6 +220,133 @@ class PopularityTest(BaseTest):
         self.assertDictEqual({'Arm1': 0.38016528925619836, 'Arm2': 0.6198347107438016},
                              mab.predict_expectations())
 
+    def test_2arm_partial_fit(self):
+        exp, mab = self.predict(arms=[1, 2],
+                                decisions=[1, 1, 1, 2, 2, 2],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
 
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp[1] + exp[2])
+        self.assertAlmostEqual(exp[1], 0.6)
+        self.assertAlmostEqual(exp[2], 0.4)
 
+        # Partial fit to push arm1 probability to 0.75
+        mab.partial_fit([1, 1, 1, 2, 2, 2],[1, 1, 1, 0, 0, 0])
+        exp = mab.predict_expectations()
 
+        self.assertAlmostEqual(1.0, exp[1] + exp[2])
+        self.assertAlmostEqual(exp[1], 0.75)
+        self.assertAlmostEqual(exp[2], 0.25)
+
+    def test_fit_twice(self):
+
+        exp, mab = self.predict(arms=[1, 2],
+                                decisions=[1, 1, 1, 2, 2, 2],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp[1] + exp[2])
+        self.assertAlmostEqual(exp[1], 0.6)
+        self.assertAlmostEqual(exp[2], 0.4)
+
+        # Fit the other way around
+        mab.fit([2, 2, 2, 1, 1, 1], [1, 1, 1, 0, 1, 1])
+        exp = mab.predict_expectations()
+
+        # Assert the opposite result
+        self.assertAlmostEqual(1.0, exp[1] + exp[2])
+        self.assertAlmostEqual(exp[1], 0.4)
+        self.assertAlmostEqual(exp[2], 0.6)
+
+    def test_unused_arm(self):
+
+        exp, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp[1] + exp[2] + exp[3])
+        self.assertAlmostEqual(exp[1], 0.6)
+        self.assertAlmostEqual(exp[2], 0.4)
+        self.assertAlmostEqual(exp[3], 0.0)
+
+    def test_add_arm(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 neighborhood_policy=NeighborhoodPolicy.Clusters(2),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        mab.add_arm(5)
+        self.assertTrue(5 in mab.arms)
+        self.assertTrue(5 in mab._imp.arms)
+        self.assertTrue(5 in mab._imp.lp_list[0].arms)
+        self.assertTrue(5 in mab._imp.lp_list[0].arm_to_expectation.keys())
+
+    def test_string_arms(self):
+
+        exp, mab = self.predict(arms=["one", "two"],
+                                decisions=["one", "one", "one", "two", "two", "two"],
+                                rewards=[1, 1, 1, 0, 1, 1],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
+        self.assertAlmostEqual(exp["one"], 0.6)
+        self.assertAlmostEqual(exp["two"], 0.4)
+
+    def test_numpy_rewards(self):
+
+        exp, mab = self.predict(arms=["one", "two"],
+                                decisions=["one", "one", "one", "two", "two", "two"],
+                                rewards=np.array([1, 1, 1, 0, 1, 1]),
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
+        self.assertAlmostEqual(exp["one"], 0.6)
+        self.assertAlmostEqual(exp["two"], 0.4)
+
+    def test_data_frame(self):
+
+        df = pd.DataFrame({"decisions": ["one", "one", "one", "two", "two", "two"],
+                           "rewards": [1, 1, 1, 0, 1, 1]})
+
+        exp, mab = self.predict(arms=["one", "two"],
+                                decisions=df["decisions"],
+                                rewards=df["rewards"],
+                                learning_policy=LearningPolicy.Popularity(),
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+
+        # Initial probabilities
+        self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
+        self.assertAlmostEqual(exp["one"], 0.6)
+        self.assertAlmostEqual(exp["two"], 0.4)

@@ -17,6 +17,7 @@ class MABTest(BaseTest):
     #################################################
     # Test property decorator methods
     ################################################
+
     def test_learning_policy_property(self):
         for lp in BaseTest.lps:
             print("Testing: ", lp)
