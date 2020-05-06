@@ -95,6 +95,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_bandit.html">Adding a New Bandit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a></li>
 </ul>
 
@@ -163,8 +164,14 @@
   <div class="section" id="usage-examples">
 <span id="examples"></span><h1>Usage Examples<a class="headerlink" href="#usage-examples" title="Permalink to this headline">¶</a></h1>
 <p>The examples below show how to use different bandit policies to make decisions among multiple arms based on their expected rewards.</p>
-<p>Conceptually, given a set of historical decisions and their corresponding rewards, the high-level idea behind MABWiser is to train a model using the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method to make predictions about next best decisions using the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method.</p>
-<p>It is possible to retrieve the expected reward of each arm using the <code class="docutils literal notranslate"><span class="pre">predict_expectations()</span></code> method and online training is available using the <code class="docutils literal notranslate"><span class="pre">partial_fit()</span></code> method. New arms can be added to the bandits using the <code class="docutils literal notranslate"><span class="pre">add_arm()</span></code> method. Decisions and rewards data support lists, 1D numpy arrays, and pandas series. Contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.</p>
+<p>Conceptually, given a set of historical decisions and their corresponding rewards,
+the high-level idea behind MABWiser is to train a model using the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method to make predictions
+about next best decisions using the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method.</p>
+<p>It is possible to retrieve the expected reward of each arm using the <code class="docutils literal notranslate"><span class="pre">predict_expectations()</span></code> method and
+online training is available using the <code class="docutils literal notranslate"><span class="pre">partial_fit()</span></code> method.
+New arms can be added to the bandits using the <code class="docutils literal notranslate"><span class="pre">add_arm()</span></code> method.
+Decisions and rewards data support lists, 1D numpy arrays, and pandas series.
+Contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last">Additional examples are available in the <a class="reference external" href="https://github.com/fmr-llc/mabwiser/tree/master/examples">examples folder</a> in the repo.</p>

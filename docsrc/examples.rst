@@ -5,9 +5,15 @@ Usage Examples
 
 The examples below show how to use different bandit policies to make decisions among multiple arms based on their expected rewards.
 
-Conceptually, given a set of historical decisions and their corresponding rewards, the high-level idea behind MABWiser is to train a model using the ``fit()`` method to make predictions about next best decisions using the ``predict()`` method.
+Conceptually, given a set of historical decisions and their corresponding rewards,
+the high-level idea behind MABWiser is to train a model using the ``fit()`` method to make predictions
+about next best decisions using the ``predict()`` method.
 
-It is possible to retrieve the expected reward of each arm using the ``predict_expectations()`` method and online training is available using the ``partial_fit()`` method. New arms can be added to the bandits using the ``add_arm()`` method. Decisions and rewards data support lists, 1D numpy arrays, and pandas series. Contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.
+It is possible to retrieve the expected reward of each arm using the ``predict_expectations()`` method and
+online training is available using the ``partial_fit()`` method.
+New arms can be added to the bandits using the ``add_arm()`` method.
+Decisions and rewards data support lists, 1D numpy arrays, and pandas series.
+Contexts data supports 2D lists, 2D numpy arrays, pandas series and data frames.
 
 .. seealso:: Additional examples are available in the `examples folder`_ in the repo.
 

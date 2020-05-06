@@ -28,7 +28,8 @@ packages. The following packages are used currently:
 Wheel Package
 -------------
 
-The library is provided as a wheel package. You can install the library from the wheel package using the following commands:
+The library is provided as a wheel package.
+You can install the library from the wheel package using the following commands:
 
 .. code-block:: python
 
