@@ -3,7 +3,8 @@ MABWiser Contextual Multi-Armed Bandits
 
 MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
 It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models.
-It provides built-in parallelization for both training and testing components and a simulation utility for algorithm comparisons and hyper-parameter tuning.
+It provides built-in parallelization for both training and testing components and
+a simulation utility for algorithm comparisons and hyper-parameter tuning.
 The library follows the scikit-learn style, adheres to `PEP-8 standards`_, and is tested heavily. 
 MABWiser is released by Fidelity Investments Artificial Intelligence Center of Excellence.
 

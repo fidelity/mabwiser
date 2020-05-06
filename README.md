@@ -13,7 +13,7 @@ MABWiser is developed by the Artificial Intelligence Center of Excellence at Fid
 
 ```python
 # An example that shows how to use the UCB1 learning policy
-# to make decisions between two arms based on their expected rewards.
+# to choose between two arms based on their expected rewards.
 
 # Import MABWiser Library
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy

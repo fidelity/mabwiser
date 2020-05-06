@@ -3,8 +3,7 @@
 About Multi-Armed Bandits
 =========================
 
-There are many real-world situations in which we have to decide between multiple options yet we are
-only able to learn the best course of action by testing each option sequentially. 
+There are many real-world situations in which we have to decide between multiple options yet we are only able to learn the best course of action by testing each option sequentially.
 
 **Multi-armed bandit (MAB)** algorithms are suitable for such sequential, online decision making problems under uncertainty.
 As such, they play an important part in many machine learning applications in internet advertising, recommendation engines, and clinical trials among many others.
