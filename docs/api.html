@@ -193,17 +193,34 @@ implement specific bandit policies using:</p>
 <li><code class="docutils literal notranslate"><span class="pre">predict_expectations</span></code> method to retrieve the expectation of each arm</li>
 <li><code class="docutils literal notranslate"><span class="pre">predict</span></code> method for testing to retrieve the best arm based on the policy</li>
 </ul>
+<p>To ensure this is the case, alpha and l2_lambda are required to be greater than zero.</p>
 </div></blockquote>
 <dl class="attribute">
 <dt id="mabwiser.base_mab.BaseMAB.rng">
 <code class="descname">rng</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.rng" title="Permalink to this definition">¶</a></dt>
 <dd><p>The random number generator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">np.random.RandomState</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mabwiser.base_mab.BaseMAB.arms">
 <code class="descname">arms</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.arms" title="Permalink to this definition">¶</a></dt>
 <dd><p>The list of all arms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">List</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -213,20 +230,25 @@ implement specific bandit policies using:</p>
 Default value is set to 1.
 If set to -1, all CPUs are used.
 If set to -2, all CPUs but one are used, and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mabwiser.base_mab.BaseMAB.backend">
 <code class="descname">backend</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify a parallelization backend implementation supported in the joblib library. Supported options are:
-- “loky” used by default, can induce some communication and memory overhead when exchanging input and</p>
+- “loky” used by default, can induce some communication and memory overhead when exchanging input and output data with the worker Python processes.
+- “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
+- “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the</p>
 <blockquote>
-<div>output data with the worker Python processes.</div></blockquote>
-<ul class="simple">
-<li>“multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.</li>
-<li>“threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
-called function relies a lot on Python objects.</li>
-</ul>
+<div>called function relies a lot on Python objects.</div></blockquote>
 <p>Default value is None. In this case the default backend selected by joblib will be used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,6 +264,14 @@ called function relies a lot on Python objects.</li>
 <dt id="mabwiser.base_mab.BaseMAB.arm_to_expectation">
 <code class="descname">arm_to_expectation</code><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.arm_to_expectation" title="Permalink to this definition">¶</a></dt>
 <dd><p>The dictionary of arms (keys) to their expected rewards (values).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">Dict[Arm, floot]</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -927,7 +957,7 @@ called function relies a lot on Python objects.</li>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
 <li>TypeError:  For ThompsonSampling, binarizer must be a callable function.</li>
 <li>TypeError:  The standard scaler object must have a transform method.</li>
-<li>TypeError:  The standard scaler object must be fit with calculated <a href="#id1"><span class="problematic" id="id2">mean_</span></a> and <a href="#id3"><span class="problematic" id="id4">var_</span></a> attributes.</li>
+<li>TypeError:  The standard scaler object must be fit with calculated <code class="docutils literal notranslate"><span class="pre">mean_</span></code> and <code class="docutils literal notranslate"><span class="pre">var_</span></code> attributes.</li>
 <li>ValueError: A binarizer function was provided but the learning policy is not Thompson Sampling.</li>
 <li>ValueError: The arm already exists.</li>
 <li>ValueError: The arm is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</li>

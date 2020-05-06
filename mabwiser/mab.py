@@ -798,7 +798,7 @@ class MAB:
         ------
         TypeError:  For ThompsonSampling, binarizer must be a callable function.
         TypeError:  The standard scaler object must have a transform method.
-        TypeError:  The standard scaler object must be fit with calculated mean_ and var_ attributes.
+        TypeError:  The standard scaler object must be fit with calculated ``mean_`` and ``var_`` attributes.
 
         ValueError: A binarizer function was provided but the learning policy is not Thompson Sampling.
         ValueError: The arm already exists.

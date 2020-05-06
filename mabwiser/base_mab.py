@@ -36,26 +36,27 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - ``predict_expectations`` method to retrieve the expectation of each arm
         - ``predict`` method for testing to retrieve the best arm based on the policy
 
+        To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
+
     Attributes
     ----------
-    rng:
+    rng: np.random.RandomState
         The random number generator.
-    arms:
+    arms: List
         The list of all arms.
-    n_jobs:
+    n_jobs: int
         This is used to specify how many concurrent processes/threads should be used for parallelized routines.
         Default value is set to 1.
         If set to -1, all CPUs are used.
         If set to -2, all CPUs but one are used, and so on.
     backend: str, optional
         Specify a parallelization backend implementation supported in the joblib library. Supported options are:
-        - “loky” used by default, can induce some communication and memory overhead when exchanging input and
-          output data with the worker Python processes.
+        - “loky” used by default, can induce some communication and memory overhead when exchanging input and output data with the worker Python processes.
         - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
         - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
         Default value is None. In this case the default backend selected by joblib will be used.
-    arm_to_expectation:
+    arm_to_expectation: Dict[Arm, floot]
         The dictionary of arms (keys) to their expected rewards (values).
     """
 
