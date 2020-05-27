@@ -82,20 +82,14 @@ class _LinTS(_RidgeRegression):
     def init(self, num_features):
         super().init(num_features)
 
-        # Calculate exploration factor
-        exploration = np.square(self.alpha) * self.A_inv
-
-        # Covariance using cholesky decomposition
-        self.covar_decomposed = np.linalg.cholesky(exploration)
+        # Calculate covariance
+        self.covar_decomposed = self._cholesky()
 
     def fit(self, X, y):
         super().fit(X, y)
 
-        # Calculate exploration factor
-        exploration = np.square(self.alpha) * self.A_inv
-
-        # Covariance using cholesky decomposition
-        self.covar_decomposed = np.linalg.cholesky(exploration)
+        # Calculate covariance
+        self.covar_decomposed = self._cholesky()
 
     def predict(self, x):
 
@@ -113,6 +107,16 @@ class _LinTS(_RidgeRegression):
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
+
+    def _cholesky(self):
+
+        # Calculate exploration factor
+        exploration = np.square(self.alpha) * self.A_inv
+
+        # Covariance using cholesky decomposition
+        covar_decomposed = np.linalg.cholesky(exploration)
+
+        return covar_decomposed
 
 
 class _LinUCB(_RidgeRegression):
