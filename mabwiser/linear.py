@@ -72,32 +72,51 @@ class _RidgeRegression:
 
 class _LinTS(_RidgeRegression):
 
+    def __init__(self, rng: np.random.RandomState, l2_lambda: Num = 1.0, alpha: Num = 1.0,
+                 scaler: Optional[Callable] = None):
+        super().__init__(rng, l2_lambda, alpha, scaler)
+
+        # Set covariance to none
+        self.covar_decomposed = None
+
+    def init(self, num_features):
+        super().init(num_features)
+
+        # Calculate covariance
+        self.covar_decomposed = self._cholesky()
+
+    def fit(self, X, y):
+        super().fit(X, y)
+
+        # Calculate covariance
+        self.covar_decomposed = self._cholesky()
+
     def predict(self, x):
 
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
-        # Calculate the covariance matrix multiplied by alpha squred
-        exploration = np.square(self.alpha) * self.A_inv
+        # Multivariate Normal Sampling
+        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
+        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
+        sampled_norm = self.rng.standard_normal(self.beta.shape[0])
 
-        # Randomly sample coefficients from Normal Distribution N(mean=beta, variance=exploration)
-        beta_sampled = self._multivariate_normal(exploration)
+        # Randomly sample coefficients from Normal Distribution N(mean=beta, std=covar_decomposed)
+        beta_sampled = self.beta + np.dot(sampled_norm, self.covar_decomposed)
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
 
-    def _multivariate_normal(self, exploration):
-        # Multivariate Normal Sampling
-        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
-        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
+    def _cholesky(self):
 
-        sampled_norm = self.rng.standard_normal(self.beta.shape[0])
+        # Calculate exploration factor
+        exploration = np.square(self.alpha) * self.A_inv
 
-        # Use exploration factor of covariance * alpha^2
+        # Covariance using cholesky decomposition
         covar_decomposed = np.linalg.cholesky(exploration)
 
-        return self.beta + np.dot(sampled_norm, covar_decomposed)
+        return covar_decomposed
 
 
 class _LinUCB(_RidgeRegression):
