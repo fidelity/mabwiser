@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# SPDX-License-Identifer: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
 from typing import Callable, List, NoReturn, Optional, Union

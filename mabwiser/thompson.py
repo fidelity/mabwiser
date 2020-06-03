@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# SPDX-License-Identifer: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0
 
 from typing import Dict, List, NoReturn, Optional, Callable
 

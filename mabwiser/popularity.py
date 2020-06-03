@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# SPDX-License-Identifer: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0
 
 from typing import List, Optional, NoReturn
 import numpy as np
@@ -22,6 +22,7 @@ class _Popularity(_EpsilonGreedy):
 
         # Make sure expectations sum up to 1 like probabilities
         self._normalize_expectations()
+
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Fit as usual greedy
