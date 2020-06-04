@@ -352,4 +352,4 @@ Simulator
 
 .. seealso:: Additional examples are available in the `examples folder`_ in the repo. 
 
-.. _examples folder: https://github.com/fmr-llc/mabwiser/tree/master/examples
+.. _examples folder: https://github.com/fidelity/mabwiser/tree/master/examples

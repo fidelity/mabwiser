@@ -5,7 +5,7 @@ It supports **context-free**, **parametric** and **non-parametric** **contextual
 parallelization for both training and testing components. The library also provides a simulation utility for comparing 
 different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to 
 [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. Full documentation is available at 
-[fmr-llc.github.io/mabwiser](https://fmr-llc.github.io/mabwiser).
+[fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
 
 MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments.
 
@@ -53,11 +53,11 @@ Available Neighborhood Policies:
 ## Installation
 
 MABWiser can be installed from the wheel file or building from source by following the instructions in 
-our [documentation](https://fmr-llc.github.io/mabwiser/installation.html).
+our [documentation](https://fidelity.github.io/mabwiser/installation.html).
 
 ## Support
 
-Please submit bug reports and feature requests as [Issues](https://github.com/fmr-llc/mabwiser/issues).
+Please submit bug reports and feature requests as [Issues](https://github.com/fidelity/mabwiser/issues).
 
 For additional questions and feedback, please contact us at [mabwiser@fmr.com](mailto:mabwiser@fmr.com?subject=[Github]%20MABWiser%20Feedback).
 
@@ -78,7 +78,7 @@ E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextua
       year      = {2019},
       pages     = {885-890},
       organization = {IEEE},
-      url       = {https://github.com/fmr-llc/mabwiser}
+      url       = {https://github.com/fidelity/mabwiser}
     }
 ```
 

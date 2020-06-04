@@ -100,6 +100,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 
-.. _GitHub: https://github.com/fmr-llc/mabwiser
+.. _GitHub: https://github.com/fidelity/mabwiser
 .. _PEP-8 standards: https://www.python.org/dev/peps/pep-0008/
-.. _Issues: https://github.com/fmr-llc/mabwiser/issues
+.. _Issues: https://github.com/fidelity/mabwiser/issues

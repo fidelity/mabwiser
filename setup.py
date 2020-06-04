@@ -9,7 +9,7 @@ setuptools.setup(
     long_description=long_description,
     version="1.9.1",
     author="FMR LLC",
-    url="https://github.com/fmr-llc/mabwiser",
+    url="https://github.com/fidelity/mabwiser",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
@@ -17,7 +17,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     project_urls={
-        "Documentation": "https://fmr-llc.github.io/mabwiser/",
-        "Source": "https://github.com/fmr-llc/mabwiser"
+        "Documentation": "https://fidelity.github.io/mabwiser/",
+        "Source": "https://github.com/fidelity/mabwiser"
     }
 )

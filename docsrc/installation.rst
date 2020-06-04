@@ -33,7 +33,7 @@ You can install the library from the wheel package using the following commands:
 
 .. code-block:: python
 
-	git clone https://github.com/fmr-llc/mabwiser.git 
+	git clone https://github.com/fidelity/mabwiser.git
 	cd mabwiser
 	pip install dist/mabwiser-X.X.X-py3-none-any.whl
 
@@ -46,7 +46,7 @@ Alternatively, you can build a wheel package on your platform from scratch using
 
 .. code-block:: python
 
-	git clone https://github.com/fmr-llc/mabwiser.git
+	git clone https://github.com/fidelity/mabwiser.git
 	cd mabwiser
 	pip install setuptools wheel # if wheel is not installed
 	python setup.py bdist_wheel 
@@ -60,7 +60,7 @@ All tests should pass.
 
 .. code-block:: python
 
-	git clone https://github.com/fmr-llc/mabwiser.git
+	git clone https://github.com/fidelity/mabwiser.git
 	cd mabwiser
 	python -m unittest discover tests
 
