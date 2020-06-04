@@ -12,5 +12,5 @@ In general, our main requirements for contribution are:
 * **Contributions should be accompanied by unit tests to ensure basic functionality and adhere to PEP-8 standards if applicable.** Tests are contained in the ``./tests/`` directory. 
 * **Contributions are accompanied by documentation.** MABWiser uses the `numpydoc`_ standard.
 
-.. _GitHub: https://github.com/fmr-llc/mabwiser
+.. _GitHub: https://github.com/fidelity/mabwiser
 .. _numpydoc: https://numpydoc.readthedocs.io/en/latest/

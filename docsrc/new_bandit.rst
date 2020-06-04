@@ -270,5 +270,5 @@ f. Build a new wheel package and remove the old one in /dist folder. See install
 **Congratulations!!** You are ready to send a Pull Request and include your changes in the MABWiser library.
 How cool is that? :)
 
-.. _GitHub: https://github.com/fmr-llc/mabwiser
+.. _GitHub: https://github.com/fidelity/mabwiser
 .. _numpydoc: https://numpydoc.readthedocs.io/en/latest/
