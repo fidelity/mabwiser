@@ -84,6 +84,6 @@ E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextua
 
 ## License
 
-MABWiser is licensed under the [Apache License 2.0](LICENSE.md).
+MABWiser is licensed under the [Apache License 2.0](LICENSE).
 
 <br>
