@@ -29,7 +29,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Constants, Arm, Num, check_true, check_false
+from mabwiser.utils import Constants, Arm, Num, check_true, check_false, _NumpyRNG
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
@@ -664,7 +664,7 @@ class MAB:
         self.backend = backend
 
         # Create the random number generator
-        self._rng = np.random.RandomState(seed=self.seed)
+        self._rng = _NumpyRNG(self.seed)
         self._is_initial_fit = False
 
         # Create the learning policy implementor

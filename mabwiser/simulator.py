@@ -34,7 +34,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, check_true, Constants
+from mabwiser.utils import Arm, Num, check_true, Constants, _NumpyRNG
 
 
 def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarray, predictions: List[Arm],
@@ -116,7 +116,7 @@ def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarra
 
 class _NeighborsSimulator(_Neighbors):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
@@ -245,7 +245,7 @@ class _NeighborsSimulator(_Neighbors):
 
 class _RadiusSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
@@ -265,7 +265,7 @@ class _RadiusSimulator(_NeighborsSimulator):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = np.random.RandomState(seeds[index])
+            lp.rng = _NumpyRNG(seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis
@@ -306,7 +306,7 @@ class _RadiusSimulator(_NeighborsSimulator):
 
 class _KNearestSimulator(_NeighborsSimulator):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  k: int, metric: str, is_quick: bool):
         super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
@@ -325,7 +325,7 @@ class _KNearestSimulator(_NeighborsSimulator):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = np.random.RandomState(seed=seeds[index])
+            lp.rng = _NumpyRNG(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis

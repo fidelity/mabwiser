@@ -6,12 +6,12 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num
+from mabwiser.utils import Arm, Num, _NumpyRNG
 
 
 class _Random(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str]):
+    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
         super().__init__(rng, arms, n_jobs, backend)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:

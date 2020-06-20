@@ -6,12 +6,12 @@ from typing import Dict, List, NoReturn, Optional, Callable
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, reset, argmax
+from mabwiser.utils import Arm, Num, reset, argmax, _NumpyRNG
 
 
 class _ThompsonSampling(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  binarizer: Optional[Callable] = None):
         super().__init__(rng, arms, n_jobs, backend)
         self.binarizer = binarizer
