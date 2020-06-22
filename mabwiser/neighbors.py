@@ -15,12 +15,12 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _NumpyRNG
+from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
 
 
 class _Neighbors(BaseMAB):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1], metric: str):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
@@ -98,7 +98,7 @@ class _Neighbors(BaseMAB):
 
 class _Radius(_Neighbors):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  radius: Num, metric: str, no_nhood_prob_of_arm=Optional[List]):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
@@ -119,7 +119,7 @@ class _Radius(_Neighbors):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = _NumpyRNG(seed=seeds[index])
+            lp.rng = create_rng(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis
@@ -155,7 +155,7 @@ class _Radius(_Neighbors):
 
 class _KNearest(_Neighbors):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  k: int, metric: str):
         super().__init__(rng, arms, n_jobs, backend, lp, metric)
@@ -175,7 +175,7 @@ class _KNearest(_Neighbors):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = _NumpyRNG(seed=seeds[index])
+            lp.rng = create_rng(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis

@@ -5,12 +5,12 @@ from typing import List, Optional, NoReturn
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.utils import Arm, reset, _NumpyRNG
+from mabwiser.utils import Arm, reset, _BaseRNG
 
 
 class _Popularity(_EpsilonGreedy):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
 
         # Init the parent greedy policy with zero epsilon
         super().__init__(rng, arms, n_jobs, backend, epsilon=0.0)

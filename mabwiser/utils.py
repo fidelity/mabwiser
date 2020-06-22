@@ -66,7 +66,7 @@ def reset(dictionary: Dict, value) -> NoReturn:
 class _BaseRNG(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def __init__(self, seed):
+    def __init__(self, seed: int):
         """ Random Number Generator (RNG) with the given seed"""
         self.seed = seed
         self.rng = None
@@ -191,3 +191,19 @@ class _NumpyRNG(_BaseRNG):
 
     def standard_normal(self, size):
         return self.rng.standard_normal(size)
+
+
+def create_rng(seed: int) -> _BaseRNG:
+    """ Returns an rng object
+
+        Parameters
+        ----------
+        seed : int
+            the seed of the rng
+
+        Returns
+        -------
+        out : _BaseRNG
+            An rng object that implements the base rng class
+    """
+    return _NumpyRNG(seed)

@@ -5,7 +5,7 @@
 """
 :Author: FMR LLC
 :Email: mabwiser@fmr.com
-:Version: 1.9.1 of May 27, 2020
+:Version: 1.10.0 of June 22, 2020
 
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
@@ -29,11 +29,11 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Constants, Arm, Num, check_true, check_false, _NumpyRNG
+from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_rng
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.9.1"
+__version__ = "1.10.0"
 __copyright__ = "Copyright (C), FMR LLC"
 
 
@@ -664,7 +664,7 @@ class MAB:
         self.backend = backend
 
         # Create the random number generator
-        self._rng = _NumpyRNG(self.seed)
+        self._rng = create_rng(self.seed)
         self._is_initial_fit = False
 
         # Create the learning policy implementor

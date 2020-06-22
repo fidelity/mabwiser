@@ -7,12 +7,12 @@ from typing import Dict, Callable, List, NoReturn, Optional, Union
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import reset, Arm, Num, _NumpyRNG
+from mabwiser.utils import reset, Arm, Num, _BaseRNG
 
 
 class _Softmax(BaseMAB):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  tau: Optional[Union[int, float]] = 1):
 
         super().__init__(rng, arms, n_jobs, backend)

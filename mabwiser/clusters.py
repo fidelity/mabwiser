@@ -14,12 +14,12 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _NumpyRNG
+from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
 
 
 class _Clusters(BaseMAB):
 
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  n_clusters: Num, is_minibatch: bool):
         super().__init__(rng, arms, n_jobs, backend)
@@ -131,7 +131,7 @@ class _Clusters(BaseMAB):
             cluster = cluster_predictions[index]
 
             # Set random state
-            lp_list[cluster].rng = _NumpyRNG(seed=seeds[index])
+            lp_list[cluster].rng = create_rng(seed=seeds[index])
 
             # Predict based on the cluster
             if is_predict:

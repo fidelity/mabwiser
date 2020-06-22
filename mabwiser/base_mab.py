@@ -16,7 +16,7 @@ import multiprocessing as mp
 from joblib import Parallel, delayed
 import numpy as np
 
-from mabwiser.utils import Arm, Num, _NumpyRNG
+from mabwiser.utils import Arm, Num, _BaseRNG
 
 
 class BaseMAB(metaclass=abc.ABCMeta):
@@ -61,12 +61,12 @@ class BaseMAB(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def __init__(self, rng: _NumpyRNG, arms: List[Arm], n_jobs: int, backend: str = None):
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: str = None):
         """Abstract method.
 
         Creates a multi-armed bandit policy with the given arms.
         """
-        self.rng: _NumpyRNG = rng
+        self.rng: _BaseRNG = rng
         self.arms: List[Arm] = arms
         self.n_jobs: int = n_jobs
         self.backend: str = backend
