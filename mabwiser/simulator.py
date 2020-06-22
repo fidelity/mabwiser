@@ -34,7 +34,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, check_true, Constants, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, check_true, Constants, _BaseRNG, _create_rng
 
 
 def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarray, predictions: List[Arm],
@@ -265,7 +265,7 @@ class _RadiusSimulator(_NeighborsSimulator):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = create_rng(seeds[index])
+            lp.rng = _create_rng(seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis
@@ -325,7 +325,7 @@ class _KNearestSimulator(_NeighborsSimulator):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = create_rng(seed=seeds[index])
+            lp.rng = _create_rng(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis

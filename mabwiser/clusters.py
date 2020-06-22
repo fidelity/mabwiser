@@ -14,7 +14,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, reset, _BaseRNG, _create_rng
 
 
 class _Clusters(BaseMAB):
@@ -131,7 +131,7 @@ class _Clusters(BaseMAB):
             cluster = cluster_predictions[index]
 
             # Set random state
-            lp_list[cluster].rng = create_rng(seed=seeds[index])
+            lp_list[cluster].rng = _create_rng(seed=seeds[index])
 
             # Predict based on the cluster
             if is_predict:

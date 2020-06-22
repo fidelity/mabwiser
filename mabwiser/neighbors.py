@@ -15,7 +15,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, reset, _BaseRNG, _create_rng
 
 
 class _Neighbors(BaseMAB):
@@ -119,7 +119,7 @@ class _Radius(_Neighbors):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = create_rng(seed=seeds[index])
+            lp.rng = _create_rng(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis
@@ -175,7 +175,7 @@ class _KNearest(_Neighbors):
         for index, row in enumerate(contexts):
 
             # Get random generator
-            lp.rng = create_rng(seed=seeds[index])
+            lp.rng = _create_rng(seed=seeds[index])
 
             # Calculate the distances from the historical contexts
             # Row is 1D so convert it to 2D array for cdist using newaxis
