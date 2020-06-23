@@ -7,7 +7,7 @@ from scipy.spatial.distance import cdist
 
 from mabwiser.linear import _Linear
 from mabwiser.mab import _EpsilonGreedy
-from mabwiser.utils import argmax, Arm, Num, _create_rng, _BaseRNG
+from mabwiser.utils import argmax, Arm, Num, create_rng, _BaseRNG
 
 
 ######################################################################################
@@ -65,7 +65,7 @@ class CustomGreedy(_EpsilonGreedy):
 
 
 # Random number generator
-rng = _create_rng(123456)
+rng = create_rng(123456)
 
 # Arms
 options = [1, 2]
@@ -196,7 +196,7 @@ class LinUCBColdStart(_Linear):
 
 
 # Random number generator
-rng = _create_rng(123456)
+rng = create_rng(123456)
 
 # Arms
 articles = [1, 2, 3, 4, 5, 6]

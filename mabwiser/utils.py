@@ -193,7 +193,7 @@ class _NumpyRNG(_BaseRNG):
         return self.rng.standard_normal(size)
 
 
-def _create_rng(seed: int) -> _BaseRNG:
+def create_rng(seed: int) -> _BaseRNG:
     """ Returns an rng object
 
         Parameters
