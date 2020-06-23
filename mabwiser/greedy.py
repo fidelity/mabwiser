@@ -6,12 +6,12 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import reset, argmax, Arm, Num
+from mabwiser.utils import reset, argmax, Arm, Num, _BaseRNG
 
 
 class _EpsilonGreedy(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  epsilon: Optional[float] = 0.05):
         super().__init__(rng, arms, n_jobs, backend)
         self.epsilon = epsilon

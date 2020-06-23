@@ -7,12 +7,12 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, argmax
+from mabwiser.utils import Arm, Num, argmax, _BaseRNG
 
 
 class _RidgeRegression:
 
-    def __init__(self, rng: np.random.RandomState, l2_lambda: Num = 1.0, alpha: Num = 1.0,
+    def __init__(self, rng: _BaseRNG, l2_lambda: Num = 1.0, alpha: Num = 1.0,
                  scaler: Optional[Callable] = None):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
@@ -72,7 +72,7 @@ class _RidgeRegression:
 
 class _LinTS(_RidgeRegression):
 
-    def __init__(self, rng: np.random.RandomState, l2_lambda: Num = 1.0, alpha: Num = 1.0,
+    def __init__(self, rng: _BaseRNG, l2_lambda: Num = 1.0, alpha: Num = 1.0,
                  scaler: Optional[Callable] = None):
         super().__init__(rng, l2_lambda, alpha, scaler)
 
@@ -138,7 +138,7 @@ class _Linear(BaseMAB):
 
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  l2_lambda: Num, alpha: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
         super().__init__(rng, arms, n_jobs, backend)
         self.l2_lambda = l2_lambda

@@ -14,12 +14,12 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset
+from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
 
 
 class _Clusters(BaseMAB):
 
-    def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str],
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  n_clusters: Num, is_minibatch: bool):
         super().__init__(rng, arms, n_jobs, backend)
@@ -27,9 +27,9 @@ class _Clusters(BaseMAB):
         self.n_clusters = n_clusters
 
         if is_minibatch:
-            self.kmeans = MiniBatchKMeans(n_clusters, random_state=rng.get_state()[1][0])
+            self.kmeans = MiniBatchKMeans(n_clusters, random_state=rng.seed)
         else:
-            self.kmeans = KMeans(n_clusters, random_state=rng.get_state()[1][0])
+            self.kmeans = KMeans(n_clusters, random_state=rng.seed)
 
         # Create the list of learning policies for each cluster
         # Deep copy all parameters of the lp objects, except refer to the originals of rng and arms
@@ -131,7 +131,7 @@ class _Clusters(BaseMAB):
             cluster = cluster_predictions[index]
 
             # Set random state
-            lp_list[cluster].rng = np.random.RandomState(seed=seeds[index])
+            lp_list[cluster].rng = create_rng(seed=seeds[index])
 
             # Predict based on the cluster
             if is_predict:
