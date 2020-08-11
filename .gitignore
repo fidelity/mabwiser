@@ -4,6 +4,7 @@
 .pytest_cache/*
 tests/__pycache__/*
 mabwiser/__pycache__/*
+dist/*
 
 # Environments
 .env

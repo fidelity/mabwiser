@@ -54,7 +54,7 @@ Available Neighborhood Policies:
 
 MABWiser is available to install as: pip install mabwiser 
 
-It can also be installed from the wheel file or building from source by following the instructions in 
+It can also be installed by building from source by following the instructions in 
 our [documentation](https://fidelity.github.io/mabwiser/installation.html).
 
 ## Support
