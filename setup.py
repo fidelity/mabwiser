@@ -15,6 +15,7 @@ setuptools.setup(
     author="FMR LLC",
     url="https://github.com/fidelity/mabwiser",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    install_requires=required,
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.6",
