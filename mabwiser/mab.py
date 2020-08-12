@@ -33,7 +33,7 @@ from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_
 
 __author__ = "FMR LLC"
 __email__ = "mabwiser@fmr.com"
-__version__ = "1.10.0"
+__version__ = "1.10.1"
 __copyright__ = "Copyright (C), FMR LLC"
 
 
