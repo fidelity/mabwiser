@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Adding a New Bandit &mdash; MABWiser 1.9.0 documentation</title>
+  <title>Adding a New Bandit &mdash; MABWiser 1.10.1 documentation</title>
   
 
   
@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -164,14 +164,14 @@
 <span id="new-bandit"></span><h1>Adding a New Bandit<a class="headerlink" href="#adding-a-new-bandit" title="Permalink to this headline">¶</a></h1>
 <p>In this section, we provide high-level guidelines on how to introduce a new bandit algorithm in MABWiser.</p>
 <div class="admonition-high-level-overview admonition">
-<p class="first admonition-title">High-Level Overview</p>
+<p class="admonition-title">High-Level Overview</p>
 <p>Adding a new bandit algorithm to MABWiser consists of three main steps:</p>
 <ol class="arabic simple">
-<li>Exposing the new bandit policy within the Public API</li>
-<li>Developing the underlying bandit algorithm</li>
-<li>Testing the behavior of the bandit policy</li>
+<li><p>Exposing the new bandit policy within the Public API</p></li>
+<li><p>Developing the underlying bandit algorithm</p></li>
+<li><p>Testing the behavior of the bandit policy</p></li>
 </ol>
-<p class="last">These steps can be followed by a Pull Request to include your new policy in the MABWiser library. In the following, the details of each of step are provided.</p>
+<p>These steps can be followed by a Pull Request to include your new policy in the MABWiser library. In the following, the details of each of step are provided.</p>
 </div>
 <div class="section" id="exposing-the-public-api">
 <h2>1. Exposing the Public API<a class="headerlink" href="#exposing-the-public-api" title="Permalink to this headline">¶</a></h2>
@@ -198,28 +198,28 @@ This is how it would look like in a usage example. Notice how the <code class="d
 </div>
 <p>To enable public access to your bandit policy, you need the the following changes in <code class="docutils literal notranslate"><span class="pre">mab.py</span></code>:</p>
 <div class="admonition important">
-<p class="first admonition-title">Important</p>
-<p class="last">Make sure to complete the following steps in a new feature branch created via
+<p class="admonition-title">Important</p>
+<p>Make sure to complete the following steps in a new feature branch created via
 <code class="docutils literal notranslate"><span class="pre">`git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">mycoolpolicy`</span></code>. Later on, you can create a pull request from this branch
 to make your contributions part of the library.</p>
 </div>
 <ol class="loweralpha simple">
-<li>Introduce the new bandit algorithm as an inner namedtuple class as part of the <code class="docutils literal notranslate"><span class="pre">LearningPolicy</span></code> class. See existing bandit policies as an example.</li>
-<li>The parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> will be a class member of this new inner class. Make sure to add type hinting. If possible, set a default value.</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">_validate()</span></code> function for error checking on input values. If this raises errors, please document those in the <code class="docutils literal notranslate"><span class="pre">mab</span></code> constructor.</li>
-<li>Add pydoc string documentation within this inner class to provide users a description of your new bandit policy. You can even use <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">math::</span></code> to express formulas.</li>
-<li>Create a doctest based on a usage example with you new policy, like the one above. See other doctests in existing policies.</li>
-<li>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</li>
+<li><p>Introduce the new bandit algorithm as an inner namedtuple class as part of the <code class="docutils literal notranslate"><span class="pre">LearningPolicy</span></code> class. See existing bandit policies as an example.</p></li>
+<li><p>The parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> will be a class member of this new inner class. Make sure to add type hinting. If possible, set a default value.</p></li>
+<li><p>Implement the <code class="docutils literal notranslate"><span class="pre">_validate()</span></code> function for error checking on input values. If this raises errors, please document those in the <code class="docutils literal notranslate"><span class="pre">mab</span></code> constructor.</p></li>
+<li><p>Add pydoc string documentation within this inner class to provide users a description of your new bandit policy. You can even use <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">math::</span></code> to express formulas.</p></li>
+<li><p>Create a doctest based on a usage example with you new policy, like the one above. See other doctests in existing policies.</p></li>
+<li><p>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</p></li>
 </ol>
 <p>You now have an entry point to your new bandit algorithm.
 The next step is to connect this bandit with an <em>implementor</em> object in the constructor of the <code class="docutils literal notranslate"><span class="pre">MAB</span></code> class:</p>
 <ol class="loweralpha simple">
-<li>Go to the constructor of the <code class="docutils literal notranslate"><span class="pre">MAB</span></code> class.</li>
-<li>Set the value of the <code class="docutils literal notranslate"><span class="pre">lp</span></code> to your internal implementor class, in this case <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code>.</li>
-<li>Pass down the parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> to the internal implementor object.</li>
-<li>Make sure to update the decorator <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> so that we can return the <code class="docutils literal notranslate"><span class="pre">learning_policy</span></code> back to the user.</li>
-<li>In the <code class="docutils literal notranslate"><span class="pre">_validate_mab_args</span></code> function, register your new policy as a valid bandit to pass input validation.</li>
-<li>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</li>
+<li><p>Go to the constructor of the <code class="docutils literal notranslate"><span class="pre">MAB</span></code> class.</p></li>
+<li><p>Set the value of the <code class="docutils literal notranslate"><span class="pre">lp</span></code> to your internal implementor class, in this case <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code>.</p></li>
+<li><p>Pass down the parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code> to the internal implementor object.</p></li>
+<li><p>Make sure to update the decorator <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> so that we can return the <code class="docutils literal notranslate"><span class="pre">learning_policy</span></code> back to the user.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">_validate_mab_args</span></code> function, register your new policy as a valid bandit to pass input validation.</p></li>
+<li><p>The same idea applies if you were introducing a new <code class="docutils literal notranslate"><span class="pre">NeighborhoodPolicy</span></code>.</p></li>
 </ol>
 <p><strong>Congratulations!!</strong> You can now increment the version of library <code class="docutils literal notranslate"><span class="pre">__version__</span></code>.
 Next, let’s move on to the implementation phase of your cool bandit algorithm!</p>
@@ -231,8 +231,8 @@ What remains is to implement the learning algorithm behind your bandit policy.</
 <p>Start by creating a new Python file named <code class="docutils literal notranslate"><span class="pre">mycoolpolicy.py</span></code> under the /mabwiser folder
 to implement a class called <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code>. This is where the bandit implementation will live.</p>
 <div class="admonition important">
-<p class="first admonition-title">Important</p>
-<p class="last">In Python, the prefix <code class="docutils literal notranslate"><span class="pre">_</span></code> in the class name denotes a private class. That is, the users do not need to directly access</p>
+<p class="admonition-title">Important</p>
+<p>In Python, the prefix <code class="docutils literal notranslate"><span class="pre">_</span></code> in the class name denotes a private class. That is, the users do not need to directly access</p>
 </div>
 <p>this implementor class. Instead, they work with an immutable namedtuple object as shown in the usage example above.</p>
 <p>Here is, at a high-level, what you need to implement in your bandit policy:</p>
@@ -264,7 +264,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># These fields are declared here and initialized to zero.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arms</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This method trains your algorithm from scratch each time its called.</span>
     <span class="c1"># You might need to reset the internal fields</span>
@@ -275,7 +275,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># This automatically activates parallelization in the training phase.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
     <span class="c1"># This method trains your algorithm in a continuous fashion.</span>
     <span class="c1"># Unlike fit() operation, the partial_fit() does not reset internal fields typically.</span>
     <span class="c1"># This allows us to continue learning online</span>
@@ -284,7 +284,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># This automatically activates parallelization in the training phase.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Arm</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Arm</span><span class="p">:</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This method returns the best arm to the user according to your policy.</span>
     <span class="c1"># It bases its decision on arm_to_expectation which is calculated in the _fit_arm() method.</span>
@@ -292,13 +292,13 @@ to implement a class called <code class="docutils literal notranslate"><span cla
 
     <span class="k">return</span> <span class="n">best_arm</span>
 
-<span class="k">def</span> <span class="nf">predict_expectations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Num</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">predict_expectations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Num</span><span class="p">]:</span>
     <span class="c1"># This method returns a copy of the expectations dictionary.</span>
     <span class="c1"># Make sure to return a copy of the internal object,</span>
     <span class="c1"># so that the user cannot accidentally break your policy.</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">_fit_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_fit_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This is the MOST IMPORTANT function to implement.</span>
     <span class="c1"># This method is for the algorithm behind your bandit policy on how it trains for each arm.</span>
@@ -307,10 +307,10 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span> <span class="o">=</span> <span class="o">...</span> <span class="c1"># magic goes here</span>
 
 <span class="k">def</span> <span class="nf">_predict_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_predict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                      <span class="n">seeds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">start_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+                      <span class="n">seeds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">start_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">_uptake_new_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">binarizer</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_uptake_new_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">binarizer</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This method is called when add_arm() method is used to introduce new arms.</span>
     <span class="c1"># if you have declared additional fields in the constructor</span>
@@ -342,7 +342,7 @@ Every test starts with the <code class="docutils literal notranslate"><span clas
                                 <span class="n">learning_policy</span><span class="o">=</span><span class="n">LearningPolicy</span><span class="o">.</span><span class="n">_MyCoolPolicy</span><span class="p">(),</span>
                                 <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">,</span>
                                 <span class="n">num_run</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                <span class="n">is_predict</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                <span class="n">is_predict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Assert the predicted arm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">arm</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -355,7 +355,7 @@ Every test starts with the <code class="docutils literal notranslate"><span clas
                                 <span class="n">learning_policy</span><span class="o">=</span><span class="n">LearningPolicy</span><span class="o">.</span><span class="n">_MyCoolPolicy</span><span class="p">(),</span>
                                 <span class="n">seed</span><span class="o">=</span><span class="mi">123456</span><span class="p">,</span>
                                 <span class="n">num_run</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                <span class="n">is_predict</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                                <span class="n">is_predict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Assert the arm expectations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertDictEqual</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span> <span class="n">exp</span><span class="p">)</span>
@@ -405,12 +405,12 @@ This is no small step and deserves its own victory dance!
 Now it is time to share it with everyone in the world by sending a pull request so that your code can be merged to the master branch.</p>
 <p>Preparing a pull request typically involves the following steps:</p>
 <ol class="loweralpha simple">
-<li>Add a note about your changes in the CHANGELOG.txt.</li>
-<li>Update the library version. You can use a keyword search for “version” to make sure you cover all version fields.</li>
-<li>Update the README.md, in necessary.</li>
-<li>Update the documentation rst files under the /docsrc folder , if necessary.</li>
-<li>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder.</li>
-<li>Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.</li>
+<li><p>Add a note about your changes in the CHANGELOG.txt.</p></li>
+<li><p>Update the library version. You can use a keyword search for “version” to make sure you cover all version fields.</p></li>
+<li><p>Update the README.md, in necessary.</p></li>
+<li><p>Update the documentation rst files under the /docsrc folder , if necessary.</p></li>
+<li><p>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder.</p></li>
+<li><p>Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.</p></li>
 </ol>
 <p><strong>Congratulations!!</strong> You are ready to send a Pull Request and include your changes in the MABWiser library.
 How cool is that? :)</p>

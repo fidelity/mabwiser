@@ -5,10 +5,10 @@ Installation
 
 .. admonition:: Installation Options
 
-	There are two alternatives to install the library: 
+	There are two alternatives to install the library:
 
-	1. Install from the provided wheel package
-	2. Build from the source code 
+	1. pip install mabwiser
+	2. Build from the source code
 	
 Requirements
 ------------
@@ -25,19 +25,6 @@ packages. The following packages are used currently:
 	scipy
 	seaborn>=0.9.0
 
-Wheel Package
--------------
-
-The library is provided as a wheel package.
-You can install the library from the wheel package using the following commands:
-
-.. code-block:: python
-
-	git clone https://github.com/fidelity/mabwiser.git
-	cd mabwiser
-	pip install dist/mabwiser-X.X.X-py3-none-any.whl
-
-.. important:: Don't forget to replace ``X.X.X`` with the current version number. 
 
 Source Code
 -----------
@@ -49,7 +36,7 @@ Alternatively, you can build a wheel package on your platform from scratch using
 	git clone https://github.com/fidelity/mabwiser.git
 	cd mabwiser
 	pip install setuptools wheel # if wheel is not installed
-	python setup.py bdist_wheel 
+	python setup.py sdist bdist_wheel
 	pip install dist/mabwiser-X.X.X-py3-none-any.whl
 
 Test Your Setup
@@ -75,4 +62,9 @@ For examples of how to use the library, refer to :ref:`Usage Examples<examples>`
 Upgrade the Library
 -------------------
 
-To upgrade to the latest version of the library, run ``git pull origin master`` in the repo folder, and then run ``pip install --upgrade --no-cache-dir dist/mabwiser-X.X.X-py3-none-any.whl``.
+To upgrade to the latest version of the library, run pip install --upgrade mabwiser.
+
+If you are a custom build:
+1. run ``git pull origin master`` in the repo folder
+2. run python setup.py sdist bdist_wheel
+3. run ``pip install --upgrade --no-cache-dir dist/mabwiser-X.X.X-py3-none-any.whl``.
