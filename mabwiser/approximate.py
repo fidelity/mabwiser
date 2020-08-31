@@ -62,7 +62,7 @@ class _ApproximateNearest(_Neighbors):
         # Add more historical data for prediction
         self.decisions = np.concatenate((self.decisions, decisions))
         self.rewards = np.concatenate((self.rewards, rewards))
-        self.rewards = np.concatenate((self.rewards, rewards))
+        self.contexts = np.concatenate((self.contexts, contexts))
 
         # Fit hashes for each training context
         self._fit_operation(contexts)
@@ -71,7 +71,9 @@ class _ApproximateNearest(_Neighbors):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
             hash_values = self.get_context_hash(contexts, self.table_to_plane[k])
+            # Get list of unique hashes - list is sparse, there should be collisions
             hash_keys = np.unique(hash_values)
+            # For each hash, get the indices of contexts with that hash
             for h in hash_keys:
                 self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
 
@@ -111,7 +113,7 @@ class _ApproximateNearest(_Neighbors):
 
     @staticmethod
     def get_context_hash(contexts, plane):
-        # Project row onto planes and get signs
+        # Project rows onto plane and get signs
         projection_signs = 1 * (np.dot(contexts, plane) > 0)
 
         # Get base 2 value of projection signs
