@@ -364,8 +364,7 @@ class _ApproximateSimulator(_NeighborsSimulator):
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         # Initialize planes
-        self.table_to_plane = {i: self.rng.standard_normal(size=(contexts.shape[1], self.n_dimensions))
-                               for i in self.table_to_plane.keys()}
+        self._initialize_planes(contexts.shape[1])
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -392,7 +391,7 @@ class _ApproximateSimulator(_NeighborsSimulator):
         # Add more historical data for prediction
         self.decisions = np.concatenate((self.decisions, decisions))
         self.rewards = np.concatenate((self.rewards, rewards))
-        self.rewards = np.concatenate((self.rewards, rewards))
+        self.contexts = np.concatenate((self.contexts, contexts))
 
         # Fit hashes for each training context
         self._fit_operation(contexts)
@@ -401,9 +400,17 @@ class _ApproximateSimulator(_NeighborsSimulator):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
             hash_values = _ApproximateNearest.get_context_hash(contexts, self.table_to_plane[k])
+
+            # Get list of unique hashes - list is sparse, there should be collisions
             hash_keys = np.unique(hash_values)
+
+            # For each hash, get the indices of contexts with that hash
             for h in hash_keys:
                 self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+
+    def _initialize_planes(self, n_rows):
+        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
+                               for i in self.table_to_plane.keys()}
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:

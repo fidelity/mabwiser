@@ -415,7 +415,7 @@ class NeighborhoodPolicy(NamedTuple):
                           NeighborhoodPolicy.ApproximateNearest(5, 5))
             >>> mab.fit(decisions, rewards, contexts)
             >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
-            [1, 1]
+            [3, 3]
         """
         n_dimensions: int = 5
         n_tables: int = 5
