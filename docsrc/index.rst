@@ -66,6 +66,7 @@ Available Learning Policies:
 
 Available Neighborhood Policies:
 
+* Approximate Nearest
 * Clusters
 * K-Nearest
 * Radius

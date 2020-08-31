@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-:Author: FMR LLC
-:Email: mabwiser@fmr.com
-
 This module defines the abstract base class for contextual multi-armed bandit algorithms.
 """
 
@@ -17,6 +14,12 @@ from joblib import Parallel, delayed
 import numpy as np
 
 from mabwiser.utils import Arm, Num, _NumpyRNG
+from mabwiser._version import __author__, __email__, __version__, __copyright__
+
+__author__ = __author__
+__email__ = __email__
+__version__ = __version__
+__copyright__ = __copyright__
 
 
 class BaseMAB(metaclass=abc.ABCMeta):

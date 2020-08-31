@@ -20,13 +20,18 @@ logging.disable(logging.CRITICAL)
 class TestSimulator(unittest.TestCase):
 
     lps = [LearningPolicy.EpsilonGreedy(),
-           LearningPolicy.Popularity(), LearningPolicy.Random(),
-           LearningPolicy.UCB1(), LearningPolicy.ThompsonSampling(),
+           LearningPolicy.Popularity(),
+           LearningPolicy.Random(),
+           LearningPolicy.UCB1(),
+           LearningPolicy.ThompsonSampling(),
            LearningPolicy.Softmax()]
 
-    parametric = [LearningPolicy.LinUCB()]
+    parametric = [LearningPolicy.LinUCB(), LearningPolicy.LinTS()]
 
-    nps = [NeighborhoodPolicy.Radius(), NeighborhoodPolicy.KNearest(), NeighborhoodPolicy.Clusters()]
+    nps = [NeighborhoodPolicy.ApproximateNearest(),
+           NeighborhoodPolicy.KNearest(),
+           NeighborhoodPolicy.Radius(),
+           NeighborhoodPolicy.Clusters()]
 
     def test_contextual_offline(self):
         rng = np.random.RandomState(seed=7)

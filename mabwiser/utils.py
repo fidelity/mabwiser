@@ -2,9 +2,6 @@
 # SPDX-License-Identifer: Apache-2.0
 
 """
-:Author: FMR LLC
-:Email: mabwiser@fmr.com
-
 This module provides a number of constants and helper functions.
 """
 

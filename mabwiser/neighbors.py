@@ -21,10 +21,12 @@ from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
 class _Neighbors(BaseMAB):
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1], metric: str):
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
+                 metric: str, no_nhood_prob_of_arm=None):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.metric = metric
+        self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
 
         self.decisions = None
         self.rewards = None
@@ -43,9 +45,7 @@ class _Neighbors(BaseMAB):
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.lp.is_contextual_binarized = False
-            self.rewards = self.lp._get_binary_rewards(decisions, rewards)
-            self.lp.is_contextual_binarized = True
+            self.rewards = self._binarize_ts_rewards(decisions, rewards)
         else:
             self.rewards = rewards
 
@@ -53,9 +53,7 @@ class _Neighbors(BaseMAB):
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.lp.is_contextual_binarized = False
-            rewards = self.lp._get_binary_rewards(decisions, rewards)
-            self.lp.is_contextual_binarized = True
+            rewards = self._binarize_ts_rewards(decisions, rewards)
 
         # Add more historical data for prediction
         self.decisions = np.concatenate((self.decisions, decisions))
@@ -81,6 +79,13 @@ class _Neighbors(BaseMAB):
         """Abstract method to be implemented by child classes."""
         pass
 
+    def _binarize_ts_rewards(self, decisions, rewards):
+        self.lp.is_contextual_binarized = False
+        rewards = self.lp._get_binary_rewards(decisions, rewards)
+        self.lp.is_contextual_binarized = True
+
+        return rewards
+
     def _get_nhood_predictions(self, lp, indices, row_2d, is_predict):
 
         # Fit the decisions and rewards of the neighbors
@@ -92,6 +97,18 @@ class _Neighbors(BaseMAB):
         else:
             return lp.predict_expectations(row_2d)
 
+    def _get_no_nhood_predictions(self, lp, is_predict):
+
+        if is_predict:
+            # if no_nhood_prob_of_arm is None, select a random int
+            # else, select a non-uniform random arm
+            # choice returns an array, hence get zero index
+            rand_int = lp.rng.choice(len(self.arms), size=1, p=self.no_nhood_prob_of_arm)[0]
+            return self.arms[rand_int]
+        else:
+            # Expectations will be nan when there are no neighbors
+            return self.arm_to_expectation.copy()
+
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
         self.lp.add_arm(arm, binarizer)
 
@@ -101,10 +118,9 @@ class _Radius(_Neighbors):
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  radius: Num, metric: str, no_nhood_prob_of_arm=Optional[List]):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric)
+        super().__init__(rng, arms, n_jobs, backend, lp, metric, no_nhood_prob_of_arm)
 
         self.radius = radius
-        self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -139,18 +155,6 @@ class _Radius(_Neighbors):
 
         # Return the list of predictions
         return predictions
-
-    def _get_no_nhood_predictions(self, lp, is_predict):
-
-        if is_predict:
-            # if no_nhood_prob_of_arm is None, select a random int
-            # else, select a non-uniform random arm
-            # choice returns an array, hence get zero index
-            rand_int = lp.rng.choice(len(self.arms), size=1, p=self.no_nhood_prob_of_arm)[0]
-            return self.arms[rand_int]
-        else:
-            # Expectations will be nan when there are no neighbors
-            return self.arm_to_expectation.copy()
 
 
 class _KNearest(_Neighbors):

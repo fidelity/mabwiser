@@ -6,6 +6,7 @@ from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 
+# TODO add ANN test
 class ParallelTest(BaseTest):
 
     def test_greedy_t1(self):

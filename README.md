@@ -46,6 +46,7 @@ Available Learning Policies:
 * Upper Confidence Bound (UCB1)
 
 Available Neighborhood Policies: 
+* Approximate Nearest
 * Clusters
 * K-Nearest
 * Radius
@@ -60,8 +61,6 @@ our [documentation](https://fidelity.github.io/mabwiser/installation.html).
 ## Support
 
 Please submit bug reports and feature requests as [Issues](https://github.com/fidelity/mabwiser/issues).
-
-For additional questions and feedback, please contact us at [mabwiser@fmr.com](mailto:mabwiser@fmr.com?subject=[Github]%20MABWiser%20Feedback).
 
 
 ## Citation

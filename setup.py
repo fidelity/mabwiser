@@ -1,4 +1,5 @@
 import setuptools
+from mabwiser._version import __author__, __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -11,8 +12,8 @@ setuptools.setup(
     description="MABWiser: Parallelizable Contextual Multi-Armed Bandits Library",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="1.10.1",
-    author="FMR LLC",
+    version=__version__,
+    author=__author__,
     url="https://github.com/fidelity/mabwiser",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=required,
