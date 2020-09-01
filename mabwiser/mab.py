@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
 
-from mabwiser.approximate import _ApproximateNearest
+from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
@@ -376,10 +376,10 @@ class LearningPolicy(NamedTuple):
 
 
 class NeighborhoodPolicy(NamedTuple):
-    class ApproximateNearest(NamedTuple):
-        """Approximate Nearest Neighbors Policy.
+    class LSHNearest(NamedTuple):
+        """LSH Approximate Nearest Neighbors Policy.
 
-        ApproximateNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
+        LSHNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
         select observations to be used with a learning policy.
 
         For the simhash, contexts are projected onto an n-dimensional plane and each dimension is evaluated for its
@@ -412,7 +412,7 @@ class NeighborhoodPolicy(NamedTuple):
             >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
                             [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
             >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), \
-                          NeighborhoodPolicy.ApproximateNearest(5, 5))
+                          NeighborhoodPolicy.LSHNearest(5, 5))
             >>> mab.fit(decisions, rewards, contexts)
             >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
             [3, 3]
@@ -631,7 +631,7 @@ class MAB:
                                         LearningPolicy.LinTS,
                                         LearningPolicy.LinUCB],                     # The learning policy
                  neighborhood_policy: Union[None,
-                                            NeighborhoodPolicy.ApproximateNearest,
+                                            NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
                                             NeighborhoodPolicy.Radius] = None,      # The context policy, optional
@@ -685,9 +685,9 @@ class MAB:
         TypeError:  For Softmax, tau must be an integer or float.
         TypeError:  For ThompsonSampling, binarizer must be a callable function.
         TypeError:  For UCB, alpha must be an integer or float.
-        TypeError:  For ApproximateNearest, n_dimensions must be an integer or float.
-        TypeError:  For ApproximateNearest, n_tables must be an integer or float.
-        TypeError:  For ApproximateNearest, no_nhood_prob_of_arm must be None or List that sums up to 1.0.
+        TypeError:  For LSHNearest, n_dimensions must be an integer or float.
+        TypeError:  For LSHNearest, n_tables must be an integer or float.
+        TypeError:  For LSHNearest, no_nhood_prob_of_arm must be None or List that sums up to 1.0.
         TypeError:  For Clusters, n_clusters must be an integer.
         TypeError:  For Clusters, is_minibatch must be a boolean.
         TypeError:  For Radius, radius must be an integer or float.
@@ -705,9 +705,9 @@ class MAB:
         ValueError: For LinUCB, l2_lambda cannot be negative.
         ValueError: For Softmax, tau must be greater than zero.
         ValueError: For UCB, alpha must be greater than zero.
-        ValueError: For ApproximateNearest, n_dimensions must be gerater than zero.
-        ValueError: For ApproximateNearest, n_tables must be gerater than zero.
-        ValueError: For ApproximateNearest, if given, no_nhood_prob_of_arm list should sum up to 1.0.
+        ValueError: For LSHNearest, n_dimensions must be gerater than zero.
+        ValueError: For LSHNearest, n_tables must be gerater than zero.
+        ValueError: For LSHNearest, if given, no_nhood_prob_of_arm list should sum up to 1.0.
         ValueError: For Clusters, n_clusters cannot be less than 2.
         ValueError: For Radius and KNearest, metric is not supported by scipy.spatial.distance.cdist.
         ValueError: For Radius, radius must be greater than zero.
@@ -758,10 +758,10 @@ class MAB:
             # Do not use parallel fit or predict for Learning Policy when contextual
             lp.n_jobs = 1
 
-            if isinstance(neighborhood_policy, NeighborhoodPolicy.ApproximateNearest):
-                self._imp = _ApproximateNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                                neighborhood_policy.n_dimensions, neighborhood_policy.n_tables,
-                                                neighborhood_policy.no_nhood_prob_of_arm)
+            if isinstance(neighborhood_policy, NeighborhoodPolicy.LSHNearest):
+                self._imp = _LSHNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
+                                        neighborhood_policy.n_dimensions, neighborhood_policy.n_tables,
+                                        neighborhood_policy.no_nhood_prob_of_arm)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.Clusters):
                 self._imp = _Clusters(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                       neighborhood_policy.n_clusters, neighborhood_policy.is_minibatch)
@@ -792,7 +792,7 @@ class MAB:
         NotImplementedError: MAB learning_policy property not implemented for this learning policy.
 
         """
-        if isinstance(self._imp, (_ApproximateNearest, _KNearest, _Radius)):
+        if isinstance(self._imp, (_LSHNearest, _KNearest, _Radius)):
             lp = self._imp.lp
         elif isinstance(self._imp, _Clusters):
             lp = self._imp.lp_list[0]
@@ -832,9 +832,9 @@ class MAB:
         -------
         The neighborhood policy
         """
-        if isinstance(self._imp, _ApproximateNearest):
-            return NeighborhoodPolicy.ApproximateNearest(self._imp.n_dimensions, self._imp.n_tables,
-                                                         self._imp.no_nhood_prob_of_arm)
+        if isinstance(self._imp, _LSHNearest):
+            return NeighborhoodPolicy.LSHNearest(self._imp.n_dimensions, self._imp.n_tables,
+                                                 self._imp.no_nhood_prob_of_arm)
         elif isinstance(self._imp, _KNearest):
             return NeighborhoodPolicy.KNearest(self._imp.k, self._imp.metric)
         elif isinstance(self._imp, _Radius):
@@ -1112,7 +1112,7 @@ class MAB:
         # Contextual Policy
         if context_policy:
             check_true(isinstance(context_policy,
-                                  (NeighborhoodPolicy.ApproximateNearest,
+                                  (NeighborhoodPolicy.LSHNearest,
                                    NeighborhoodPolicy.KNearest, NeighborhoodPolicy.Radius,
                                    NeighborhoodPolicy.Clusters)),
                        TypeError("Context Policy type mismatch."))

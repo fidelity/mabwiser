@@ -26,7 +26,7 @@ from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.mab import MAB
 from mabwiser.neighbors import _Neighbors, _Radius, _KNearest
-from mabwiser.approximate import _ApproximateNearest
+from mabwiser.approximate import _LSHNearest
 from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
@@ -347,7 +347,7 @@ class _KNearestSimulator(_NeighborsSimulator):
         return predictions
 
 
-class _ApproximateSimulator(_NeighborsSimulator):
+class _LSHSimulator(_NeighborsSimulator):
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
                  n_dimensions: int, n_tables: int, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
@@ -399,7 +399,7 @@ class _ApproximateSimulator(_NeighborsSimulator):
     def _fit_operation(self, contexts):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
-            hash_values = _ApproximateNearest.get_context_hash(contexts, self.table_to_plane[k])
+            hash_values = _LSHNearest.get_context_hash(contexts, self.table_to_plane[k])
 
             # Get list of unique hashes - list is sparse, there should be collisions
             hash_keys = np.unique(hash_values)
@@ -432,7 +432,7 @@ class _ApproximateSimulator(_NeighborsSimulator):
 
             # Get list of neighbors from each hash table based on the hash values of the new context
             for k in self.table_to_plane.keys():
-                hash_value = _ApproximateNearest.get_context_hash(row_2d, self.table_to_plane[k])
+                hash_value = _LSHNearest.get_context_hash(row_2d, self.table_to_plane[k])
                 indices += self.table_to_hash_to_index[k][hash_value[0]]
 
             # Drop duplicates from list of neighbors
@@ -1021,7 +1021,7 @@ class Simulator:
 
                     else:
                         predictions = mab.predict(chunk_contexts)
-                        if isinstance(mab, _ApproximateSimulator):
+                        if isinstance(mab, _LSHSimulator):
                             expectations = mab.row_arm_to_expectation[start:stop].copy()
                         elif isinstance(mab._imp, _Neighbors):
                             expectations = mab._imp.arm_to_expectation.copy()
@@ -1188,7 +1188,7 @@ class Simulator:
                             expectations = mab.row_arm_to_expectation[start+chunk_start:start+chunk_stop].copy()
                         else:
                             predictions = mab.predict(chunk_contexts)
-                            if isinstance(mab, _ApproximateSimulator):
+                            if isinstance(mab, _LSHSimulator):
                                 expectations = mab.row_arm_to_expectation[start:stop].copy()
                             else:
                                 expectations = mab.predict_expectations(chunk_contexts)
@@ -1219,7 +1219,7 @@ class Simulator:
                 self.bandit_to_predictions[name] = self.bandit_to_predictions[name] + batch_predictions[name]
                 self.bandit_to_expectations[name] = self.bandit_to_expectations[name] + batch_expectations[name]
 
-                if isinstance(mab, (_RadiusSimulator, _ApproximateSimulator)) and not self.is_quick:
+                if isinstance(mab, (_RadiusSimulator, _LSHSimulator)) and not self.is_quick:
                     self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
                 if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
                     self.bandit_to_arm_to_stats_neighborhoods[name] = mab.neighborhood_arm_to_stat.copy()
@@ -1396,10 +1396,10 @@ class Simulator:
             elif isinstance(imp, _KNearest):
                 mab = _KNearestSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp, imp.k,
                                          imp.metric, is_quick=self.is_quick)
-            elif isinstance(imp, _ApproximateNearest):
-                mab = _ApproximateSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp,
-                                            imp.n_dimensions, imp.n_tables, is_quick=self.is_quick,
-                                            no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm)
+            elif isinstance(imp, _LSHNearest):
+                mab = _LSHSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp,
+                                    imp.n_dimensions, imp.n_tables, is_quick=self.is_quick,
+                                    no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm)
 
             new_bandits.append((name, mab))
             if mab.is_contextual:

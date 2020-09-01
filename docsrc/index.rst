@@ -66,7 +66,7 @@ Available Learning Policies:
 
 Available Neighborhood Policies:
 
-* Approximate Nearest
+* LSH Nearest
 * Clusters
 * K-Nearest
 * Radius
@@ -74,7 +74,7 @@ Available Neighborhood Policies:
 Bug Reports
 ===========
 
-You can send feedback to mabwiser@fmr.com. Please use the GitHub `Issues`_ tracking for bug reports and feature requests.
+Please use the GitHub `Issues`_ tracking for bug reports and feature requests. 
 
 Citation
 ========

@@ -2,7 +2,7 @@
 
 import numpy as np
 from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
-from mabwiser.approximate import _ApproximateNearest
+from mabwiser.approximate import _LSHNearest
 from tests.test_base import BaseTest
 
 
@@ -22,7 +22,7 @@ class ApproximateTest(BaseTest):
 
         hash_lists = []
         for k in table_to_plane.keys():
-            hashes = _ApproximateNearest.get_context_hash(contexts, table_to_plane[k])
+            hashes = _LSHNearest.get_context_hash(contexts, table_to_plane[k])
             hash_lists.append(list(hashes))
         self.assertListEqual(hash_lists[0], [22, 14, 11, 14, 18,  9,  6,  7, 14, 11])
         self.assertListEqual(hash_lists[1], [28, 29, 21, 7, 20, 28,  4, 28, 28, 20])
@@ -36,7 +36,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -72,7 +72,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -90,7 +90,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -109,7 +109,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 0, 0, 1, 1, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=5),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -127,7 +127,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1.0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -145,7 +145,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.ThompsonSampling(),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -163,7 +163,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.UCB1(alpha=1),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -181,7 +181,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.Softmax(tau=1),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -200,7 +200,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 2],
                                  rewards=[10, 10, 10, -10, -10, -10],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=20, n_tables=1),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=20, n_tables=1),
                                  context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
                                  contexts=contexts,
@@ -216,7 +216,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 2],
                                  rewards=[10, 10, 10, -10, -10, -10],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=20, n_tables=1),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=20, n_tables=1),
                                  context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
                                  contexts=contexts,
@@ -231,32 +231,32 @@ class ApproximateTest(BaseTest):
     def test_no_neighbors(self):
 
         arms, mab = self.predict(arms=[1, 2, 3, 4],
-                                decisions=[1, 1, 1, 2, 2, 2],
-                                rewards=[10, 10, 10, -10, -10, -10],
-                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=20, n_tables=1),
-                                context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                 decisions=[1, 1, 1, 2, 2, 2],
+                                 rewards=[10, 10, 10, -10, -10, -10],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=20, n_tables=1),
+                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
-                                contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
+                                 contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
                                            [0, -1, -2, -3, -5]],
-                                seed=7,
-                                num_run=1,
-                                is_predict=True)
+                                 seed=7,
+                                 num_run=1,
+                                 is_predict=True)
 
         self.assertListEqual(arms, [2, 3, 2, 3, 4])
 
         arms, mab = self.predict(arms=[1, 2, 3, 4],
-                                decisions=[1, 1, 1, 2, 2, 2],
-                                rewards=[10, 10, 10, -10, -10, -10],
-                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=20, n_tables=1),
-                                context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                 decisions=[1, 1, 1, 2, 2, 2],
+                                 rewards=[10, 10, 10, -10, -10, -10],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=20, n_tables=1),
+                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
-                                contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
+                                 contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
                                            [0, -1, -2, -3, -5]],
-                                seed=12,
-                                num_run=1,
-                                is_predict=True)
+                                 seed=12,
+                                 num_run=1,
+                                 is_predict=True)
 
         self.assertListEqual(arms, [3, 2, 4, 1, 4])
 
@@ -266,7 +266,7 @@ class ApproximateTest(BaseTest):
                                 decisions=[1, 1, 1, 2, 2, 2],
                                 rewards=[10, 10, 10, -10, -10, -10],
                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=25),
+                                neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=25),
                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
                                 contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1]],
@@ -279,16 +279,16 @@ class ApproximateTest(BaseTest):
                 self.assertIs(np.nan, row[key])
 
         exp, mab = self.predict(arms=[1, 2, 3],
-                                 decisions=[1, 1, 1, 2, 2, 2],
-                                 rewards=[10, 10, 10, -10, -10, -10],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=25),
-                                 context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
+                                decisions=[1, 1, 1, 2, 2, 2],
+                                rewards=[10, 10, 10, -10, -10, -10],
+                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=25),
+                                context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
-                                 contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1]],
-                                 seed=7,
-                                 num_run=1,
-                                 is_predict=False)
+                                contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1]],
+                                seed=7,
+                                num_run=1,
+                                is_predict=False)
 
         for index, row in enumerate(exp):
             for key in row.keys():
@@ -300,7 +300,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -337,7 +337,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 7, 0, 1, 9, 0, 2, 6, 11],
                                  learning_policy=LearningPolicy.ThompsonSampling(binarize),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -377,7 +377,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 7, 0, 1, 9, 0, 2, 6, 11],
                                  learning_policy=LearningPolicy.ThompsonSampling(binarize),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -412,7 +412,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=2),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
@@ -435,7 +435,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 2],
                                  rewards=[10, 10, 10, -10, -10, -10],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=25),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=25),
                                  context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
                                  contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1]],
@@ -455,7 +455,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 2],
                                  rewards=[10, 10, 10, -10, -10, -10],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(
                                      n_dimensions=25, no_nhood_prob_of_arm=[0, 0.8, 0.2]),
                                  context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
@@ -476,7 +476,7 @@ class ApproximateTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 2],
                                  rewards=[10, 10, 10, -10, -10, -10],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=25),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=25),
                                  context_history=[[1, 1, 2, 3, 5], [1, 2, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0]],
                                  contexts=[[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1]],

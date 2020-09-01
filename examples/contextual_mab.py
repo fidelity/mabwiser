@@ -151,14 +151,14 @@ clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=tes
 # Updating of the model with new arm
 clusters.add_arm(6)
 
-########################################################
-# Approximate Neighborhood Policy with UCB1 Learning Policy
-########################################################
+###############################################################
+# LSH Approximate Neighborhood Policy with UCB1 Learning Policy
+###############################################################
 
 # Radius contextual policy with radius equals to 5 and ucb1 learning with alpha 1.25
 ann = MAB(arms=ads,
           learning_policy=LearningPolicy.UCB1(alpha=1.25),
-          neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_dimensions=5, n_tables=5))
+          neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5, n_tables=5))
 
 # Learn from previous ads shown and revenues generated
 ann.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)

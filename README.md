@@ -46,7 +46,7 @@ Available Learning Policies:
 * Upper Confidence Bound (UCB1)
 
 Available Neighborhood Policies: 
-* Approximate Nearest
+* LSH Nearest
 * Clusters
 * K-Nearest
 * Radius

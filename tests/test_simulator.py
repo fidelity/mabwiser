@@ -28,7 +28,7 @@ class TestSimulator(unittest.TestCase):
 
     parametric = [LearningPolicy.LinUCB(), LearningPolicy.LinTS()]
 
-    nps = [NeighborhoodPolicy.ApproximateNearest(),
+    nps = [NeighborhoodPolicy.LSHNearest(),
            NeighborhoodPolicy.KNearest(),
            NeighborhoodPolicy.Radius(),
            NeighborhoodPolicy.Clusters()]

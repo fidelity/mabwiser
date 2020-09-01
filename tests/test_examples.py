@@ -282,7 +282,7 @@ class ExampleTest(BaseTest):
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
                                  learning_policy=LearningPolicy.UCB1(alpha=1.25),
-                                 neighborhood_policy=NeighborhoodPolicy.ApproximateNearest(n_tables=5, n_dimensions=5),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_tables=5, n_dimensions=5),
                                  context_history=train,
                                  contexts=test,
                                  seed=123456,

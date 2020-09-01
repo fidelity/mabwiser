@@ -6,7 +6,6 @@ from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 
-# TODO add ANN test
 class ParallelTest(BaseTest):
 
     def test_greedy_t1(self):
@@ -401,6 +400,51 @@ class ParallelTest(BaseTest):
 
         self.assertListEqual(arms, [2, 1, 1, 3, 3, 1, 2, 2, 3, 3])
 
+    def test_greedy1_a2(self):
+        rng = np.random.RandomState(seed=7)
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=1)
+
+        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2)
+
+        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[rng.random_sample() for _ in range(5)] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=-1)
+
+        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+
     def test_thompson_k2(self):
 
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -533,6 +577,51 @@ class ParallelTest(BaseTest):
                                  n_jobs=-1)
 
         self.assertListEqual(arms, [1, 1, 3, 1, 1, 1, 1, 2, 1, 2])
+
+    def test_thompson_a2(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.ThompsonSampling(),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=1)
+
+        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.ThompsonSampling(),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=2)
+
+        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+                                 rewards=[1, 1, 0, 0, 0, 0, 1, 1, 0, 0],
+                                 learning_policy=LearningPolicy.ThompsonSampling(),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(),
+                                 context_history=[[0, 0, 0, 0, 0] for _ in range(10)],
+                                 contexts=[[1, 1, 1, 1, 1] for _ in range(10)],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True,
+                                 n_jobs=-1)
+
+        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+
 
     def test_linUCB(self):
 

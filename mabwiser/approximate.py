@@ -18,7 +18,7 @@ from mabwiser.ucb import _UCB1
 from mabwiser.utils import Arm, _BaseRNG, create_rng
 
 
-class _ApproximateNearest(_Neighbors):
+class _LSHNearest(_Neighbors):
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
@@ -115,7 +115,6 @@ class _ApproximateNearest(_Neighbors):
                 predictions[index] = self._get_no_nhood_predictions(lp, is_predict)
 
         return predictions
-
 
     @staticmethod
     def get_context_hash(contexts, plane):
