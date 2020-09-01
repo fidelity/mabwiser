@@ -14,7 +14,6 @@
 #
 import os
 import sys
-from mabwiser._version import __version__
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
@@ -28,7 +27,7 @@ author = 'FMR LLC'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = __version__
+release = '1.11.0'
 
 
 # -- General configuration ---------------------------------------------------
