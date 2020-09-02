@@ -18,25 +18,11 @@ from mabwiser.ucb import _UCB1
 from mabwiser.utils import Arm, _BaseRNG, create_rng
 
 
-class _LSHNearest(_Neighbors):
-
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 n_dimensions: int, n_tables: int, no_nhood_prob_of_arm=Optional[List]):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric='simhash', no_nhood_prob_of_arm=no_nhood_prob_of_arm)
-
-        # Properties for hash tables
-        self.n_dimensions = n_dimensions
-        self.n_tables = n_tables
-        self.buckets = 2 ** n_dimensions
-
-        # Initialize dictionaries for planes and hash table
-        self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
-        self.table_to_plane = {i: [] for i in range(self.n_tables)}
+class _ApproximateNeighbors(_Neighbors):
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         # Initialize planes
-        self._initialize_planes(contexts.shape[1])
+        self._initialize(contexts.shape[1])
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -66,21 +52,17 @@ class _LSHNearest(_Neighbors):
         # Fit hashes for each training context
         self._fit_operation(contexts)
 
+    def _get_neighbors(self, row_2d):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+    def _initialize(self, dimensions):
+        """Abstract method to be implemented by child classes."""
+        pass
+
     def _fit_operation(self, contexts):
-        # Get hashes for each hash table for each training context
-        for k in self.table_to_plane.keys():
-            hash_values = self.get_context_hash(contexts, self.table_to_plane[k])
-
-            # Get list of unique hashes - list is sparse, there should be collisions
-            hash_keys = np.unique(hash_values)
-
-            # For each hash, get the indices of contexts with that hash
-            for h in hash_keys:
-                self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
-
-    def _initialize_planes(self, n_rows):
-        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
-                               for i in self.table_to_plane.keys()}
+        """Abstract method to be implemented by child classes."""
+        pass
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -98,12 +80,7 @@ class _LSHNearest(_Neighbors):
 
             # Prepare for hashing
             row_2d = row[np.newaxis, :]
-            indices = list()
-
-            # Get list of neighbors from each hash table based on the hash values of the new context
-            for k in self.table_to_plane.keys():
-                hash_value = self.get_context_hash(row_2d, self.table_to_plane[k])
-                indices += self.table_to_hash_to_index[k][hash_value[0]]
+            indices = self._get_neighbors(row_2d)
 
             # Drop duplicates from list of neighbors
             indices = list(set(indices))
@@ -115,6 +92,49 @@ class _LSHNearest(_Neighbors):
                 predictions[index] = self._get_no_nhood_predictions(lp, is_predict)
 
         return predictions
+
+
+class _LSHNearest(_ApproximateNeighbors):
+
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
+                 n_dimensions: int, n_tables: int, no_nhood_prob_of_arm=Optional[List]):
+        super().__init__(rng, arms, n_jobs, backend, lp, metric='simhash', no_nhood_prob_of_arm=no_nhood_prob_of_arm)
+
+        # Properties for hash tables
+        self.n_dimensions = n_dimensions
+        self.n_tables = n_tables
+        self.buckets = 2 ** n_dimensions
+
+        # Initialize dictionaries for planes and hash table
+        self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
+        self.table_to_plane = {i: [] for i in range(self.n_tables)}
+
+    def _fit_operation(self, contexts):
+        # Get hashes for each hash table for each training context
+        for k in self.table_to_plane.keys():
+            hash_values = self.get_context_hash(contexts, self.table_to_plane[k])
+
+            # Get list of unique hashes - list is sparse, there should be collisions
+            hash_keys = np.unique(hash_values)
+
+            # For each hash, get the indices of contexts with that hash
+            for h in hash_keys:
+                self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+
+    def _initialize(self, n_rows):
+        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
+                               for i in self.table_to_plane.keys()}
+
+    def _get_neighbors(self, row_2d):
+        indices = list()
+
+        # Get list of neighbors from each hash table based on the hash values of the new context
+        for k in self.table_to_plane.keys():
+            hash_value = self.get_context_hash(row_2d, self.table_to_plane[k])
+            indices += self.table_to_hash_to_index[k][hash_value[0]]
+
+        return indices
 
     @staticmethod
     def get_context_hash(contexts, plane):
