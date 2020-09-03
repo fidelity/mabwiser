@@ -145,6 +145,6 @@ class _LSHNearest(_ApproximateNeighbors):
         # Another approach is to convert to strings ('01000', '00101', '11111', etc)
         hash_values = np.zeros(contexts.shape[0])
         for i in range(plane.shape[1]):
-            hash_values += projection_signs[:, i] * 2**i
+            hash_values = hash_values + (projection_signs[:, i] * 2**i)
 
         return hash_values
