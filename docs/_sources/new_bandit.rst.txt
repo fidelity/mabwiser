@@ -262,9 +262,9 @@ Preparing a pull request typically involves the following steps:
 
 a. Add a note about your changes in the CHANGELOG.txt.
 b. Update the library version. You can use a keyword search for "version" to make sure you cover all version fields.
-c. Update the README.md, in necessary.
+c. Update the README.md, if necessary.
 d. Update the documentation rst files under the /docsrc folder , if necessary.
-e. If you update any documentation, make sure to recompile the docs by running ``make github`` under the /docsrc folder.
+e. If you update any documentation, make sure to recompile the docs by running ``make github`` under the /docsrc folder. If you have mabwiser installed, you will need to uninstall it, as Sphinx first looks for an installed version before using the local package.
 f. Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.
 
 **Congratulations!!** You are ready to send a Pull Request and include your changes in the MABWiser library.

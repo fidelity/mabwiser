@@ -3,9 +3,11 @@
 
 from collections import defaultdict
 from copy import deepcopy
+from itertools import chain
 from typing import List, NoReturn, Optional, Union
 
 import numpy as np
+from joblib import Parallel, delayed
 
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
@@ -110,17 +112,35 @@ class _LSHNearest(_ApproximateNeighbors):
         self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
         self.table_to_plane = {i: [] for i in range(self.n_tables)}
 
+    def _add_neighbors(self, hash_values, k, h):
+        self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+
     def _fit_operation(self, contexts):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
-            hash_values = self.get_context_hash(contexts, self.table_to_plane[k])
+            n_contexts = len(contexts)
+
+            # Partition contexts by job
+            n_jobs, n_contexts, starts = self._partition_contexts(n_contexts)
+
+            # Get hashes in parallel
+            hash_values = Parallel(n_jobs=n_jobs, backend=self.backend)(
+                delayed(self.get_context_hash)(
+                    contexts[starts[i]:starts[i + 1]],
+                    self.table_to_plane[k])
+                for i in range(n_jobs))
+
+            # Reduce
+            hash_values = list(chain.from_iterable(t for t in hash_values))
 
             # Get list of unique hashes - list is sparse, there should be collisions
             hash_keys = np.unique(hash_values)
 
             # For each hash, get the indices of contexts with that hash
-            for h in hash_keys:
-                self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+            Parallel(n_jobs=n_jobs, require='sharedmem')(
+                delayed(self._add_neighbors)(
+                    hash_values, k, h)
+                for h in hash_keys)
 
     def _initialize(self, n_rows):
         self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))

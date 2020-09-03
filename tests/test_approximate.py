@@ -111,8 +111,8 @@ class ApproximateTest(BaseTest):
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
                                  neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 2, 3, 5], [1, 3, 4, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 5, 4, 3, 0], [0, 1, 5, 4, 5], [1, 2, 1, 1, 3],
                                                   [0, 2, 1, 0, 0]],
                                  contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
                                  seed=123456,
@@ -137,7 +137,7 @@ class ApproximateTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 4])
+        self.assertListEqual(arms, [2, 2])
 
     def test_thompson_d2(self):
 
@@ -155,7 +155,7 @@ class ApproximateTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 3])
+        self.assertListEqual(arms, [3, 3])
 
     def test_ucb_d2(self):
 
@@ -348,7 +348,7 @@ class ApproximateTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [1, 3])
+        self.assertListEqual(arms, [3, 3])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -388,7 +388,7 @@ class ApproximateTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [1, 3])
+        self.assertListEqual(arms, [3, 3])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -445,7 +445,7 @@ class ApproximateTest(BaseTest):
 
         # 3rd arm was never seen but picked up by random neighborhood in both tests
         self.assertListEqual(arms[0], [2, 3])
-        self.assertListEqual(arms[1], [3, 3])
+        self.assertListEqual(arms[1], [2, 1])
 
     def test_greedy0_no_nhood_predict_weighted(self):
 
@@ -466,7 +466,7 @@ class ApproximateTest(BaseTest):
 
         # 2nd arm is weighted highly but 3rd is picked too
         self.assertListEqual(arms[0], [2, 2])
-        self.assertListEqual(arms[1], [3, 2])
+        self.assertListEqual(arms[1], [2, 2])
 
     def test_greedy0_no_nhood_expectation_nan(self):
 

@@ -415,7 +415,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=1)
 
-        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+        self.assertListEqual(arms, [1, 2, 3, 3, 3, 2, 3, 3, 2, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
@@ -429,7 +429,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=2)
 
-        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+        self.assertListEqual(arms, [1, 2, 3, 3, 3, 2, 3, 3, 2, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
@@ -443,7 +443,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=-1)
 
-        self.assertListEqual(arms, [2, 1, 3, 1, 3, 3, 2, 3, 3, 1])
+        self.assertListEqual(arms, [1, 2, 3, 3, 3, 2, 3, 3, 2, 1])
 
     def test_thompson_k2(self):
 
@@ -592,7 +592,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=1)
 
-        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+        self.assertListEqual(arms, [1, 3, 1, 1, 2, 1, 2, 3, 1, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
@@ -606,7 +606,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=2)
 
-        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+        self.assertListEqual(arms, [1, 3, 1, 1, 2, 1, 2, 3, 1, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
@@ -620,7 +620,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=-1)
 
-        self.assertListEqual(arms, [2, 1, 3, 2, 1, 2, 3, 3, 1, 1])
+        self.assertListEqual(arms, [1, 3, 1, 1, 2, 1, 2, 3, 1, 1])
 
 
     def test_linUCB(self):

@@ -347,21 +347,7 @@ class _KNearestSimulator(_NeighborsSimulator):
         return predictions
 
 
-class _LSHSimulator(_NeighborsSimulator):
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 n_dimensions: int, n_tables: int, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
-        super().__init__(rng, arms, n_jobs, backend, lp, 'simhash', is_quick, no_nhood_prob_of_arm)
-
-        # Properties for hash tables
-        self.n_dimensions = n_dimensions
-        self.n_tables = n_tables
-        self.buckets = 2 ** n_dimensions
-
-        # Initialize dictionaries for planes and hash table
-        self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
-        self.table_to_plane = {i: [] for i in range(self.n_tables)}
-
+class _ApproximateSimulator(_NeighborsSimulator):
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         # Initialize planes
         self._initialize_planes(contexts.shape[1])
@@ -396,22 +382,6 @@ class _LSHSimulator(_NeighborsSimulator):
         # Fit hashes for each training context
         self._fit_operation(contexts)
 
-    def _fit_operation(self, contexts):
-        # Get hashes for each hash table for each training context
-        for k in self.table_to_plane.keys():
-            hash_values = _LSHNearest.get_context_hash(contexts, self.table_to_plane[k])
-
-            # Get list of unique hashes - list is sparse, there should be collisions
-            hash_keys = np.unique(hash_values)
-
-            # For each hash, get the indices of contexts with that hash
-            for h in hash_keys:
-                self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
-
-    def _initialize_planes(self, n_rows):
-        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
-                               for i in self.table_to_plane.keys()}
-
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
         # Copy learning policy object
@@ -428,12 +398,7 @@ class _LSHSimulator(_NeighborsSimulator):
 
             # Prepare for hashing
             row_2d = row[np.newaxis, :]
-            indices = list()
-
-            # Get list of neighbors from each hash table based on the hash values of the new context
-            for k in self.table_to_plane.keys():
-                hash_value = _LSHNearest.get_context_hash(row_2d, self.table_to_plane[k])
-                indices += self.table_to_hash_to_index[k][hash_value[0]]
+            indices = self._get_neighbors(row_2d)
 
             # Drop duplicates from list of neighbors
             indices = list(set(indices))
@@ -451,6 +416,78 @@ class _LSHSimulator(_NeighborsSimulator):
                 predictions[index] = [prediction, {}, 0, {}]
 
         return predictions
+
+    def _get_neighbors(self, row_2d):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+    def _initialize(self, dimensions):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+    def _fit_operation(self, contexts):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+
+class _LSHSimulator(_ApproximateSimulator):
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
+                 n_dimensions: int, n_tables: int, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
+        super().__init__(rng, arms, n_jobs, backend, lp, 'simhash', is_quick, no_nhood_prob_of_arm)
+
+        # Properties for hash tables
+        self.n_dimensions = n_dimensions
+        self.n_tables = n_tables
+        self.buckets = 2 ** n_dimensions
+
+        # Initialize dictionaries for planes and hash table
+        self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
+        self.table_to_plane = {i: [] for i in range(self.n_tables)}
+
+    def _add_neighbors(self, hash_values, k, h):
+        self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+
+    def _fit_operation(self, contexts):
+        # Get hashes for each hash table for each training context
+        for k in self.table_to_plane.keys():
+
+            n_contexts = len(contexts)
+
+            # Partition contexts by job
+            n_jobs, n_contexts, starts = self._partition_contexts(n_contexts)
+
+            # Get hashes in parallel
+            hash_values = Parallel(n_jobs=n_jobs, backend=self.backend)(
+                delayed(_LSHNearest.get_context_hash)(
+                    contexts[starts[i]:starts[i + 1]],
+                    self.table_to_plane[k])
+                for i in range(n_jobs))
+
+            # Reduce
+            hash_values = list(chain.from_iterable(t for t in hash_values))
+
+            # Get list of unique hashes - list is sparse, there should be collisions
+            hash_keys = np.unique(hash_values)
+
+            # For each hash, get the indices of contexts with that hash
+            Parallel(n_jobs=n_jobs, require='sharedmem')(
+                delayed(self._add_neighbors)(
+                    hash_values, k, h)
+                for h in hash_keys)
+
+    def _initialize_planes(self, n_rows):
+        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
+                               for i in self.table_to_plane.keys()}
+
+    def _get_neighbors(self, row_2d):
+        indices = list()
+
+        # Get list of neighbors from each hash table based on the hash values of the new context
+        for k in self.table_to_plane.keys():
+            hash_value = _LSHNearest.get_context_hash(row_2d, self.table_to_plane[k])
+            indices += self.table_to_hash_to_index[k][hash_value[0]]
+        return indices
 
 
 class Simulator:

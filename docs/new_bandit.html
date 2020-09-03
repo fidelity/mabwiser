@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -52,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> MABWiser
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> MABWiser
           
 
           
@@ -75,6 +76,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -101,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -139,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Adding a New Bandit</li>
     
@@ -407,9 +410,9 @@ Now it is time to share it with everyone in the world by sending a pull request 
 <ol class="loweralpha simple">
 <li><p>Add a note about your changes in the CHANGELOG.txt.</p></li>
 <li><p>Update the library version. You can use a keyword search for “version” to make sure you cover all version fields.</p></li>
-<li><p>Update the README.md, in necessary.</p></li>
+<li><p>Update the README.md, if necessary.</p></li>
 <li><p>Update the documentation rst files under the /docsrc folder , if necessary.</p></li>
-<li><p>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder.</p></li>
+<li><p>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder. If you have mabwiser installed, you will need to uninstall it, as Sphinx first looks for an installed version before using the local package.</p></li>
 <li><p>Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.</p></li>
 </ol>
 <p><strong>Congratulations!!</strong> You are ready to send a Pull Request and include your changes in the MABWiser library.
@@ -437,11 +440,19 @@ How cool is that? :)</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, FMR LLC
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -452,7 +463,6 @@ How cool is that? :)</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
