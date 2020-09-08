@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
+import abc
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
@@ -20,49 +21,38 @@ from mabwiser.ucb import _UCB1
 from mabwiser.utils import Arm, _BaseRNG, create_rng
 
 
-class _ApproximateNeighbors(_Neighbors):
+class _ApproximateNeighbors(_Neighbors, metaclass=abc.ABCMeta):
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        super().fit(decisions, rewards, contexts)
+
         # Initialize planes
         self._initialize(contexts.shape[1])
 
-        # Set the historical data for prediction
-        self.decisions = decisions
-        self.contexts = contexts
-
-        # Binarize the rewards if using Thompson Sampling
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.rewards = self._binarize_ts_rewards(decisions, rewards)
-        else:
-            self.rewards = rewards
-
         # Fit hashes for each training context
-        self._fit_operation(contexts)
+        self._fit_operation(contexts, context_start=0)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
                     contexts: Optional[np.ndarray] = None) -> NoReturn:
+        start = len(self.contexts)
 
-        # Binarize the rewards if using Thompson Sampling
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            rewards = self._binarize_ts_rewards(decisions, rewards)
-
-        # Add more historical data for prediction
-        self.decisions = np.concatenate((self.decisions, decisions))
-        self.rewards = np.concatenate((self.rewards, rewards))
-        self.contexts = np.concatenate((self.contexts, contexts))
+        super().partial_fit(decisions, rewards, contexts)
 
         # Fit hashes for each training context
-        self._fit_operation(contexts)
+        self._fit_operation(contexts, context_start=start)
 
+    @abc.abstractmethod
     def _get_neighbors(self, row_2d):
         """Abstract method to be implemented by child classes."""
         pass
 
+    @abc.abstractmethod
     def _initialize(self, dimensions):
         """Abstract method to be implemented by child classes."""
         pass
 
-    def _fit_operation(self, contexts):
+    @abc.abstractmethod
+    def _fit_operation(self, contexts, context_start):
         """Abstract method to be implemented by child classes."""
         pass
 
@@ -112,10 +102,14 @@ class _LSHNearest(_ApproximateNeighbors):
         self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
         self.table_to_plane = {i: [] for i in range(self.n_tables)}
 
-    def _add_neighbors(self, hash_values, k, h):
-        self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+    def _add_neighbors(self, hash_values, k, h, context_start):
+        if context_start > 0:
+            neighbors = np.where(hash_values == h)[0] + context_start
+        else:
+            neighbors = np.where(hash_values == h)[0]
+        self.table_to_hash_to_index[k][h] += list(neighbors)
 
-    def _fit_operation(self, contexts):
+    def _fit_operation(self, contexts, context_start):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
             n_contexts = len(contexts)
@@ -139,7 +133,7 @@ class _LSHNearest(_ApproximateNeighbors):
             # For each hash, get the indices of contexts with that hash
             Parallel(n_jobs=n_jobs, require='sharedmem')(
                 delayed(self._add_neighbors)(
-                    hash_values, k, h)
+                    hash_values, k, h, context_start)
                 for h in hash_keys)
 
     def _initialize(self, n_rows):

@@ -22,7 +22,7 @@ class _Neighbors(BaseMAB):
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 metric: str, no_nhood_prob_of_arm=None):
+                 metric: str, no_nhood_prob_of_arm: Optional[List] = None):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.metric = metric

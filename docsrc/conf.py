@@ -18,16 +18,18 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 
+with open(os.path.join('..', 'mabwiser', '_version.py')) as fp:
+    exec(fp.read())
 # -- Project information -----------------------------------------------------
 
 project = 'MABWiser'
-copyright = '2020, FMR LLC'
-author = 'FMR LLC'
+copyright = __copyright__
+author = __author__
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '1.11.0'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------

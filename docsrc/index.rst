@@ -1,4 +1,4 @@
-`MABWiser Contextual Multi-Armed Bandits
+MABWiser Contextual Multi-Armed Bandits
 =======================================
 
 MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
@@ -66,9 +66,9 @@ Available Learning Policies:
 
 Available Neighborhood Policies:
 
-* LSH Nearest
 * Clusters
 * K-Nearest
+* LSH Nearest
 * Radius
 
 Bug Reports

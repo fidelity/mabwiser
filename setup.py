@@ -1,11 +1,14 @@
 import setuptools
-from mabwiser._version import __author__, __version__
+import os
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 with open("requirements.txt") as fh:
     required = fh.read().splitlines()
+
+with open(os.path.join('mabwiser', '_version.py')) as fp:
+    exec(fp.read())
 
 setuptools.setup(
     name="mabwiser",

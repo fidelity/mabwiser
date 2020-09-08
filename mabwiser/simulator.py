@@ -5,6 +5,7 @@
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
 
+import abc
 import logging
 from copy import deepcopy
 from collections import defaultdict
@@ -247,17 +248,6 @@ class _NeighborsSimulator(_Neighbors):
 
             return prediction, {}, arm_to_stat
 
-    def _get_no_nhood_predictions(self, lp, is_predict):
-        if is_predict:
-            # if no_nhood_prob_of_arm is None, select a random int
-            # else, select a non-uniform random arm
-            # choice returns an array, hence get zero index
-            rand_int = lp.rng.choice(len(self.arms), 1, p=self.no_nhood_prob_of_arm)[0]
-            return self.arms[rand_int]
-        else:
-            # Expectations will be nan when there are no neighbors
-            return self.arm_to_expectation.copy()
-
 
 class _RadiusSimulator(_NeighborsSimulator):
 
@@ -347,40 +337,24 @@ class _KNearestSimulator(_NeighborsSimulator):
         return predictions
 
 
-class _ApproximateSimulator(_NeighborsSimulator):
+class _ApproximateSimulator(_NeighborsSimulator, metaclass=abc.ABCMeta):
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        super().fit(decisions, rewards, contexts)
+
         # Initialize planes
-        self._initialize_planes(contexts.shape[1])
-
-        # Set the historical data for prediction
-        self.decisions = decisions
-        self.contexts = contexts
-
-        # Binarize the rewards if using Thompson Sampling
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.raw_rewards = rewards.copy()
-            self.rewards = self._binarize_ts_rewards(decisions, rewards)
-        else:
-            self.rewards = rewards
+        self._initialize(contexts.shape[1])
 
         # Fit hashes for each training context
-        self._fit_operation(contexts)
+        self._fit_operation(contexts, context_start=0)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
                     contexts: Optional[np.ndarray] = None) -> NoReturn:
+        start = len(self.contexts)
 
-        # Binarize the rewards if using Thompson Sampling
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.raw_rewards = np.concatenate((self.raw_rewards, rewards.copy()))
-            rewards = self._binarize_ts_rewards(decisions, rewards)
-
-        # Add more historical data for prediction
-        self.decisions = np.concatenate((self.decisions, decisions))
-        self.rewards = np.concatenate((self.rewards, rewards))
-        self.contexts = np.concatenate((self.contexts, contexts))
+        super().partial_fit(decisions, rewards, contexts)
 
         # Fit hashes for each training context
-        self._fit_operation(contexts)
+        self._fit_operation(contexts, context_start=start)
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -417,15 +391,18 @@ class _ApproximateSimulator(_NeighborsSimulator):
 
         return predictions
 
+    @abc.abstractmethod
     def _get_neighbors(self, row_2d):
         """Abstract method to be implemented by child classes."""
         pass
 
+    @abc.abstractmethod
     def _initialize(self, dimensions):
         """Abstract method to be implemented by child classes."""
         pass
 
-    def _fit_operation(self, contexts):
+    @abc.abstractmethod
+    def _fit_operation(self, contexts, context_start):
         """Abstract method to be implemented by child classes."""
         pass
 
@@ -445,10 +422,14 @@ class _LSHSimulator(_ApproximateSimulator):
         self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
         self.table_to_plane = {i: [] for i in range(self.n_tables)}
 
-    def _add_neighbors(self, hash_values, k, h):
-        self.table_to_hash_to_index[k][h] += list(np.where(hash_values == h)[0])
+    def _add_neighbors(self, hash_values, k, h, context_start):
+        if context_start > 0:
+            neighbors = np.where(hash_values == h)[0] + context_start
+        else:
+            neighbors = np.where(hash_values == h)[0]
+        self.table_to_hash_to_index[k][h] += list(neighbors)
 
-    def _fit_operation(self, contexts):
+    def _fit_operation(self, contexts, context_start):
         # Get hashes for each hash table for each training context
         for k in self.table_to_plane.keys():
 
@@ -473,10 +454,10 @@ class _LSHSimulator(_ApproximateSimulator):
             # For each hash, get the indices of contexts with that hash
             Parallel(n_jobs=n_jobs, require='sharedmem')(
                 delayed(self._add_neighbors)(
-                    hash_values, k, h)
+                    hash_values, k, h, context_start)
                 for h in hash_keys)
 
-    def _initialize_planes(self, n_rows):
+    def _initialize(self, n_rows):
         self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
                                for i in self.table_to_plane.keys()}
 

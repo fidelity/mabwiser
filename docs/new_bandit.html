@@ -412,7 +412,7 @@ Now it is time to share it with everyone in the world by sending a pull request 
 <li><p>Update the library version. You can use a keyword search for “version” to make sure you cover all version fields.</p></li>
 <li><p>Update the README.md, if necessary.</p></li>
 <li><p>Update the documentation rst files under the /docsrc folder , if necessary.</p></li>
-<li><p>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder. If you have mabwiser installed, you will need to uninstall it, as Sphinx first looks for an installed version before using the local package.</p></li>
+<li><p>If you update any documentation, make sure to recompile the docs by running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">github</span></code> under the /docsrc folder. If you have mabwiser installed and it isn’t in development mode, you will need to uninstall it, as Sphinx first looks for an installed version before using the local package. To install in development mode use pip install -e.</p></li>
 <li><p>Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.</p></li>
 </ol>
 <p><strong>Congratulations!!</strong> You are ready to send a Pull Request and include your changes in the MABWiser library.
@@ -441,7 +441,7 @@ How cool is that? :)</p>
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2020, FMR LLC
+        &copy; Copyright Copyright (C), FMR LLC
 
     </p>
   </div>
