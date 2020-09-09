@@ -2,15 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-:Author: FMR LLC
-:Email: mabwiser@fmr.com
-:Version: 1.10.1 of August 12, 2020
-
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
 
+import abc
 import logging
 from copy import deepcopy
+from collections import defaultdict
 from itertools import chain
 from typing import Union, List, Optional, NoReturn
 
@@ -29,12 +27,19 @@ from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.mab import MAB
 from mabwiser.neighbors import _Neighbors, _Radius, _KNearest
+from mabwiser.approximate import _LSHNearest
 from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
 from mabwiser.utils import Arm, Num, check_true, Constants, _BaseRNG, create_rng
+from mabwiser._version import __author__, __email__, __version__, __copyright__
+
+__author__ = __author__
+__email__ = __email__
+__version__ = __version__
+__copyright__ = __copyright__
 
 
 def default_evaluator(arms: List[Arm], decisions: np.ndarray, rewards: np.ndarray, predictions: List[Arm],
@@ -118,8 +123,9 @@ class _NeighborsSimulator(_Neighbors):
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 metric: str, is_quick: bool):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric)
+                 metric: str, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
+        super().__init__(rng, arms, n_jobs, backend, lp, metric, no_nhood_prob_of_arm)
+
         self.is_quick = is_quick
         self.neighborhood_arm_to_stat = []
         self.raw_rewards = None
@@ -247,10 +253,9 @@ class _RadiusSimulator(_NeighborsSimulator):
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
                  lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm=Optional[List]):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
+                 radius: Num, metric: str, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
+        super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick, no_nhood_prob_of_arm)
         self.radius = radius
-        self.no_nhood_prob_of_arm = no_nhood_prob_of_arm
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -292,17 +297,6 @@ class _RadiusSimulator(_NeighborsSimulator):
         # Return the list of predictions
         return predictions
 
-    def _get_no_nhood_predictions(self, lp, is_predict):
-        if is_predict:
-            # if no_nhood_prob_of_arm is None, select a random int
-            # else, select a non-uniform random arm
-            # choice returns an array, hence get zero index
-            rand_int = lp.rng.choice(len(self.arms), 1, p=self.no_nhood_prob_of_arm)[0]
-            return self.arms[rand_int]
-        else:
-            # Expectations will be nan when there are no neighbors
-            return self.arm_to_expectation.copy()
-
 
 class _KNearestSimulator(_NeighborsSimulator):
 
@@ -341,6 +335,140 @@ class _KNearestSimulator(_NeighborsSimulator):
 
         # Return the list of predictions
         return predictions
+
+
+class _ApproximateSimulator(_NeighborsSimulator, metaclass=abc.ABCMeta):
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        super().fit(decisions, rewards, contexts)
+
+        # Initialize planes
+        self._initialize(contexts.shape[1])
+
+        # Fit hashes for each training context
+        self._fit_operation(contexts, context_start=0)
+
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
+                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+        start = len(self.contexts)
+
+        super().partial_fit(decisions, rewards, contexts)
+
+        # Fit hashes for each training context
+        self._fit_operation(contexts, context_start=start)
+
+    def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
+                          seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
+        # Copy learning policy object
+        lp = deepcopy(self.lp)
+
+        # Create an empty list of predictions
+        predictions = [None] * len(contexts)
+
+        # For each row in the given contexts
+        for index, row in enumerate(contexts):
+
+            # Get random generator
+            lp.rng = create_rng(seed=seeds[index])
+
+            # Prepare for hashing
+            row_2d = row[np.newaxis, :]
+            indices = self._get_neighbors(row_2d)
+
+            # Drop duplicates from list of neighbors
+            indices = list(set(indices))
+
+            # If neighbors exist
+            if len(indices) > 0:
+
+                prediction, exp, stats = self._get_nhood_predictions(lp, row_2d, indices, is_predict)
+                predictions[index] = [prediction, exp, len(indices), stats]
+
+            else:  # When there are no neighbors
+
+                # Random arm (or nan expectations)
+                prediction = self._get_no_nhood_predictions(lp, is_predict)
+                predictions[index] = [prediction, {}, 0, {}]
+
+        return predictions
+
+    @abc.abstractmethod
+    def _get_neighbors(self, row_2d):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+    @abc.abstractmethod
+    def _initialize(self, dimensions):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+    @abc.abstractmethod
+    def _fit_operation(self, contexts, context_start):
+        """Abstract method to be implemented by child classes."""
+        pass
+
+
+class _LSHSimulator(_ApproximateSimulator):
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
+                 n_dimensions: int, n_tables: int, is_quick: bool, no_nhood_prob_of_arm: Optional[List] = None):
+        super().__init__(rng, arms, n_jobs, backend, lp, 'simhash', is_quick, no_nhood_prob_of_arm)
+
+        # Properties for hash tables
+        self.n_dimensions = n_dimensions
+        self.n_tables = n_tables
+        self.buckets = 2 ** n_dimensions
+
+        # Initialize dictionaries for planes and hash table
+        self.table_to_hash_to_index = {k: defaultdict(list) for k in range(self.n_tables)}
+        self.table_to_plane = {i: [] for i in range(self.n_tables)}
+
+    def _add_neighbors(self, hash_values, k, h, context_start):
+        if context_start > 0:
+            neighbors = np.where(hash_values == h)[0] + context_start
+        else:
+            neighbors = np.where(hash_values == h)[0]
+        self.table_to_hash_to_index[k][h] += list(neighbors)
+
+    def _fit_operation(self, contexts, context_start):
+        # Get hashes for each hash table for each training context
+        for k in self.table_to_plane.keys():
+
+            n_contexts = len(contexts)
+
+            # Partition contexts by job
+            n_jobs, n_contexts, starts = self._partition_contexts(n_contexts)
+
+            # Get hashes in parallel
+            hash_values = Parallel(n_jobs=n_jobs, backend=self.backend)(
+                delayed(_LSHNearest.get_context_hash)(
+                    contexts[starts[i]:starts[i + 1]],
+                    self.table_to_plane[k])
+                for i in range(n_jobs))
+
+            # Reduce
+            hash_values = list(chain.from_iterable(t for t in hash_values))
+
+            # Get list of unique hashes - list is sparse, there should be collisions
+            hash_keys = np.unique(hash_values)
+
+            # For each hash, get the indices of contexts with that hash
+            Parallel(n_jobs=n_jobs, require='sharedmem')(
+                delayed(self._add_neighbors)(
+                    hash_values, k, h, context_start)
+                for h in hash_keys)
+
+    def _initialize(self, n_rows):
+        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
+                               for i in self.table_to_plane.keys()}
+
+    def _get_neighbors(self, row_2d):
+        indices = list()
+
+        # Get list of neighbors from each hash table based on the hash values of the new context
+        for k in self.table_to_plane.keys():
+            hash_value = _LSHNearest.get_context_hash(row_2d, self.table_to_plane[k])
+            indices += self.table_to_hash_to_index[k][hash_value[0]]
+        return indices
 
 
 class Simulator:
@@ -901,7 +1029,7 @@ class Simulator:
             for name, mab in self.bandits:
 
                 if mab.is_contextual:
-                    if isinstance(mab, _NeighborsSimulator):
+                    if isinstance(mab, (_RadiusSimulator, _KNearestSimulator)):
                         if distances is None:
                             distances = mab.calculate_distances(chunk_contexts)
                         else:
@@ -911,7 +1039,9 @@ class Simulator:
 
                     else:
                         predictions = mab.predict(chunk_contexts)
-                        if isinstance(mab._imp, _Neighbors):
+                        if isinstance(mab, _LSHSimulator):
+                            expectations = mab.row_arm_to_expectation[start:stop].copy()
+                        elif isinstance(mab._imp, _Neighbors):
                             expectations = mab._imp.arm_to_expectation.copy()
                         else:
                             expectations = mab.predict_expectations(chunk_contexts)
@@ -1065,7 +1195,7 @@ class Simulator:
 
                     # Predict for the batch
                     if mab.is_contextual:
-                        if isinstance(mab, _NeighborsSimulator):
+                        if isinstance(mab, (_RadiusSimulator, _KNearestSimulator)):
                             if distances is None:
                                 distances = mab.calculate_distances(chunk_contexts)
                                 self.logger.info('Distances calculated')
@@ -1076,7 +1206,10 @@ class Simulator:
                             expectations = mab.row_arm_to_expectation[start+chunk_start:start+chunk_stop].copy()
                         else:
                             predictions = mab.predict(chunk_contexts)
-                            expectations = mab.predict_expectations(chunk_contexts)
+                            if isinstance(mab, _LSHSimulator):
+                                expectations = mab.row_arm_to_expectation[start:stop].copy()
+                            else:
+                                expectations = mab.predict_expectations(chunk_contexts)
 
                         if self.batch_size == 1:
                             predictions = [predictions]
@@ -1104,7 +1237,7 @@ class Simulator:
                 self.bandit_to_predictions[name] = self.bandit_to_predictions[name] + batch_predictions[name]
                 self.bandit_to_expectations[name] = self.bandit_to_expectations[name] + batch_expectations[name]
 
-                if isinstance(mab, _RadiusSimulator) and not self.is_quick:
+                if isinstance(mab, (_RadiusSimulator, _LSHSimulator)) and not self.is_quick:
                     self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
                 if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
                     self.bandit_to_arm_to_stats_neighborhoods[name] = mab.neighborhood_arm_to_stat.copy()
@@ -1281,6 +1414,10 @@ class Simulator:
             elif isinstance(imp, _KNearest):
                 mab = _KNearestSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp, imp.k,
                                          imp.metric, is_quick=self.is_quick)
+            elif isinstance(imp, _LSHNearest):
+                mab = _LSHSimulator(imp.rng, imp.arms, imp.n_jobs, imp.backend, imp.lp,
+                                    imp.n_dimensions, imp.n_tables, is_quick=self.is_quick,
+                                    no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm)
 
             new_bandits.append((name, mab))
             if mab.is_contextual:

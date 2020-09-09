@@ -68,12 +68,13 @@ Available Neighborhood Policies:
 
 * Clusters
 * K-Nearest
+* LSH Nearest
 * Radius
 
 Bug Reports
 ===========
 
-You can send feedback to mabwiser@fmr.com. Please use the GitHub `Issues`_ tracking for bug reports and feature requests.
+Please use the GitHub `Issues`_ tracking for bug reports and feature requests.
 
 Citation
 ========

@@ -3,6 +3,18 @@ MABWiser CHANGELOG
 =====================
 
 -------------------------------------------------------------------------------
+September, 8, 2020 1.11.0
+-------------------------------------------------------------------------------
+major:
+- New Algorithm: Locality Sensitive Hashing Approximate Nearest Neighbors
+- This neighborhood policy uses locality-sensitive hashing with random projection via the SimHash algorithm to create approximate neighborhoods.
+- More information: https://en.wikipedia.org/wiki/Locality-sensitive_hashing#Random_projection
+
+minor:
+- Refactor of _Neighbors and _Radius classes to support reusability of empty neighborhood functionality
+- Switch to centralized version incrementing and use of the opensource@fmr.com email
+
+-------------------------------------------------------------------------------
 August, 12, 2020 1.10.1
 -------------------------------------------------------------------------------
 major:

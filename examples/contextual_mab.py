@@ -150,3 +150,32 @@ clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=tes
 
 # Updating of the model with new arm
 clusters.add_arm(6)
+
+###############################################################
+# LSH Approximate Neighborhood Policy with UCB1 Learning Policy
+###############################################################
+
+# LSH Approximate Neareset Neighbors contextual policy with n_dimenions and n_tables equal to 5
+# and ucb1 learning with alpha 1.25
+lshnearest = MAB(arms=ads,
+                 learning_policy=LearningPolicy.UCB1(alpha=1.25),
+                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5, n_tables=5))
+
+# Learn from previous ads shown and revenues generated
+lshnearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+
+# Predict the next best ad to show
+prediction = lshnearest.predict(test)
+
+# Expectation of each ad based on learning from past ad revenues
+expectations = lshnearest.predict_expectations(test)
+
+# Results
+print("LSH Nearest: ", prediction, " ", expectations)
+assert(prediction == [1, 1])
+
+# Online update of model
+lshnearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+
+# Updating of the model with new arm
+lshnearest.add_arm(6)

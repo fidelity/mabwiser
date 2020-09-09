@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MABWiser Public API &mdash; MABWiser 1.10.1 documentation</title>
+  <title>MABWiser Public API &mdash; MABWiser 1.11.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> MABWiser
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> MABWiser
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -100,6 +102,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -138,7 +141,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>MABWiser Public API</li>
     
@@ -163,14 +166,6 @@
 <span id="mabwiser-api"></span><h1>MABWiser Public API<a class="headerlink" href="#mabwiser-public-api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-mabwiser.base_mab">
 <span id="base-mab"></span><h2>base_mab<a class="headerlink" href="#module-mabwiser.base_mab" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>FMR LLC</p>
-</dd>
-<dt class="field-even">Email</dt>
-<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
-</dd>
-</dl>
 <p>This module defines the abstract base class for contextual multi-armed bandit algorithms.</p>
 <dl class="py class">
 <dt id="mabwiser.base_mab.BaseMAB">
@@ -301,17 +296,6 @@ decision and reward history and corresponding contexts if any.</p>
 </div>
 <div class="section" id="module-mabwiser.mab">
 <span id="mab"></span><h2>mab<a class="headerlink" href="#module-mabwiser.mab" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>FMR LLC</p>
-</dd>
-<dt class="field-even">Email</dt>
-<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
-</dd>
-<dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.10.0 of June 22, 2020</p>
-</dd>
-</dl>
 <p>This module defines the public interface of the <strong>MABWiser Library</strong> providing access to the following modules:</p>
 <blockquote>
 <div><ul class="simple">
@@ -740,7 +724,7 @@ Default value is 1.</p>
 
 <dl class="py class">
 <dt id="mabwiser.mab.MAB">
-<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">MAB</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Popularity, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinTS, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mabwiser.mab.</code><code class="sig-name descname">MAB</code><span class="sig-paren">(</span><em class="sig-param">arms: List[NewType.&lt;locals&gt;.new_type], learning_policy: Union[mabwiser.mab.EpsilonGreedy, mabwiser.mab.Popularity, mabwiser.mab.Random, mabwiser.mab.Softmax, mabwiser.mab.ThompsonSampling, mabwiser.mab.UCB1, mabwiser.mab.LinTS, mabwiser.mab.LinUCB], neighborhood_policy: Union[None, mabwiser.mab.LSHNearest, mabwiser.mab.Clusters, mabwiser.mab.KNearest, mabwiser.mab.Radius] = None, seed: int = 123456, n_jobs: int = 1, backend: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>MABWiser: Contextual Multi-Armed Bandit Library</strong></p>
 <p>MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
@@ -1186,6 +1170,98 @@ Default value is Euclidean distance.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="mabwiser.mab.NeighborhoodPolicy.LSHNearest">
+<em class="property">class </em><code class="sig-name descname">LSHNearest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_dimensions</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5</span></em>, <em class="sig-param"><span class="n">n_tables</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">3</span></em>, <em class="sig-param"><span class="n">no_nhood_prob_of_arm</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Locality-Sensitive Hashing Approximate Nearest Neighbors Policy.</p>
+<p>LSHNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
+select observations to be used with a learning policy.</p>
+<p>For the simhash, contexts are projected onto an n-dimensional plane and each dimension is evaluated for its
+sign. This is converted to a base 2 integer used as the hash value to assign the context to a hash table. This
+process is repeated for a specified number of hash tables, where each has a unique, randomly-generated plane.
+To select the neighbors for a context, the hash value is calculated for each hash table and any contexts with
+the same hashes are selected as the neighbors.</p>
+<p>As with the radius or k value for other nearest neighbors algorithms, selecting the best number of dimensions
+and tables requires tuning. For the dimensions, a good starting point is to use the log of the square root of
+the number of rows in the training data. This will give you sqrt(n_rows) number of hashes.</p>
+<p>The number of dimensions and number of tables have inverse effects from each other on the number of empty
+neighborhoods and average neighborhood size. Increasing the dimensionality decreases the number of collisions,
+increasing the precision of the approximate neighborhood but also potentially increasing the number of empty
+neighborhoods. Increasing the number of hash tables increases the likelihood of capturing neighbors the
+other random hyperplanes miss and increases the average neighborhood size. It should be noted that the fit
+operation is O(2**n_dimensions).</p>
+<dl class="py attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.LSHNearest.n_dimensions">
+<code class="sig-name descname">n_dimensions</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest.n_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of dimensions to use for each plane.
+Integer value. Must be greater than zero.
+Default value is 5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.LSHNearest.n_tables">
+<code class="sig-name descname">n_tables</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest.n_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of hash tables.
+Integer value. Must be greater than zero.
+Default value is 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mabwiser.mab.NeighborhoodPolicy.LSHNearest.no_nhood_prob_of_arm">
+<code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest.no_nhood_prob_of_arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+If not given, a uniform random distribution over all arms is assumed.
+The probabilities should sum up to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>None or List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="p">,</span> <span class="n">NeighborhoodPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">EpsilonGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>                           <span class="n">NeighborhoodPolicy</span><span class="o">.</span><span class="n">LSHNearest</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">[3, 1]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="id16">
+<em class="property">property </em><code class="sig-name descname">n_dimensions</code><a class="headerlink" href="#id16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id17">
+<em class="property">property </em><code class="sig-name descname">n_tables</code><a class="headerlink" href="#id17" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id18">
+<em class="property">property </em><code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#id18" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="mabwiser.mab.NeighborhoodPolicy.Radius">
 <em class="property">class </em><code class="sig-name descname">Radius</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radius</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">metric</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'euclidean'</span></em>, <em class="sig-param"><span class="n">no_nhood_prob_of_arm</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
@@ -1221,7 +1297,7 @@ Default value is Euclidean distance.</p>
 <dl class="py attribute">
 <dt id="mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm">
 <code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.Radius.no_nhood_prob_of_arm" title="Permalink to this definition">¶</a></dt>
-<dd><p>The probabilities associated with each arm.
+<dd><p>The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
 If not given, a uniform random distribution over all arms is assumed.
 The probabilities should sum up to 1.</p>
 <dl class="field-list simple">
@@ -1244,20 +1320,20 @@ The probabilities should sum up to 1.</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="id16">
-<em class="property">property </em><code class="sig-name descname">metric</code><a class="headerlink" href="#id16" title="Permalink to this definition">¶</a></dt>
+<dt id="id19">
+<em class="property">property </em><code class="sig-name descname">metric</code><a class="headerlink" href="#id19" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id17">
-<em class="property">property </em><code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#id17" title="Permalink to this definition">¶</a></dt>
+<dt id="id20">
+<em class="property">property </em><code class="sig-name descname">no_nhood_prob_of_arm</code><a class="headerlink" href="#id20" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id18">
-<em class="property">property </em><code class="sig-name descname">radius</code><a class="headerlink" href="#id18" title="Permalink to this definition">¶</a></dt>
+<dt id="id21">
+<em class="property">property </em><code class="sig-name descname">radius</code><a class="headerlink" href="#id21" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -1268,17 +1344,6 @@ The probabilities should sum up to 1.</p>
 </div>
 <div class="section" id="module-mabwiser.simulator">
 <span id="simulator"></span><h2>simulator<a class="headerlink" href="#module-mabwiser.simulator" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>FMR LLC</p>
-</dd>
-<dt class="field-even">Email</dt>
-<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
-</dd>
-<dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.10.0 of June 22, 2020</p>
-</dd>
-</dl>
 <p>This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.</p>
 <dl class="py class">
 <dt id="mabwiser.simulator.Simulator">
@@ -1709,14 +1774,6 @@ Used to select the correct index from arm_to_stats if there are separate entries
 </div>
 <div class="section" id="module-mabwiser.utils">
 <span id="utils"></span><h2>utils<a class="headerlink" href="#module-mabwiser.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>FMR LLC</p>
-</dd>
-<dt class="field-even">Email</dt>
-<dd class="field-even"><p><a class="reference external" href="mailto:mabwiser&#37;&#52;&#48;fmr&#46;com">mabwiser<span>&#64;</span>fmr<span>&#46;</span>com</a></p>
-</dd>
-</dl>
 <p>This module provides a number of constants and helper functions.</p>
 <dl class="py function">
 <dt id="mabwiser.utils.Arm">
@@ -1812,11 +1869,19 @@ Used to select the correct index from arm_to_stats if there are separate entries
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, FMR LLC
+        
+        &copy; Copyright Copyright (C), FMR LLC
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1827,7 +1892,6 @@ Used to select the correct index from arm_to_stats if there are separate entries
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

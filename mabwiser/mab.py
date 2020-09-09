@@ -3,10 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-:Author: FMR LLC
-:Email: mabwiser@fmr.com
-:Version: 1.10.1 of August 12, 2020
-
 This module defines the public interface of the **MABWiser Library** providing access to the following modules:
 
     - ``MAB``
@@ -20,6 +16,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
 
+from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
@@ -30,11 +27,12 @@ from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
 from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_rng
+from mabwiser._version import __author__, __email__, __version__, __copyright__
 
-__author__ = "FMR LLC"
-__email__ = "mabwiser@fmr.com"
-__version__ = "1.10.1"
-__copyright__ = "Copyright (C), FMR LLC"
+__author__ = __author__
+__email__ = __email__
+__version__ = __version__
+__copyright__ = __copyright__
 
 
 class LearningPolicy(NamedTuple):
@@ -453,6 +451,73 @@ class NeighborhoodPolicy(NamedTuple):
                        ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
             check_true(self.k > 0, ValueError("K must be greater than zero."))
 
+    class LSHNearest(NamedTuple):
+        """Locality-Sensitive Hashing Approximate Nearest Neighbors Policy.
+
+        LSHNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
+        select observations to be used with a learning policy.
+
+        For the simhash, contexts are projected onto an n-dimensional plane and each dimension is evaluated for its
+        sign. This is converted to a base 2 integer used as the hash value to assign the context to a hash table. This
+        process is repeated for a specified number of hash tables, where each has a unique, randomly-generated plane.
+        To select the neighbors for a context, the hash value is calculated for each hash table and any contexts with
+        the same hashes are selected as the neighbors.
+
+        As with the radius or k value for other nearest neighbors algorithms, selecting the best number of dimensions
+        and tables requires tuning. For the dimensions, a good starting point is to use the log of the square root of
+        the number of rows in the training data. This will give you sqrt(n_rows) number of hashes.
+
+        The number of dimensions and number of tables have inverse effects from each other on the number of empty
+        neighborhoods and average neighborhood size. Increasing the dimensionality decreases the number of collisions,
+        increasing the precision of the approximate neighborhood but also potentially increasing the number of empty
+        neighborhoods. Increasing the number of hash tables increases the likelihood of capturing neighbors the
+        other random hyperplanes miss and increases the average neighborhood size. It should be noted that the fit
+        operation is O(2**n_dimensions).
+
+        Attributes
+        ----------
+        n_dimensions: int
+            The number of dimensions to use for each plane.
+            Integer value. Must be greater than zero.
+            Default value is 5.
+        n_tables: int
+            The number of hash tables.
+            Integer value. Must be greater than zero.
+            Default value is 3.
+        no_nhood_prob_of_arm: None or List
+            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+            If not given, a uniform random distribution over all arms is assumed.
+            The probabilities should sum up to 1.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+            >>> list_of_arms = [1, 2, 3, 4]
+            >>> decisions = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3]
+            >>> rewards = [0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
+            >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
+                            [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
+            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), \
+                          NeighborhoodPolicy.LSHNearest(5, 3))
+            >>> mab.fit(decisions, rewards, contexts)
+            >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
+            [3, 1]
+        """
+        n_dimensions: int = 5
+        n_tables: int = 3
+        no_nhood_prob_of_arm: Optional[List] = None
+
+        def _validate(self):
+            check_true(isinstance(self.n_dimensions, int), TypeError("n_dimensions must be an integer."))
+            check_true(self.n_dimensions > 0, ValueError("n_dimensions must be greater than zero."))
+            check_true(isinstance(self.n_tables, int), TypeError("n_tables must be an integer"))
+            check_true(self.n_tables > 0, ValueError("n_tables must be greater than zero."))
+            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+                       TypeError("no_nhood_prob_of_arm must be None or List."))
+            if isinstance(self.no_nhood_prob_of_arm, List):
+                check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
+                           ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
+
     class Radius(NamedTuple):
         """Radius Neighborhood Policy.
 
@@ -470,7 +535,7 @@ class NeighborhoodPolicy(NamedTuple):
             Accepts any of the metrics supported by scipy.spatial.distance.cdist.
             Default value is Euclidean distance.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm.
+            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
@@ -577,6 +642,7 @@ class MAB:
                                         LearningPolicy.LinTS,
                                         LearningPolicy.LinUCB],                     # The learning policy
                  neighborhood_policy: Union[None,
+                                            NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
                                             NeighborhoodPolicy.Radius] = None,      # The context policy, optional
@@ -630,6 +696,9 @@ class MAB:
         TypeError:  For Softmax, tau must be an integer or float.
         TypeError:  For ThompsonSampling, binarizer must be a callable function.
         TypeError:  For UCB, alpha must be an integer or float.
+        TypeError:  For LSHNearest, n_dimensions must be an integer or float.
+        TypeError:  For LSHNearest, n_tables must be an integer or float.
+        TypeError:  For LSHNearest, no_nhood_prob_of_arm must be None or List that sums up to 1.0.
         TypeError:  For Clusters, n_clusters must be an integer.
         TypeError:  For Clusters, is_minibatch must be a boolean.
         TypeError:  For Radius, radius must be an integer or float.
@@ -647,6 +716,9 @@ class MAB:
         ValueError: For LinUCB, l2_lambda cannot be negative.
         ValueError: For Softmax, tau must be greater than zero.
         ValueError: For UCB, alpha must be greater than zero.
+        ValueError: For LSHNearest, n_dimensions must be gerater than zero.
+        ValueError: For LSHNearest, n_tables must be gerater than zero.
+        ValueError: For LSHNearest, if given, no_nhood_prob_of_arm list should sum up to 1.0.
         ValueError: For Clusters, n_clusters cannot be less than 2.
         ValueError: For Radius and KNearest, metric is not supported by scipy.spatial.distance.cdist.
         ValueError: For Radius, radius must be greater than zero.
@@ -700,13 +772,17 @@ class MAB:
             if isinstance(neighborhood_policy, NeighborhoodPolicy.Clusters):
                 self._imp = _Clusters(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                       neighborhood_policy.n_clusters, neighborhood_policy.is_minibatch)
+            elif isinstance(neighborhood_policy, NeighborhoodPolicy.LSHNearest):
+                self._imp = _LSHNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
+                                        neighborhood_policy.n_dimensions, neighborhood_policy.n_tables,
+                                        neighborhood_policy.no_nhood_prob_of_arm)
+            elif isinstance(neighborhood_policy, NeighborhoodPolicy.KNearest):
+                self._imp = _KNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
+                                      neighborhood_policy.k, neighborhood_policy.metric)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.Radius):
                 self._imp = _Radius(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                     neighborhood_policy.radius, neighborhood_policy.metric,
                                     neighborhood_policy.no_nhood_prob_of_arm)
-            elif isinstance(neighborhood_policy, NeighborhoodPolicy.KNearest):
-                self._imp = _KNearest(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                      neighborhood_policy.k, neighborhood_policy.metric)
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
@@ -727,7 +803,7 @@ class MAB:
         NotImplementedError: MAB learning_policy property not implemented for this learning policy.
 
         """
-        if isinstance(self._imp, (_Radius, _KNearest)):
+        if isinstance(self._imp, (_LSHNearest, _KNearest, _Radius)):
             lp = self._imp.lp
         elif isinstance(self._imp, _Clusters):
             lp = self._imp.lp_list[0]
@@ -767,12 +843,16 @@ class MAB:
         -------
         The neighborhood policy
         """
-        if isinstance(self._imp, _KNearest):
+        if isinstance(self._imp, _Clusters):
+            return NeighborhoodPolicy.Clusters(self._imp.n_clusters, isinstance(self._imp.kmeans, MiniBatchKMeans))
+        elif isinstance(self._imp, _KNearest):
             return NeighborhoodPolicy.KNearest(self._imp.k, self._imp.metric)
+        elif isinstance(self._imp, _LSHNearest):
+            return NeighborhoodPolicy.LSHNearest(self._imp.n_dimensions, self._imp.n_tables,
+                                                 self._imp.no_nhood_prob_of_arm)
         elif isinstance(self._imp, _Radius):
             return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric, self._imp.no_nhood_prob_of_arm)
-        elif isinstance(self._imp, _Clusters):
-            return NeighborhoodPolicy.Clusters(self._imp.n_clusters, isinstance(self._imp.kmeans, MiniBatchKMeans))
+
         else:
             return None
 
@@ -1044,7 +1124,8 @@ class MAB:
         # Contextual Policy
         if context_policy:
             check_true(isinstance(context_policy,
-                                  (NeighborhoodPolicy.KNearest, NeighborhoodPolicy.Radius,
+                                  (NeighborhoodPolicy.LSHNearest,
+                                   NeighborhoodPolicy.KNearest, NeighborhoodPolicy.Radius,
                                    NeighborhoodPolicy.Clusters)),
                        TypeError("Context Policy type mismatch."))
             context_policy._validate()

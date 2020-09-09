@@ -109,6 +109,11 @@ class MABTest(BaseTest):
         self.assertEqual(np.metric, mab.neighborhood_policy.metric)
         self.assertEqual(np.no_nhood_prob_of_arm, mab.neighborhood_policy.no_nhood_prob_of_arm)
 
+        np = NeighborhoodPolicy.LSHNearest(n_dimensions=2, n_tables=2, no_nhood_prob_of_arm=[0.2, 0.8])
+        mab = MAB([0, 1], lp, np)
+        self.assertEqual(np.n_dimensions, mab.neighborhood_policy.n_dimensions)
+        self.assertEqual(np.n_tables, mab.neighborhood_policy.n_tables)
+        self.assertEqual(np.no_nhood_prob_of_arm, mab.neighborhood_policy.no_nhood_prob_of_arm)
 
     #################################################
     # Test context free predict() method

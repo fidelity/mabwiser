@@ -218,6 +218,34 @@ class InvalidTest(BaseTest):
         with self.assertRaises(TypeError):
             MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), LearningPolicy.EpsilonGreedy(epsilon=0))
 
+    def test_invalid_n_tables_type(self):
+        with self.assertRaises(TypeError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+                NeighborhoodPolicy.LSHNearest(n_tables='string'))
+
+    def test_invalid_n_tables_value(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+                NeighborhoodPolicy.LSHNearest(n_tables=0))
+
+    def test_invalid_n_dimensions_type(self):
+        with self.assertRaises(TypeError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+                NeighborhoodPolicy.LSHNearest(n_dimensions='string'))
+
+    def test_invalid_n_dimensions_value(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+                NeighborhoodPolicy.LSHNearest(n_dimensions=0))
+
+    def test_invalid_radius_no_nhood_type_ann(self):
+        with self.assertRaises(TypeError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.LSHNearest(no_nhood_prob_of_arm={}))
+
+    def test_invalid_radius_no_nhood_sum_ann(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(no_nhood_prob_of_arm=[0, 0]))
+
     def test_invalid_metric(self):
         with self.assertRaises(ValueError):
             MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(metric='linear'))

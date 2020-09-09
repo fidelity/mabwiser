@@ -50,12 +50,16 @@ class BaseTest(unittest.TestCase):
                 LearningPolicy.LinUCB(alpha=1, l2_lambda=0.5)]
 
     # A list of valid context policies
-    nps = [NeighborhoodPolicy.KNearest(),
+    nps = [NeighborhoodPolicy.LSHNearest(),
+           NeighborhoodPolicy.LSHNearest(n_dimensions=1),
+           NeighborhoodPolicy.LSHNearest(n_dimensions=1, n_tables=1),
+           NeighborhoodPolicy.KNearest(),
            NeighborhoodPolicy.KNearest(k=1),
            NeighborhoodPolicy.KNearest(k=3),
            NeighborhoodPolicy.Radius(),
            NeighborhoodPolicy.Radius(2.5),
-           NeighborhoodPolicy.Radius(5)]
+           NeighborhoodPolicy.Radius(5),
+           ]
 
     cps = [NeighborhoodPolicy.Clusters(),
            NeighborhoodPolicy.Clusters(n_clusters=3),
@@ -70,7 +74,7 @@ class BaseTest(unittest.TestCase):
                                        LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
                                        LearningPolicy.LinTS, LearningPolicy.LinUCB],
                 neighborhood_policy: Union[None, NeighborhoodPolicy.Clusters, NeighborhoodPolicy.Radius,
-                                           NeighborhoodPolicy.KNearest] = None,
+                                           NeighborhoodPolicy.KNearest, NeighborhoodPolicy.LSHNearest] = None,
                 context_history: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 contexts: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 seed: Optional[int] = 123456,
