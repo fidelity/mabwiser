@@ -457,11 +457,12 @@ class NeighborhoodPolicy(NamedTuple):
         LSHNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
         select observations to be used with a learning policy.
 
-        For the simhash, contexts are projected onto an n-dimensional plane and each dimension is evaluated for its
-        sign. This is converted to a base 2 integer used as the hash value to assign the context to a hash table. This
-        process is repeated for a specified number of hash tables, where each has a unique, randomly-generated plane.
-        To select the neighbors for a context, the hash value is calculated for each hash table and any contexts with
-        the same hashes are selected as the neighbors.
+        For the simhash, contexts are projected onto a hyperplane of n_context_cols x n_dimensions and each
+        column of the hyperplane is evaluated for its sign, giving an ordered array of binary values.
+        This is converted to a base 10 integer used as the hash code to assign the context to a hash table. This
+        process is repeated for a specified number of hash tables, where each has a unique, randomly-generated
+        hyperplane. To select the neighbors for a context, the hash code is calculated for each hash table and any
+        contexts with the same hashes are selected as the neighbors.
 
         As with the radius or k value for other nearest neighbors algorithms, selecting the best number of dimensions
         and tables requires tuning. For the dimensions, a good starting point is to use the log of the square root of
@@ -469,7 +470,7 @@ class NeighborhoodPolicy(NamedTuple):
 
         The number of dimensions and number of tables have inverse effects from each other on the number of empty
         neighborhoods and average neighborhood size. Increasing the dimensionality decreases the number of collisions,
-        increasing the precision of the approximate neighborhood but also potentially increasing the number of empty
+        which increases the precision of the approximate neighborhood but also potentially increases the number of empty
         neighborhoods. Increasing the number of hash tables increases the likelihood of capturing neighbors the
         other random hyperplanes miss and increases the average neighborhood size. It should be noted that the fit
         operation is O(2**n_dimensions).
@@ -477,7 +478,7 @@ class NeighborhoodPolicy(NamedTuple):
         Attributes
         ----------
         n_dimensions: int
-            The number of dimensions to use for each plane.
+            The number of dimensions to use for the hyperplane.
             Integer value. Must be greater than zero.
             Default value is 5.
         n_tables: int
