@@ -47,7 +47,7 @@ class _ApproximateNeighbors(_Neighbors, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _initialize(self, dimensions):
+    def _initialize(self, n_cols):
         """Abstract method to be implemented by child classes."""
         pass
 
@@ -136,8 +136,8 @@ class _LSHNearest(_ApproximateNeighbors):
                     hash_values, k, h, context_start)
                 for h in hash_keys)
 
-    def _initialize(self, n_rows):
-        self.table_to_plane = {i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
+    def _initialize(self, n_cols):
+        self.table_to_plane = {i: self.rng.standard_normal(size=(n_cols, self.n_dimensions))
                                for i in self.table_to_plane.keys()}
 
     def _get_neighbors(self, row_2d):
