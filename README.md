@@ -1,13 +1,10 @@
 # MABWiser: Parallelizable Contextual Multi-Armed Bandits 
 
-MABWiser is a research library written in Python for rapid prototyping of multi-armed bandit algorithms.
-It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models and provides built-in 
-parallelization for both training and testing components. The library also provides a simulation utility for comparing 
-different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to 
-[PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. Full documentation is available at 
-[fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
+MABWiser is a research library written in Python for rapid prototyping of multi-armed bandit algorithms. It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models and provides built-in parallelization for both training and testing components. 
 
-MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments.
+The library also provides a simulation utility for comparing different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. 
+
+MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments. Full documentation is available at [fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
 
 ## Quick Start
 
@@ -53,9 +50,7 @@ Available Neighborhood Policies:
 
 ## Installation
 
-MABWiser is available to install as: pip install mabwiser 
-
-It can also be installed by building from source by following the instructions in 
+MABWiser is available to install as `pip install mabwiser`. It can also be installed by building from source by following the instructions in 
 our [documentation](https://fidelity.github.io/mabwiser/installation.html).
 
 ## Support
@@ -67,7 +62,7 @@ Please submit bug reports and feature requests as [Issues](https://github.com/fi
 
 If you use MABWiser in a publication, please cite it as:
 
-E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python," in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.
+[E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python"](https://ieeexplore.ieee.org/document/8995418), in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.
 
 
 ```bibtex
