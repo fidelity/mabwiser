@@ -56,7 +56,6 @@ MABWiser is available to install as `pip install mabwiser`. It can also be insta
 
 Please submit bug reports and feature requests as [Issues](https://github.com/fidelity/mabwiser/issues).
 
-
 ## Citation
 
 If you use MABWiser in a publication, please cite it as:

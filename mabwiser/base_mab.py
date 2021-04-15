@@ -191,7 +191,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         n_jobs = self._effective_jobs(n_contexts, self.n_jobs)
 
         # Partition contexts between jobs
-        n_contexts_per_job = np.full(n_jobs, n_contexts // n_jobs, dtype=np.int)
+        n_contexts_per_job = np.full(n_jobs, n_contexts // n_jobs, dtype=int)
         n_contexts_per_job[:n_contexts % n_jobs] += 1
         starts = np.cumsum(n_contexts_per_job)
 
