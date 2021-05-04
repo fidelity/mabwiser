@@ -1,4 +1,6 @@
 # LinTS Reprodubility
+This directory contains all the code necessary to evaluate the reproducibility of LinTS. The most up-to-date code can be found [online](https://github.com/fidelity/mabwiser/tree/master/examples/reproducibility_notebooks).
+
 
 ## Computational Reproducibility Notebooks
 TODO - Emily
