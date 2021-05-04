@@ -18,3 +18,6 @@ TODO - Emily
 - `*.pkl` files contain various MAB models and NumPy arrays generated as part of the notebooks above
 - `example_ssh_config.json` shows the config necessary to run some of the experiments over ssh in the general reproducibility notebooks
 - `utils.py` contains minor utilities for ensuring correctness
+
+## Additional Experiments
+- See [Goodreads](goodreads) folder for additional experimentation with Goodreads data.
