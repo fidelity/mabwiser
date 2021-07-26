@@ -3,6 +3,14 @@ MABWiser CHANGELOG
 =====================
 
 -------------------------------------------------------------------------------
+August, 01, 2021 1.12.0
+-------------------------------------------------------------------------------
+major:
+- New Algorithm: TreeBandit as a decision-tree based neighborhood policy.
+- Many thanks to @irmakbky for her contribution!
+- See also Elmachtoub, A. N., et. al. "A practical method for solving contextual bandit problems using decision trees". UAI 2017
+
+-------------------------------------------------------------------------------
 April, 15, 2021 1.11.2
 -------------------------------------------------------------------------------
 minor:

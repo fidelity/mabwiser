@@ -4,7 +4,7 @@ MABWiser is a research library written in Python for rapid prototyping of multi-
 
 The library also provides a simulation utility for comparing different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. 
 
-MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments. Full documentation is available at [fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
+MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments. Documentation is available at [fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
 
 ## Quick Start
 
@@ -47,10 +47,11 @@ Available Neighborhood Policies:
 * K-Nearest
 * LSH Nearest
 * Radius
+* TreeBandit
 
 ## Installation
 
-MABWiser is available to install as `pip install mabwiser`. It can also be installed by building from source by following the instructions in our [documentation](https://fidelity.github.io/mabwiser/installation.html).
+MABWiser is available to install as `pip install mabwiser`. It can also be installed by building from source by following the instructions in the [documentation](https://fidelity.github.io/mabwiser/installation.html).
 
 ## Support
 
@@ -60,19 +61,30 @@ Please submit bug reports and feature requests as [Issues](https://github.com/fi
 
 If you use MABWiser in a publication, please cite it as:
 
-[E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python"](https://ieeexplore.ieee.org/document/8995418), in 2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019) (pp.885-890). IEEE, 2019.
-
-
+* **[IJAIT 2021]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: Parallelizable Contextual Multi-Armed Bandits"](https://www.worldscientific.com/doi/abs/10.1142/S0218213021500214)
+* **[ICTAI 2019]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python"](https://ieeexplore.ieee.org/document/8995418)
 ```bibtex
+    @article{DBLP:journals/ijait/StrongKK21,
+      author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
+      title     = {{MABWiser:} Parallelizable Contextual Multi-armed Bandits},
+      journal   = {Int. J. Artif. Intell. Tools},
+      volume    = {30},
+      number    = {4},
+      pages     = {2150021:1--2150021:19},
+      year      = {2021},
+      url       = {https://doi.org/10.1142/S0218213021500214},
+      doi       = {10.1142/S0218213021500214},
+    }
 
-    @inproceedings{mabwiser2019,
-      author    = {Strong, Emily and Kleynhans, Bernard and Kadioglu, Serdar},
-      title     = {MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python},
-      booktitle = {2019 IEEE 31st International Conference on Tools with Artificial Intelligence (ICTAI 2019)},
-      year      = {2019},
-      pages     = {885-890},
-      organization = {IEEE},
-      url       = {https://github.com/fidelity/mabwiser}
+    @inproceedings{DBLP:conf/ictai/StrongKK19,
+    author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
+    title     = {MABWiser: {A} Parallelizable Contextual Multi-Armed Bandit Library for Python},
+    booktitle = {31st {IEEE} International Conference on Tools with Artificial Intelligence, {ICTAI} 2019, Portland, OR, USA, November 4-6, 2019},
+    pages     = {909--914},
+    publisher = {{IEEE}},
+    year      = {2019},
+    url       = {https://doi.org/10.1109/ICTAI.2019.00129},
+    doi       = {10.1109/ICTAI.2019.00129},
     }
 ```
 
