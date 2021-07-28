@@ -25,6 +25,7 @@ class _TreeBandit(BaseMAB):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.tree_parameters = tree_parameters
+        self.tree_parameters["random_state"] = rng.seed
 
         self.arm_to_tree = None
         self.arm_to_rewards = None
@@ -102,7 +103,13 @@ class _TreeBandit(BaseMAB):
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
+            # Each row needs a separately seeded rng for reproducibility in parallel
+            rng = np.random.RandomState(seed=seeds[index])
+
             for arm in arms:
+
+                # Copy the row rng to the deep copied model in arm_to_tree
+                arm_to_tree[arm].rng = rng
 
                 # If there was prior data for this arm, get expectation for arm
                 if arm_to_rewards[arm]:
