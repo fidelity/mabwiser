@@ -293,6 +293,14 @@ class InvalidTest(BaseTest):
         with self.assertRaises(ValueError):
             MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Clusters(n_clusters=1))
 
+    def test_invalid_treebandit_lp_linucb(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.LinUCB(), NeighborhoodPolicy.TreeBandit())
+
+    def test_invalid_treebandit_lp_lints(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.LinTS(), NeighborhoodPolicy.TreeBandit())
+
     def test_invalid_seed(self):
         with self.assertRaises(TypeError):
             MAB([0, 1], LearningPolicy.EpsilonGreedy(0), seed=[0, 1])

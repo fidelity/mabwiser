@@ -15,7 +15,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import reset, argmax, Arm, Num, _BaseRNG
 
 
 class _TreeBandit(BaseMAB):
@@ -29,11 +29,21 @@ class _TreeBandit(BaseMAB):
         self.arm_to_tree = None
         self.arm_to_rewards = None
 
+        # Initialize the arm expectations to nan
+        # When there are neighbors, expectations of the underlying learning policy is used
+        # When there are no neighbors, return nan expectations
+        reset(self.arm_to_expectation, np.nan)
+
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Reset the decision trees of each arm
-        self.arm_to_tree = {arm: DecisionTreeClassifier() for arm in self.arms}
+        self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
         self.arm_to_rewards = {arm: dict() for arm in self.arms}
+
+        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
+            self.lp.is_contextual_binarized = False
+            rewards = self.lp._get_binary_rewards(decisions, rewards)
+            self.lp.is_contextual_binarized = True
 
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
@@ -44,9 +54,6 @@ class _TreeBandit(BaseMAB):
         for i, arm in enumerate(decisions):
             leaf_index = self.arm_to_tree[arm].apply([contexts[i]])[0]
             self.arm_to_rewards[arm][leaf_index] = np.append(self.arm_to_rewards[arm][leaf_index], rewards[i])
-
-        # this algorithm won't do actual partial fit, so we won't call parallel_fit/fit_arm again
-        # self._parallel_fit(decisions, rewards, contexts)
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
@@ -62,21 +69,31 @@ class _TreeBandit(BaseMAB):
         arm_contexts = contexts[decisions == arm]
         arm_rewards = rewards[decisions == arm]
 
-        # Fit decision tree of the arm with this dataset
-        self.arm_to_tree[arm].fit(arm_contexts, arm_rewards)
+        # Check that the dataset for the given arm is not empty
+        if arm_contexts.size != 0:
 
-        # For each leaf, keep a list of rewards
-        context_leaf_indices = self.arm_to_tree[arm].apply(arm_contexts)
-        leaf_indices = set(context_leaf_indices)
+            # Fit decision tree of the arm with this dataset
+            self.arm_to_tree[arm].fit(arm_contexts, arm_rewards)
 
-        for index in leaf_indices:
-            # Get rewards list for each leaf
-            self.arm_to_rewards[arm][index] = arm_rewards[context_leaf_indices == index]
+            # For each leaf, keep a list of rewards
+            # DecisionTreeClassifier's apply() method returns the indices of the nodes in the tree
+            # that the specified contexts lead to. Therefore, the indices returned are not necessarily
+            # consecutive/follow numerical order, but are always representative of leaf nodes.
+            leaf_indices = self.arm_to_tree[arm].apply(arm_contexts)
+
+            # Use set() to create a list of unique indices
+            # These indices represent the leaves reached via the given contexts
+            unique_leaf_indices = set(leaf_indices)
+
+            for index in unique_leaf_indices:
+                # Get rewards list for each leaf
+                self.arm_to_rewards[arm][index] = arm_rewards[leaf_indices == index]
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
-        # Get local copy of model, arm_to_expectation and arms to minimize
-        # communication overhead between arms (processes) using shared objects
+
+        # Get local copy of arm_to_tree, arm_to_expectation, arm_to_rewards, and arms
+        # to minimize communication overhead between arms (processes) using shared objects
         arm_to_tree = deepcopy(self.arm_to_tree)
         arm_to_rewards = deepcopy(self.arm_to_rewards)
         arm_to_expectation = deepcopy(self.arm_to_expectation)
@@ -87,20 +104,22 @@ class _TreeBandit(BaseMAB):
         for index, row in enumerate(contexts):
             for arm in arms:
 
-                # Go to that arm's tree, follow context, reach leaf
-                leaf_index = arm_to_tree[arm].apply([row])[0]
+                # If there was prior data for this arm, get expectation for arm
+                if arm_to_rewards[arm]:
+                    # Get leaf index for that context
+                    leaf_index = arm_to_tree[arm].apply([row])[0]
 
-                # Find expected reward
-                leaf_rewards = arm_to_rewards[arm][leaf_index]
+                    # Get the rewards list of that leaf
+                    leaf_rewards = arm_to_rewards[arm][leaf_index]
 
-                # Create leaf lp
-                leaf_lp = self._get_leaf_lp(arm)
+                    # Create leaf lp
+                    leaf_lp = self._get_leaf_lp(arm)
 
-                # Leaf LP: fit the same arm decision with the leaf rewards
-                self.lp.fit(np.asarray([arm] * len(leaf_rewards)), leaf_rewards)
+                    # Leaf LP: fit the same arm decision with the leaf rewards
+                    leaf_lp.fit(np.asarray([arm] * len(leaf_rewards)), leaf_rewards)
 
-                # Leaf LP: predict expectation
-                arm_to_expectation[arm] = leaf_lp.predict_expectations()[arm]
+                    # Leaf LP: predict expectation
+                    arm_to_expectation[arm] = leaf_lp.predict_expectations()[arm]
 
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)
@@ -111,10 +130,12 @@ class _TreeBandit(BaseMAB):
         return predictions
 
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
-        self.arm_to_tree[arm] = DecisionTreeClassifier()
+
+        self.lp.add_arm(arm, binarizer)
+        self.arm_to_tree[arm] = DecisionTreeClassifier(**self.tree_parameters)
         self.arm_to_rewards[arm] = dict()
 
-    def _get_leaf_lp(self, arm):
+    def _get_leaf_lp(self, arm: Arm):
 
         # TODO: maybe we don't need re-create but just change self.lp.arms to [arm, -1]?
         leaf_arms = [arm, -1]

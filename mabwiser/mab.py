@@ -598,7 +598,7 @@ class NeighborhoodPolicy(NamedTuple):
             'Arm2'
 
         """
-        tree_parameters: Dict = None
+        tree_parameters: Dict = {}
 
         def _validate(self):
             pass
@@ -1174,8 +1174,8 @@ class MAB:
             # Tree-Bandit learning policy compatibility
             if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
                 check_true(not isinstance(learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)),
-                           TypeError("Tree-Bandit is not compatible with LinTS and LinUCB learning policy. "
-                                     "Use context-free learning policies."))
+                           ValueError("Tree-Bandit is not compatible with LinTS and LinUCB learning policy. "
+                                      "Use context-free learning policies."))
 
         # Seed
         check_true(isinstance(seed, int), TypeError("The seed must be an integer."))
