@@ -115,7 +115,7 @@ expectations = clusters.predict_expectations(test)
 
 # Results
 print("KMeans: ", prediction, " ", expectations)
-assert(prediction == [1, 2])
+assert(prediction == [5, 2])
 
 # Online update of model
 clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
