@@ -15,6 +15,7 @@ from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.tree import DecisionTreeClassifier
 
 from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
@@ -573,7 +574,7 @@ class NeighborhoodPolicy(NamedTuple):
     class TreeBandit(NamedTuple):
         """Tree Bandit Neighborhood Policy.
 
-        This policy fits a decision tree for each arm using the context variables.
+        This policy fits a decision tree for each arm using context history.
         It uses the leaves of these trees to partition the context space into regions
         and keeps a list of rewards for each leaf.
         To predict, it receives a context vector and goes to the corresponding
@@ -583,7 +584,12 @@ class NeighborhoodPolicy(NamedTuple):
 
         Attributes
         ----------
-        tree_parameters: **kwarg, parameters of the decision tree
+        tree_parameters: Dict, **kwarg
+            Parameters of the decision tree.
+            The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
+            When a parameter is not given, the default of that parameter in sklearn.tree.DecisionTreeClassifier
+            will be chosen.
+            Default value is an empty dictionary.
 
         Example
         -------
@@ -601,7 +607,11 @@ class NeighborhoodPolicy(NamedTuple):
         tree_parameters: Dict = {}
 
         def _validate(self):
-            pass
+            check_true(isinstance(self.tree_parameters, dict), TypeError("tree_parameters must be a dictionary."))
+            tree = DecisionTreeClassifier()
+            for key in self.tree_parameters.keys():
+                check_true(key in tree.__dict__.keys(),
+                           ValueError("sklearn.tree.DecisionTreeClassifier doesn't have a parameter " + str(key) + "."))
 
 
 class MAB:
