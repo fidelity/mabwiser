@@ -31,7 +31,8 @@ class _TreeBandit(BaseMAB):
         self.arm_to_rewards = None
 
         # Initialize the arm expectations to nan
-        # When there are neighbors, expectations of the underlying learning policy is used
+        # When there are neighbors, in the leaf node of the tree, expectations of
+        # the underlying learning policy is used
         # When there are no neighbors, return nan expectations
         reset(self.arm_to_expectation, np.nan)
 
@@ -63,7 +64,6 @@ class _TreeBandit(BaseMAB):
                 # If arm's tree has not been fitted
                 self.arm_to_tree[arm].fit(contexts[decisions == arm], rewards[decisions == arm])
                 unfitted_arms.append(arm)
-
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
@@ -153,6 +153,8 @@ class _TreeBandit(BaseMAB):
 
     def _get_leaf_lp(self, arm: Arm):
 
+        # Create new learning policy object for each leaf with a dummy arm to avoid
+        # sharing the same object between different arms and leaves.
         leaf_arms = [arm, -1]
         leaf_lp = None
         if isinstance(self.lp, _EpsilonGreedy):

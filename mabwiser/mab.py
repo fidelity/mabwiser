@@ -572,7 +572,7 @@ class NeighborhoodPolicy(NamedTuple):
                            ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
 
     class TreeBandit(NamedTuple):
-        """Tree Bandit Neighborhood Policy.
+        """TreeBandit Neighborhood Policy.
 
         This policy fits a decision tree for each arm using context history.
         It uses the leaves of these trees to partition the context space into regions
@@ -581,6 +581,10 @@ class NeighborhoodPolicy(NamedTuple):
         leaf at each arm's tree and applies the given context-free MAB learning policy
         to select a reward from the rewards list at those leaves.
         It then chooses the arm with the highest expected reward.
+
+        The TreeBandit neighborhood policy is a modified version of the TreeHeuristic algorithm presented in:
+        Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
+        A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
 
         Attributes
         ----------
