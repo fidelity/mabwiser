@@ -346,3 +346,31 @@ class TreeBanditTest(BaseTest):
         self.assertTrue(5 in mab._imp.lp.arm_to_expectation.keys())
         self.assertTrue(5 in mab._imp.arm_to_tree.keys())
         self.assertTrue(5 in mab._imp.arm_to_rewards.keys())
+
+    def test_add_arm_result_match(self):
+
+        arms_1, mab = self.predict(arms=[1, 2, 4],
+                                   decisions=[1, 1, 1, 2, 2],
+                                   rewards=[0, 1, 1, 0, 0],
+                                   learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                   neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
+                                   context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]],
+                                   contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                   seed=123456,
+                                   num_run=1,
+                                   is_predict=True)
+
+        mab.add_arm(3)
+
+        decisions2 = [3, 3, 3, 3, 3]
+        rewards2 = [0, 0, 1, 1, 1]
+        context_history2 = [[0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
+        mab.partial_fit(decisions2, rewards2, context_history2)
+
+        print(mab._imp.arm_to_rewards[3])
+
+        arms_2 = mab._imp.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
+
+        self.assertListEqual(arms_1, [1, 1])
+        self.assertListEqual(arms_1, arms_2)

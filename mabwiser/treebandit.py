@@ -52,9 +52,18 @@ class _TreeBandit(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Update rewards list at leaves
+        # Keep track of arms whose trees have not been fitted, and fit them separately
+        unfitted_arms = []
         for i, arm in enumerate(decisions):
-            leaf_index = self.arm_to_tree[arm].apply([contexts[i]])[0]
-            self.arm_to_rewards[arm][leaf_index] = np.append(self.arm_to_rewards[arm][leaf_index], rewards[i])
+            try:
+                if arm not in unfitted_arms:
+                    leaf_index = self.arm_to_tree[arm].apply([contexts[i]])[0]
+                    self.arm_to_rewards[arm][leaf_index] = np.append(self.arm_to_rewards[arm][leaf_index], rewards[i])
+            except AttributeError:
+                # If arm's tree has not been fitted
+                self.arm_to_tree[arm].fit(contexts[decisions == arm], rewards[decisions == arm])
+                unfitted_arms.append(arm)
+
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
@@ -144,7 +153,6 @@ class _TreeBandit(BaseMAB):
 
     def _get_leaf_lp(self, arm: Arm):
 
-        # TODO: maybe we don't need re-create but just change self.lp.arms to [arm, -1]?
         leaf_arms = [arm, -1]
         leaf_lp = None
         if isinstance(self.lp, _EpsilonGreedy):
