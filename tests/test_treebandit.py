@@ -64,24 +64,24 @@ class TreeBanditTest(BaseTest):
     def test_greedy0_single(self):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
-                                rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                rewards=[2, 1, 1, 0, 0, 0, 4, 1, 1, 1],
                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
                                 neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 1, 2, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
                                                  [0, 2, 1, 0, 0]],
                                 contexts=[[0, 1, 2, 3, 5]],
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 1)
+        self.assertEqual(arm, 3)
 
     def test_greedy1(self):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
-                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 rewards=[0, 1, 1, 4, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
@@ -93,7 +93,7 @@ class TreeBanditTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 1])
+        self.assertListEqual(arms, [2, 1])
 
     def test_popularity(self):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
