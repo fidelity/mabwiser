@@ -70,6 +70,7 @@ Available Neighborhood Policies:
 * K-Nearest
 * LSH Nearest
 * Radius
+* TreeBandit
 
 Bug Reports
 ===========

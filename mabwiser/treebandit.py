@@ -29,6 +29,7 @@ class _TreeBandit(BaseMAB):
 
         self.arm_to_tree = None
         self.arm_to_rewards = None
+        self.unfitted_arms = []
 
         # Initialize the arm expectations to nan
         # When there are neighbors, in the leaf node of the tree, expectations of
@@ -54,16 +55,15 @@ class _TreeBandit(BaseMAB):
 
         # Update rewards list at leaves
         # Keep track of arms whose trees have not been fitted, and fit them separately
-        unfitted_arms = []
         for i, arm in enumerate(decisions):
             try:
-                if arm not in unfitted_arms:
+                if arm not in self.unfitted_arms:
                     leaf_index = self.arm_to_tree[arm].apply([contexts[i]])[0]
                     self.arm_to_rewards[arm][leaf_index] = np.append(self.arm_to_rewards[arm][leaf_index], rewards[i])
             except AttributeError:
                 # If arm's tree has not been fitted
                 self.arm_to_tree[arm].fit(contexts[decisions == arm], rewards[decisions == arm])
-                unfitted_arms.append(arm)
+                self.unfitted_arms.append(arm)
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
@@ -98,6 +98,8 @@ class _TreeBandit(BaseMAB):
             for index in unique_leaf_indices:
                 # Get rewards list for each leaf
                 self.arm_to_rewards[arm][index] = arm_rewards[leaf_indices == index]
+        else:
+            self.unfitted_arms.append(arm)
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
