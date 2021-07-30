@@ -578,8 +578,8 @@ class NeighborhoodPolicy(NamedTuple):
         It uses the leaves of these trees to partition the context space into regions
         and keeps a list of rewards for each leaf.
         To predict, it receives a context vector and goes to the corresponding
-        leaf at each arm's tree and applies the given MAB learning policy to select a reward
-        from the rewards list at those leaves.
+        leaf at each arm's tree and applies the given context-free MAB learning policy
+        to select a reward from the rewards list at those leaves.
         It then chooses the arm with the highest expected reward.
 
         Attributes
