@@ -598,7 +598,7 @@ class NeighborhoodPolicy(NamedTuple):
             >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
             >>> rewards = [20, 17, 25, 9]
             >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.Random(), NeighborhoodPolicy.TreeBandit())
+            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
             >>> mab.fit(decisions, rewards, contexts)
             >>> mab.predict([[3, 2, 0, 1]])
             'Arm2'
