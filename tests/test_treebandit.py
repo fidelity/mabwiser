@@ -368,8 +368,6 @@ class TreeBanditTest(BaseTest):
         context_history2 = [[0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
         mab.partial_fit(decisions2, rewards2, context_history2)
 
-        print(mab._imp.arm_to_rewards[3])
-
         arms_2 = mab._imp.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
 
         self.assertListEqual(arms_1, [1, 1])
