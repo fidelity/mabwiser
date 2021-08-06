@@ -6,8 +6,9 @@ This module provides a number of constants and helper functions.
 """
 
 import abc
-import numpy as np
 from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn
+
+import numpy as np
 
 Arm = NewType('Arm', Union[int, float, str])
 """Arm type is defined as integer, float, or string."""

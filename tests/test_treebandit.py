@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 
 class TreeBanditTest(BaseTest):
+
+    def test_doctest_example(self):
+        list_of_arms = ['Arm1', 'Arm2']
+        decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+        rewards = [20, 17, 25, 9]
+        contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+        mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+        mab.fit(decisions, rewards, contexts)
+        result = mab.predict([[3, 2, 0, 1]])
+        self.assertEqual(result, 'Arm2')
 
     def test_tree_parameters_default(self):
 
@@ -259,17 +269,17 @@ class TreeBanditTest(BaseTest):
         values_1 = []
         for key in mab._imp.arm_to_rewards[1].keys():
             values_1.extend(mab._imp.arm_to_rewards[1][key])
-        self.assertListEqual(sorted(values_1), [0, 1, 1, 11])
+        self.assertListEqual(sorted(values_1), [0, 1, 1, 1])
 
         values_2 = []
         for key in mab._imp.arm_to_rewards[2].keys():
             values_2.extend(mab._imp.arm_to_rewards[2][key])
-        self.assertListEqual(sorted(values_2), [0, 0, 1])
+        self.assertListEqual(sorted(values_2), [0, 0, 0])
 
         values_3 = []
         for key in mab._imp.arm_to_rewards[3].keys():
             values_3.extend(mab._imp.arm_to_rewards[3][key])
-        self.assertListEqual(sorted(values_3), [0, 1, 1, 1, 1, 6])
+        self.assertListEqual(sorted(values_3), [0, 1, 1, 1, 1, 1])
 
         values_4 = []
         for key in mab._imp.arm_to_rewards[4].keys():

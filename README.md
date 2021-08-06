@@ -63,6 +63,7 @@ If you use MABWiser in a publication, please cite it as:
 
 * **[IJAIT 2021]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: Parallelizable Contextual Multi-Armed Bandits"](https://www.worldscientific.com/doi/abs/10.1142/S0218213021500214)
 * **[ICTAI 2019]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python"](https://ieeexplore.ieee.org/document/8995418)
+
 ```bibtex
     @article{DBLP:journals/ijait/StrongKK21,
       author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},

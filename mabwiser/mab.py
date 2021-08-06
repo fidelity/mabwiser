@@ -17,6 +17,7 @@ import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.tree import DecisionTreeClassifier
 
+from mabwiser._version import __author__, __email__, __version__, __copyright__
 from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
@@ -29,7 +30,6 @@ from mabwiser.thompson import _ThompsonSampling
 from mabwiser.treebandit import _TreeBandit
 from mabwiser.ucb import _UCB1
 from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_rng
-from mabwiser._version import __author__, __email__, __version__, __copyright__
 
 __author__ = __author__
 __email__ = __email__
@@ -582,7 +582,8 @@ class NeighborhoodPolicy(NamedTuple):
         to select a reward from the rewards list at those leaves.
         It then chooses the arm with the highest expected reward.
 
-        The TreeBandit neighborhood policy is a modified version of the TreeHeuristic algorithm presented in:
+        The TreeBandit neighborhood policy is a modified version of
+        the TreeHeuristic algorithm presented in:
         Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
         A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
 
@@ -591,8 +592,8 @@ class NeighborhoodPolicy(NamedTuple):
         tree_parameters: Dict, **kwarg
             Parameters of the decision tree.
             The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
-            When a parameter is not given, the default of that parameter in sklearn.tree.DecisionTreeClassifier
-            will be chosen.
+            When a parameter is not given, the default parameters from
+            sklearn.tree.DecisionTreeClassifier will be chosen.
             Default value is an empty dictionary.
 
         Example
@@ -681,7 +682,7 @@ class MAB:
     """
 
     def __init__(self,
-                 arms: List[Arm],                                                   # The list of arms
+                 arms: List[Arm],  # The list of arms
                  learning_policy: Union[LearningPolicy.EpsilonGreedy,
                                         LearningPolicy.Popularity,
                                         LearningPolicy.Random,
@@ -689,16 +690,16 @@ class MAB:
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
                                         LearningPolicy.LinTS,
-                                        LearningPolicy.LinUCB],                     # The learning policy
+                                        LearningPolicy.LinUCB],  # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
                                             NeighborhoodPolicy.Radius,
                                             NeighborhoodPolicy.TreeBandit] = None,  # The context policy, optional
-                 seed: int = Constants.default_seed,                                # The random seed
-                 n_jobs: int = 1,                                                   # Number of parallel jobs
-                 backend: str = None                                                # Parallel backend implementation
+                 seed: int = Constants.default_seed,  # The random seed
+                 n_jobs: int = 1,  # Number of parallel jobs
+                 backend: str = None  # Parallel backend implementation
                  ):
         """Initializes a multi-armed bandit (MAB) with the given arguments.
 
@@ -961,10 +962,10 @@ class MAB:
         self._imp.add_arm(arm, binarizer, scaler)
 
     def fit(self,
-            decisions: Union[List[Arm], np.ndarray, pd.Series],                     # Decisions that are made
-            rewards: Union[List[Num], np.ndarray, pd.Series],                       # Rewards that are received
+            decisions: Union[List[Arm], np.ndarray, pd.Series],  # Decisions that are made
+            rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
             contexts: Union[None, List[List[Num]],
-                            np.ndarray, pd.Series, pd.DataFrame] = None                                             # Contexts, optional
+                            np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
             ) -> NoReturn:
         """Fits the multi-armed bandit to the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
@@ -1076,7 +1077,7 @@ class MAB:
 
     def predict(self,
                 contexts: Union[None, List[Num], List[List[Num]],
-                                np.ndarray, pd.Series, pd.DataFrame] = None                  # Contexts, optional
+                                np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                 ) -> Union[Arm, List[Arm]]:
         """Returns the "best" arm (or arms list if multiple contexts are given) based on the expected reward.
 
@@ -1116,7 +1117,7 @@ class MAB:
 
     def predict_expectations(self,
                              contexts: Union[None, List[Num], List[List[Num]],
-                                             np.ndarray, pd.Series, pd.DataFrame] = None     # Contexts, optional
+                                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                              ) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         """Returns a dictionary of arms (key) to their expected rewards (value).
 

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
+from collections import defaultdict
 from copy import deepcopy
+from functools import partial
 from typing import Union, Dict, List, NoReturn, Optional, Callable
 
 import numpy as np
@@ -29,7 +31,6 @@ class _TreeBandit(BaseMAB):
 
         self.arm_to_tree = None
         self.arm_to_rewards = None
-        self.unfitted_arms = []
 
         # Initialize the arm expectations to nan
         # When there are neighbors, in the leaf node of the tree, expectations of
@@ -39,10 +40,11 @@ class _TreeBandit(BaseMAB):
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
-        # Reset the decision trees of each arm
+        # Reset the decision tree and rewards of each arm
         self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
-        self.arm_to_rewards = {arm: dict() for arm in self.arms}
+        self.arm_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
+        # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
             self.lp.is_contextual_binarized = False
             rewards = self.lp._get_binary_rewards(decisions, rewards)
@@ -53,17 +55,14 @@ class _TreeBandit(BaseMAB):
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
-        # Update rewards list at leaves
-        # Keep track of arms whose trees have not been fitted, and fit them separately
-        for i, arm in enumerate(decisions):
-            try:
-                if arm not in self.unfitted_arms:
-                    leaf_index = self.arm_to_tree[arm].apply([contexts[i]])[0]
-                    self.arm_to_rewards[arm][leaf_index] = np.append(self.arm_to_rewards[arm][leaf_index], rewards[i])
-            except AttributeError:
-                # If arm's tree has not been fitted
-                self.arm_to_tree[arm].fit(contexts[decisions == arm], rewards[decisions == arm])
-                self.unfitted_arms.append(arm)
+        # If TS and a binarizer function is given, binarize the rewards
+        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
+            self.lp.is_contextual_binarized = False
+            rewards = self.lp._get_binary_rewards(decisions, rewards)
+            self.lp.is_contextual_binarized = True
+
+        # Calculate fit
+        self._parallel_fit(decisions, rewards, contexts)
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
@@ -82,8 +81,9 @@ class _TreeBandit(BaseMAB):
         # Check that the dataset for the given arm is not empty
         if arm_contexts.size != 0:
 
-            # Fit decision tree of the arm with this dataset
-            self.arm_to_tree[arm].fit(arm_contexts, arm_rewards)
+            # If the arm is unfitted, train decision tree on arm dataset
+            if len(self.arm_to_rewards[arm]) == 0:
+                self.arm_to_tree[arm].fit(arm_contexts, arm_rewards)
 
             # For each leaf, keep a list of rewards
             # DecisionTreeClassifier's apply() method returns the indices of the nodes in the tree
@@ -97,9 +97,12 @@ class _TreeBandit(BaseMAB):
 
             for index in unique_leaf_indices:
                 # Get rewards list for each leaf
-                self.arm_to_rewards[arm][index] = arm_rewards[leaf_indices == index]
-        else:
-            self.unfitted_arms.append(arm)
+                rewards_to_add = arm_rewards[leaf_indices == index]
+
+                # Add rewards
+                # ND: No need to check if index key in arm_to_rewards dict
+                # thanks to defaultdict() construction
+                self.arm_to_rewards[arm][index] = np.append(self.arm_to_rewards[arm][index], rewards_to_add)
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -131,7 +134,7 @@ class _TreeBandit(BaseMAB):
                     leaf_rewards = arm_to_rewards[arm][leaf_index]
 
                     # Create leaf lp
-                    leaf_lp = self._get_leaf_lp(arm)
+                    leaf_lp = self._create_leaf_lp(arm)
 
                     # Leaf LP: fit the same arm decision with the leaf rewards
                     leaf_lp.fit(np.asarray([arm] * len(leaf_rewards)), leaf_rewards)
@@ -151,9 +154,9 @@ class _TreeBandit(BaseMAB):
 
         self.lp.add_arm(arm, binarizer)
         self.arm_to_tree[arm] = DecisionTreeClassifier(**self.tree_parameters)
-        self.arm_to_rewards[arm] = dict()
+        self.arm_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
 
-    def _get_leaf_lp(self, arm: Arm):
+    def _create_leaf_lp(self, arm: Arm):
 
         # Create new learning policy object for each leaf with a dummy arm to avoid
         # sharing the same object between different arms and leaves.

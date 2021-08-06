@@ -91,7 +91,7 @@ E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextua
       year      = {2019},
       pages     = {885-890},
       organization = {IEEE},
-      url       = {https://github.com/fmr-llc/mabwiser}
+      url       = {https://github.com/fidelity/mabwiser}
     }
 
 
