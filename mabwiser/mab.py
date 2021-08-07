@@ -618,6 +618,12 @@ class NeighborhoodPolicy(NamedTuple):
                 check_true(key in tree.__dict__.keys(),
                            ValueError("sklearn.tree.DecisionTreeClassifier doesn't have a parameter " + str(key) + "."))
 
+        def _is_compatible(self, learning_policy: LearningPolicy):
+            # TreeBandit is compatible with these learning policies
+            return isinstance(learning_policy, (LearningPolicy.EpsilonGreedy,
+                                                LearningPolicy.UCB1,
+                                                LearningPolicy.ThompsonSampling))
+
 
 class MAB:
     """**MABWiser: Contextual Multi-Armed Bandit Library**
@@ -1161,7 +1167,6 @@ class MAB:
 
         # Arms
         check_true(isinstance(arms, list), TypeError("The arms should be provided in a list."))
-        check_true(len(arms) > 1, ValueError("The number of arms should be greater than 1."))
         check_false(None in arms, ValueError("The arm list cannot contain None."))
         check_false(np.nan in arms, ValueError("The arm list cannot contain NaN."))
         check_false(np.Inf in arms, ValueError("The arm list cannot contain Infinity."))
@@ -1188,9 +1193,8 @@ class MAB:
 
             # Tree-Bandit learning policy compatibility
             if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
-                check_true(not isinstance(learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)),
-                           ValueError("Tree-Bandit is not compatible with LinTS and LinUCB learning policy. "
-                                      "Use context-free learning policies."))
+                check_true(neighborhood_policy._is_compatible(learning_policy),
+                           ValueError("Tree-Bandit is not compatible with the learning policy: " + str(learning_policy)))
 
         # Seed
         check_true(isinstance(seed, int), TypeError("The seed must be an integer."))

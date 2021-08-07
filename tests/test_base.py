@@ -59,7 +59,7 @@ class BaseTest(unittest.TestCase):
            NeighborhoodPolicy.Radius(),
            NeighborhoodPolicy.Radius(2.5),
            NeighborhoodPolicy.Radius(5),
-           ]
+           NeighborhoodPolicy.TreeBandit()]
 
     cps = [NeighborhoodPolicy.Clusters(),
            NeighborhoodPolicy.Clusters(n_clusters=3),
@@ -110,6 +110,16 @@ class BaseTest(unittest.TestCase):
             # Return: expectations(s) and the MAB instance
             expectations = [mab.predict_expectations(contexts)for _ in range(num_run)]
             return expectations[0] if num_run == 1 else expectations, mab
+
+    @staticmethod
+    def is_compatible(lp, np):
+
+        # Case for TreeBandit lp/np compatibility
+        treebandit_compat = isinstance(np, NeighborhoodPolicy.TreeBandit) \
+                            and np._is_compatible(lp)
+
+        return treebandit_compat
+
 
     def assertListAlmostEqual(self, list1, list2):
         """

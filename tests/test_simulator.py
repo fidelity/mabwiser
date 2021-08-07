@@ -34,12 +34,25 @@ class TestSimulator(unittest.TestCase):
            NeighborhoodPolicy.Clusters(),
            NeighborhoodPolicy.TreeBandit()]
 
+    @staticmethod
+    def is_compatible(lp, np):
+
+        # Case for TreeBandit lp/np compatibility
+        treebandit_compat = isinstance(np, NeighborhoodPolicy.TreeBandit) \
+                            and np._is_compatible(lp)
+
+        return treebandit_compat
+
     def test_contextual_offline(self):
         rng = np.random.RandomState(seed=7)
         bandits = []
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -60,6 +73,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -84,6 +101,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp, n_jobs=2)))
                 counter += 1
 
@@ -107,6 +128,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -131,6 +156,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -154,6 +183,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -253,6 +286,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -280,6 +317,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -308,6 +349,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -331,6 +376,10 @@ class TestSimulator(unittest.TestCase):
         counter = 0
         for cp in TestSimulator.nps:
             for lp in TestSimulator.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 bandits.append((str(counter), MAB([0, 1], lp, cp)))
                 counter += 1
 
@@ -593,6 +642,10 @@ class TestSimulator(unittest.TestCase):
 
         for nbp in self.nps:
             for lp in self.lps:
+
+                if not self.is_compatible(lp, nbp):
+                    continue
+
                 sim = Simulator(bandits=[("example", MAB([0, 1], lp, nbp))],
                                 decisions=decisions,
                                 rewards=rewards,
@@ -611,8 +664,12 @@ class TestSimulator(unittest.TestCase):
                     self.assertEqual(len(sim.bandit_to_neighborhood_size['example']),
                                      len(sim.bandit_to_predictions['example']))
 
+                # Skip TreeBandit as it does not work with parametric lps
+                if isinstance(nbp, NeighborhoodPolicy.TreeBandit):
+                    continue
+
                 for par in self.parametric:
-                    if not isinstance(nbp, NeighborhoodPolicy.TreeBandit):
+
                         sim = Simulator(bandits=[("example", MAB([0, 1], par, nbp))],
                                         decisions=decisions,
                                         rewards=rewards,
@@ -658,6 +715,10 @@ class TestSimulator(unittest.TestCase):
 
         for nbp in self.nps:
             for lp in self.lps:
+
+                if not self.is_compatible(lp, nbp):
+                    continue
+
                 sim = Simulator(bandits=[("example", MAB([0, 1], lp, nbp))],
                                 decisions=decisions,
                                 rewards=rewards,
@@ -676,6 +737,10 @@ class TestSimulator(unittest.TestCase):
                                      len(sim.bandit_to_predictions['example']))
 
             for par in self.parametric:
+
+                if not self.is_compatible(par, nbp):
+                    continue
+
                 if not isinstance(nbp, NeighborhoodPolicy.TreeBandit):
                     sim = Simulator(bandits=[("example", MAB([0, 1], par, nbp))],
                                     decisions=decisions,

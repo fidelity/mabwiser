@@ -595,7 +595,7 @@ class ExampleTest(BaseTest):
         self.assertTrue(sim.bandit_to_confusion_matrices)
         self.assertTrue(sim.bandit_to_predictions)
 
-    def test_example(self):
+    def test_treebandit(self):
         # Arms
         ads = [1, 2, 3, 4, 5]
 
@@ -633,7 +633,7 @@ class ExampleTest(BaseTest):
         expectations = treebandit.predict_expectations(test)
 
         # Results
-        print("TreeBandit: ", prediction, " ", expectations)
+        # print("TreeBandit: ", prediction, " ", expectations)
         assert (prediction == [4, 4])
 
         # Online update of model

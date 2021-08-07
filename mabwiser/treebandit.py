@@ -29,14 +29,9 @@ class _TreeBandit(BaseMAB):
         self.tree_parameters = tree_parameters
         self.tree_parameters["random_state"] = rng.seed
 
-        self.arm_to_tree = None
-        self.arm_to_rewards = None
-
-        # Initialize the arm expectations to nan
-        # When there are neighbors, in the leaf node of the tree, expectations of
-        # the underlying learning policy is used
-        # When there are no neighbors, return nan expectations
-        reset(self.arm_to_expectation, np.nan)
+        # Reset the decision tree and rewards of each arm
+        self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
+        self.arm_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -100,7 +95,7 @@ class _TreeBandit(BaseMAB):
                 rewards_to_add = arm_rewards[leaf_indices == index]
 
                 # Add rewards
-                # ND: No need to check if index key in arm_to_rewards dict
+                # NB: No need to check if index key in arm_to_rewards dict
                 # thanks to defaultdict() construction
                 self.arm_to_rewards[arm][index] = np.append(self.arm_to_rewards[arm][index], rewards_to_add)
 
@@ -143,7 +138,11 @@ class _TreeBandit(BaseMAB):
                     arm_to_expectation[arm] = leaf_lp.predict_expectations()[arm]
 
             if is_predict:
-                predictions[index] = argmax(arm_to_expectation)
+                # Return a random arm with less than epsilon probability
+                if isinstance(self.lp, _EpsilonGreedy) and self.rng.rand() < self.lp.epsilon:
+                    predictions[index] = self.arms[self.rng.randint(0, len(self.arms))]
+                else:
+                    predictions[index] = argmax(arm_to_expectation)
             else:
                 predictions[index] = arm_to_expectation.copy()
 
@@ -158,21 +157,15 @@ class _TreeBandit(BaseMAB):
 
     def _create_leaf_lp(self, arm: Arm):
 
-        # Create new learning policy object for each leaf with a dummy arm to avoid
-        # sharing the same object between different arms and leaves.
-        leaf_arms = [arm, -1]
-        leaf_lp = None
+        # Create a new learning policy object for each leaf
+        # This avoids sharing the same object between different arms and leaves.
         if isinstance(self.lp, _EpsilonGreedy):
-            leaf_lp = _EpsilonGreedy(self.rng, leaf_arms, self.n_jobs, self.backend, self.lp.epsilon)
-        elif isinstance(self.lp, _Popularity):
-            leaf_lp = _Popularity(self.rng, leaf_arms, self.n_jobs, self.backend)
-        elif isinstance(self.lp, _Random):
-            leaf_lp = _Random(self.rng, leaf_arms, self.n_jobs, self.backend)
-        elif isinstance(self.lp, _Softmax):
-            leaf_lp = _Softmax(self.rng, leaf_arms, self.n_jobs, self.backend, self.lp.tau)
+            leaf_lp = _EpsilonGreedy(self.rng, [arm], self.n_jobs, self.backend, self.lp.epsilon)
         elif isinstance(self.lp, _ThompsonSampling):
-            leaf_lp = _ThompsonSampling(self.rng, leaf_arms, self.n_jobs, self.backend, self.lp.binarizer)
+            leaf_lp = _ThompsonSampling(self.rng, [arm], self.n_jobs, self.backend, self.lp.binarizer)
         elif isinstance(self.lp, _UCB1):
-            leaf_lp = _UCB1(self.rng, leaf_arms, self.n_jobs, self.backend, self.lp.alpha)
+            leaf_lp = _UCB1(self.rng, [arm], self.n_jobs, self.backend, self.lp.alpha)
+        else:
+            raise ValueError("Incompatible leaf lp for TreeBandit: ", self.lp)
 
         return leaf_lp

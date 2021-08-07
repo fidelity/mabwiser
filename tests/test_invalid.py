@@ -19,10 +19,6 @@ logging.disable(logging.CRITICAL)
 
 class InvalidTest(BaseTest):
 
-    def test_invalid_arm_list(self):
-        with self.assertRaises(ValueError):
-            MAB([0], LearningPolicy.EpsilonGreedy(epsilon=0))
-
     def test_invalid_arm_not_list(self):
         with self.assertRaises(TypeError):
             MAB(1, LearningPolicy.EpsilonGreedy(epsilon=0))
@@ -297,6 +293,14 @@ class InvalidTest(BaseTest):
         with self.assertRaises(ValueError):
             MAB([0, 1], LearningPolicy.LinUCB(), NeighborhoodPolicy.TreeBandit())
 
+    def test_invalid_treebandit_lp_popularity(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.Popularity(), NeighborhoodPolicy.TreeBandit())
+
+    def test_invalid_treebandit_lp_softmax(self):
+        with self.assertRaises(ValueError):
+            MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.TreeBandit())
+
     def test_invalid_treebandit_lp_lints(self):
         with self.assertRaises(ValueError):
             MAB([0, 1], LearningPolicy.LinTS(), NeighborhoodPolicy.TreeBandit())
@@ -318,6 +322,10 @@ class InvalidTest(BaseTest):
 
         for cp in InvalidTest.nps:
             for lp in InvalidTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2], lp, cp)
                 with self.assertRaises(Exception):
                     mab.predict_expectations([[0, 1, 1, 2]])
@@ -327,6 +335,9 @@ class InvalidTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
 
                 with self.assertRaises(TypeError):
                     self.predict(arms=[1, 2, 3, 4],
@@ -344,6 +355,10 @@ class InvalidTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 with self.assertRaises(TypeError):
                     self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1],
@@ -360,6 +375,10 @@ class InvalidTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 with self.assertRaises(TypeError):
                     self.predict(arms=[1, 2, 3, 4],
                                  decisions=np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
