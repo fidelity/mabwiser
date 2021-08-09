@@ -1196,7 +1196,8 @@ class MAB:
             # Tree-Bandit learning policy compatibility
             if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
                 check_true(neighborhood_policy._is_compatible(learning_policy),
-                           ValueError("Tree-Bandit is not compatible with the learning policy: " + str(learning_policy)))
+                           ValueError(
+                               "Tree-Bandit is not compatible with the learning policy: " + str(learning_policy)))
 
         # Seed
         check_true(isinstance(seed, int), TypeError("The seed must be an integer."))

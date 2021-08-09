@@ -97,7 +97,8 @@ class _TreeBandit(BaseMAB):
                 # Add rewards
                 # NB: No need to check if index key in arm_to_rewards dict
                 # thanks to defaultdict() construction
-                self.arm_to_leaf_to_rewards[arm][index] = np.append(self.arm_to_leaf_to_rewards[arm][index], rewards_to_add)
+                self.arm_to_leaf_to_rewards[arm][index] = np.append(self.arm_to_leaf_to_rewards[arm][index],
+                                                                    rewards_to_add)
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:

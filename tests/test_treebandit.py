@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import pandas as pd
+
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
-import pandas as pd
 
 
 class TreeBanditTest(BaseTest):
@@ -38,10 +39,10 @@ class TreeBanditTest(BaseTest):
     def test_tree_parameters(self):
 
         tree_parameters = {
-                            # "criterion": "entropy",
-                           "max_depth": 4,
-                           "min_samples_split": 2,
-                           "max_leaf_nodes": 10}
+            # "criterion": "entropy",
+            "max_depth": 4,
+            "min_samples_split": 2,
+            "max_leaf_nodes": 10}
 
         arm, mab = self.predict(arms=['Arm1', 'Arm2'],
                                 decisions=['Arm1', 'Arm1', 'Arm2', 'Arm1'],
@@ -99,9 +100,9 @@ class TreeBanditTest(BaseTest):
                                  learning_policy=LearningPolicy.EpsilonGreedy(epsilon=1.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                 [0, 1, 2, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                 [0, 2, 1, 0, 0]],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 2, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
                                  contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
                                  seed=123456,
                                  num_run=1,
