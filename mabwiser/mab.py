@@ -579,8 +579,10 @@ class NeighborhoodPolicy(NamedTuple):
         and keeps a list of rewards for each leaf.
         To predict, it receives a context vector and goes to the corresponding
         leaf at each arm's tree and applies the given context-free MAB learning policy
-        to select a reward from the rewards list at those leaves.
-        It then chooses the arm with the highest expected reward.
+        to predict expectations and choose an arm.
+
+        The TreeBandit neighborhood policy is compatible with the following
+        context-free learning policies only: EpsilonGreedy, ThompsonSampling and UCB1.
 
         The TreeBandit neighborhood policy is a modified version of
         the TreeHeuristic algorithm presented in:
@@ -1356,12 +1358,21 @@ class MAB:
 
             else:  # For predictions, compare the shape to the stored context history
 
+                # We need to find out the number of features (to distinguish Series shape)
                 if isinstance(self.learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size
                     else:
                         num_features = self._imp.contexts.shape[1]
+                elif isinstance(self._imp, _TreeBandit):
+                    # Even when fit() happened, the first arm might not necessarily have a fitted tree
+                    # So we have to search for a fitted tree
+                    for arm in self.arms:
+                        try:
+                            num_features = len(self._imp.arm_to_tree[arm].feature_importances_)
+                        except:
+                            continue
                 else:
                     num_features = self._imp.contexts.shape[1]
 

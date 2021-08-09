@@ -114,12 +114,11 @@ class BaseTest(unittest.TestCase):
     @staticmethod
     def is_compatible(lp, np):
 
-        # Case for TreeBandit lp/np compatibility
-        treebandit_compat = isinstance(np, NeighborhoodPolicy.TreeBandit) \
-                            and np._is_compatible(lp)
+        # Special case for TreeBandit lp/np compatibility
+        if isinstance(np, NeighborhoodPolicy.TreeBandit):
+            return np._is_compatible(lp)
 
-        return treebandit_compat
-
+        return True
 
     def assertListAlmostEqual(self, list1, list2):
         """

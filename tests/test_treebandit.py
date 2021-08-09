@@ -2,6 +2,7 @@
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
+import pandas as pd
 
 
 class TreeBanditTest(BaseTest):
@@ -194,13 +195,13 @@ class TreeBanditTest(BaseTest):
         mab.partial_fit(decisions2, rewards2, contexts2)
 
         values_1 = []
-        for key in mab._imp.arm_to_rewards['Arm1'].keys():
-            values_1.extend(mab._imp.arm_to_rewards['Arm1'][key])
+        for key in mab._imp.arm_to_leaf_to_rewards['Arm1'].keys():
+            values_1.extend(mab._imp.arm_to_leaf_to_rewards['Arm1'][key])
         self.assertListEqual(sorted(values_1), [9, 17, 20])
 
         values_2 = []
-        for key in mab._imp.arm_to_rewards['Arm2'].keys():
-            values_2.extend(mab._imp.arm_to_rewards['Arm2'][key])
+        for key in mab._imp.arm_to_leaf_to_rewards['Arm2'].keys():
+            values_2.extend(mab._imp.arm_to_leaf_to_rewards['Arm2'][key])
         self.assertListEqual(sorted(values_2), [25, 30])
 
     def test_partial_fit_thompson_thresholds(self):
@@ -232,23 +233,23 @@ class TreeBanditTest(BaseTest):
         mab.partial_fit(decisions2, rewards2, context_history2)
 
         values_1 = []
-        for key in mab._imp.arm_to_rewards[1].keys():
-            values_1.extend(mab._imp.arm_to_rewards[1][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[1].keys():
+            values_1.extend(mab._imp.arm_to_leaf_to_rewards[1][key])
         self.assertListEqual(sorted(values_1), [0, 1, 1, 1])
 
         values_2 = []
-        for key in mab._imp.arm_to_rewards[2].keys():
-            values_2.extend(mab._imp.arm_to_rewards[2][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[2].keys():
+            values_2.extend(mab._imp.arm_to_leaf_to_rewards[2][key])
         self.assertListEqual(sorted(values_2), [0, 0, 0])
 
         values_3 = []
-        for key in mab._imp.arm_to_rewards[3].keys():
-            values_3.extend(mab._imp.arm_to_rewards[3][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[3].keys():
+            values_3.extend(mab._imp.arm_to_leaf_to_rewards[3][key])
         self.assertListEqual(sorted(values_3), [0, 1, 1, 1, 1, 1])
 
         values_4 = []
-        for key in mab._imp.arm_to_rewards[4].keys():
-            values_4.extend(mab._imp.arm_to_rewards[4][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[4].keys():
+            values_4.extend(mab._imp.arm_to_leaf_to_rewards[4][key])
         self.assertListEqual(sorted(values_4), [])
 
     def test_fit_twice_thompson_thresholds(self):
@@ -281,23 +282,23 @@ class TreeBanditTest(BaseTest):
         mab.fit(decisions2, rewards2, context_history2)
 
         values_1 = []
-        for key in mab._imp.arm_to_rewards[1].keys():
-            values_1.extend(mab._imp.arm_to_rewards[1][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[1].keys():
+            values_1.extend(mab._imp.arm_to_leaf_to_rewards[1][key])
         self.assertListEqual(sorted(values_1), [1])
 
         values_2 = []
-        for key in mab._imp.arm_to_rewards[2].keys():
-            values_2.extend(mab._imp.arm_to_rewards[2][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[2].keys():
+            values_2.extend(mab._imp.arm_to_leaf_to_rewards[2][key])
         self.assertListEqual(sorted(values_2), [0])
 
         values_3 = []
-        for key in mab._imp.arm_to_rewards[3].keys():
-            values_3.extend(mab._imp.arm_to_rewards[3][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[3].keys():
+            values_3.extend(mab._imp.arm_to_leaf_to_rewards[3][key])
         self.assertListEqual(sorted(values_3), [1])
 
         values_4 = []
-        for key in mab._imp.arm_to_rewards[4].keys():
-            values_4.extend(mab._imp.arm_to_rewards[4][key])
+        for key in mab._imp.arm_to_leaf_to_rewards[4].keys():
+            values_4.extend(mab._imp.arm_to_leaf_to_rewards[4][key])
         self.assertListEqual(sorted(values_4), [])
 
     def test_add_arm(self):
@@ -320,7 +321,7 @@ class TreeBanditTest(BaseTest):
         self.assertTrue(5 in mab._imp.lp.arms)
         self.assertTrue(5 in mab._imp.lp.arm_to_expectation.keys())
         self.assertTrue(5 in mab._imp.arm_to_tree.keys())
-        self.assertTrue(5 in mab._imp.arm_to_rewards.keys())
+        self.assertTrue(5 in mab._imp.arm_to_leaf_to_rewards.keys())
 
     def test_add_arm_result_match(self):
 
@@ -347,3 +348,14 @@ class TreeBanditTest(BaseTest):
 
         self.assertListEqual(arms_1, [1, 1])
         self.assertListEqual(arms_1, arms_2)
+
+    def test_series(self):
+        arms = [0, 1]
+        decisions = [1, 1, 1, 1, 1, 1]
+        rewards = [0, 0, 0, 0, 0, 1]
+        contexts = pd.DataFrame({'column1': [1, 2, 3, 3, 2, 1], 'column2': [2, 3, 1, 1, 2, 3]})
+
+        mab = MAB(arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+        mab.fit(decisions, rewards, contexts['column1'])
+        result = mab.predict(pd.Series([1]))
+        self.assertEqual(result, 1)

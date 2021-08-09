@@ -31,13 +31,13 @@ class _TreeBandit(BaseMAB):
 
         # Reset the decision tree and rewards of each arm
         self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
-        self.arm_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
+        self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Reset the decision tree and rewards of each arm
         self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
-        self.arm_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
+        self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
@@ -77,7 +77,7 @@ class _TreeBandit(BaseMAB):
         if arm_contexts.size != 0:
 
             # If the arm is unfitted, train decision tree on arm dataset
-            if len(self.arm_to_rewards[arm]) == 0:
+            if len(self.arm_to_leaf_to_rewards[arm]) == 0:
                 self.arm_to_tree[arm].fit(arm_contexts, arm_rewards)
 
             # For each leaf, keep a list of rewards
@@ -97,7 +97,7 @@ class _TreeBandit(BaseMAB):
                 # Add rewards
                 # NB: No need to check if index key in arm_to_rewards dict
                 # thanks to defaultdict() construction
-                self.arm_to_rewards[arm][index] = np.append(self.arm_to_rewards[arm][index], rewards_to_add)
+                self.arm_to_leaf_to_rewards[arm][index] = np.append(self.arm_to_leaf_to_rewards[arm][index], rewards_to_add)
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
@@ -105,7 +105,7 @@ class _TreeBandit(BaseMAB):
         # Get local copy of arm_to_tree, arm_to_expectation, arm_to_rewards, and arms
         # to minimize communication overhead between arms (processes) using shared objects
         arm_to_tree = deepcopy(self.arm_to_tree)
-        arm_to_rewards = deepcopy(self.arm_to_rewards)
+        arm_to_rewards = deepcopy(self.arm_to_leaf_to_rewards)
         arm_to_expectation = deepcopy(self.arm_to_expectation)
         arms = deepcopy(self.arms)
 
@@ -153,7 +153,7 @@ class _TreeBandit(BaseMAB):
 
         self.lp.add_arm(arm, binarizer)
         self.arm_to_tree[arm] = DecisionTreeClassifier(**self.tree_parameters)
-        self.arm_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
+        self.arm_to_leaf_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
 
     def _create_leaf_lp(self, arm: Arm):
 

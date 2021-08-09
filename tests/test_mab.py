@@ -493,7 +493,7 @@ class MABTest(BaseTest):
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
 
-                if not self.is_compatible(lp, cp):
+                if not self.is_compatible(lp, cp) or isinstance(cp, NeighborhoodPolicy.TreeBandit):
                     continue
 
                 arm, mab = self.predict(arms=[0, 1],
@@ -507,7 +507,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
         for cp in BaseTest.cps:
             for lp in BaseTest.lps:
@@ -526,7 +528,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
     def test_context_series(self):
 
@@ -562,7 +566,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
         for cp in BaseTest.cps:
             for lp in BaseTest.lps:
@@ -581,7 +587,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
     #################################################
     # Test contextual predict() method
