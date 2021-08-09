@@ -7,7 +7,7 @@ from functools import partial
 from typing import Union, Dict, List, NoReturn, Optional, Callable
 
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.greedy import _EpsilonGreedy
@@ -17,7 +17,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import reset, argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, Arm, Num, _BaseRNG
 
 
 class _TreeBandit(BaseMAB):
@@ -30,13 +30,13 @@ class _TreeBandit(BaseMAB):
         self.tree_parameters["random_state"] = rng.seed
 
         # Reset the decision tree and rewards of each arm
-        self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
+        self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
         self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
         # Reset the decision tree and rewards of each arm
-        self.arm_to_tree = {arm: DecisionTreeClassifier(**self.tree_parameters) for arm in self.arms}
+        self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
         self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
         # If TS and a binarizer function is given, binarize the rewards
@@ -152,7 +152,7 @@ class _TreeBandit(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
 
         self.lp.add_arm(arm, binarizer)
-        self.arm_to_tree[arm] = DecisionTreeClassifier(**self.tree_parameters)
+        self.arm_to_tree[arm] = DecisionTreeRegressor(**self.tree_parameters)
         self.arm_to_leaf_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
 
     def _create_leaf_lp(self, arm: Arm):

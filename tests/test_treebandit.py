@@ -30,14 +30,18 @@ class TreeBanditTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["criterion"], "gini")
+        # self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["criterion"], "gini")
         self.assertIsNone(mab._imp.arm_to_tree[arm].__dict__["max_depth"])
         self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["min_samples_split"], 2)
         self.assertIsNone(mab._imp.arm_to_tree[arm].__dict__["max_leaf_nodes"])
 
     def test_tree_parameters(self):
 
-        tree_parameters = {"criterion": "entropy", "max_depth": 4, "min_samples_split": 2, "max_leaf_nodes": 10}
+        tree_parameters = {
+                            # "criterion": "entropy",
+                           "max_depth": 4,
+                           "min_samples_split": 2,
+                           "max_leaf_nodes": 10}
 
         arm, mab = self.predict(arms=['Arm1', 'Arm2'],
                                 decisions=['Arm1', 'Arm1', 'Arm2', 'Arm1'],
@@ -50,7 +54,7 @@ class TreeBanditTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["criterion"], "entropy")
+        # self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["criterion"], "entropy")
         self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["max_depth"], 4)
         self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["min_samples_split"], 2)
         self.assertEqual(mab._imp.arm_to_tree[arm].__dict__["max_leaf_nodes"], 10)
