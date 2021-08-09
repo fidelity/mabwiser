@@ -115,7 +115,7 @@ expectations = clusters.predict_expectations(test)
 
 # Results
 print("KMeans: ", prediction, " ", expectations)
-assert(prediction == [1, 2])
+assert(prediction == [5, 2])
 
 # Online update of model
 clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
@@ -179,3 +179,32 @@ lshnearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=t
 
 # Updating of the model with new arm
 lshnearest.add_arm(6)
+
+####################################################################
+# TreeBandit Neighborhood Policy with Epsilon Greedy Learning Policy
+####################################################################
+
+# TreeBandit contextual policy with DecisionTreeClassifier's default tree parameters
+# and ucb1 learning with alpha of 1.25
+treebandit = MAB(arms=ads,
+                 learning_policy=LearningPolicy.UCB1(alpha=1.25),
+                 neighborhood_policy=NeighborhoodPolicy.TreeBandit())
+
+# Learn from previous ads shown and revenues generated
+treebandit.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+
+# Predict the next best ad to show
+prediction = treebandit.predict(test)
+
+# Expectation of each ad based on learning from past ad revenues
+expectations = treebandit.predict_expectations(test)
+
+# Results
+print("TreeBandit: ", prediction, " ", expectations)
+assert(prediction == [4, 4])
+
+# Online update of model
+treebandit.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+
+# Updating of the model with new arm
+treebandit.add_arm(6)

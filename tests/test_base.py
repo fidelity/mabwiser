@@ -59,7 +59,7 @@ class BaseTest(unittest.TestCase):
            NeighborhoodPolicy.Radius(),
            NeighborhoodPolicy.Radius(2.5),
            NeighborhoodPolicy.Radius(5),
-           ]
+           NeighborhoodPolicy.TreeBandit()]
 
     cps = [NeighborhoodPolicy.Clusters(),
            NeighborhoodPolicy.Clusters(n_clusters=3),
@@ -73,8 +73,9 @@ class BaseTest(unittest.TestCase):
                 learning_policy: Union[LearningPolicy.EpsilonGreedy, LearningPolicy.Popularity, LearningPolicy.Random,
                                        LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
                                        LearningPolicy.LinTS, LearningPolicy.LinUCB],
-                neighborhood_policy: Union[None, NeighborhoodPolicy.Clusters, NeighborhoodPolicy.Radius,
-                                           NeighborhoodPolicy.KNearest, NeighborhoodPolicy.LSHNearest] = None,
+                neighborhood_policy: Union[None, NeighborhoodPolicy.Clusters, NeighborhoodPolicy.KNearest,
+                                           NeighborhoodPolicy.LSHNearest, NeighborhoodPolicy.Radius,
+                                           NeighborhoodPolicy.TreeBandit] = None,
                 context_history: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 contexts: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 seed: Optional[int] = 123456,
@@ -109,6 +110,15 @@ class BaseTest(unittest.TestCase):
             # Return: expectations(s) and the MAB instance
             expectations = [mab.predict_expectations(contexts)for _ in range(num_run)]
             return expectations[0] if num_run == 1 else expectations, mab
+
+    @staticmethod
+    def is_compatible(lp, np):
+
+        # Special case for TreeBandit lp/np compatibility
+        if isinstance(np, NeighborhoodPolicy.TreeBandit):
+            return np._is_compatible(lp)
+
+        return True
 
     def assertListAlmostEqual(self, list1, list2):
         """

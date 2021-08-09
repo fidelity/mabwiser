@@ -15,7 +15,9 @@ from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.tree import DecisionTreeClassifier
 
+from mabwiser._version import __author__, __email__, __version__, __copyright__
 from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
@@ -25,9 +27,9 @@ from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
+from mabwiser.treebandit import _TreeBandit
 from mabwiser.ucb import _UCB1
 from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_rng
-from mabwiser._version import __author__, __email__, __version__, __copyright__
 
 __author__ = __author__
 __email__ = __email__
@@ -569,6 +571,61 @@ class NeighborhoodPolicy(NamedTuple):
                 check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
                            ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
 
+    class TreeBandit(NamedTuple):
+        """TreeBandit Neighborhood Policy.
+
+        This policy fits a decision tree for each arm using context history.
+        It uses the leaves of these trees to partition the context space into regions
+        and keeps a list of rewards for each leaf.
+        To predict, it receives a context vector and goes to the corresponding
+        leaf at each arm's tree and applies the given context-free MAB learning policy
+        to predict expectations and choose an arm.
+
+        The TreeBandit neighborhood policy is compatible with the following
+        context-free learning policies only: EpsilonGreedy, ThompsonSampling and UCB1.
+
+        The TreeBandit neighborhood policy is a modified version of
+        the TreeHeuristic algorithm presented in:
+        Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
+        A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
+
+        Attributes
+        ----------
+        tree_parameters: Dict, **kwarg
+            Parameters of the decision tree.
+            The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
+            When a parameter is not given, the default parameters from
+            sklearn.tree.DecisionTreeClassifier will be chosen.
+            Default value is an empty dictionary.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+            >>> mab.fit(decisions, rewards, contexts)
+            >>> mab.predict([[3, 2, 0, 1]])
+            'Arm2'
+
+        """
+        tree_parameters: Dict = {}
+
+        def _validate(self):
+            check_true(isinstance(self.tree_parameters, dict), TypeError("tree_parameters must be a dictionary."))
+            tree = DecisionTreeClassifier()
+            for key in self.tree_parameters.keys():
+                check_true(key in tree.__dict__.keys(),
+                           ValueError("sklearn.tree.DecisionTreeClassifier doesn't have a parameter " + str(key) + "."))
+
+        def _is_compatible(self, learning_policy: LearningPolicy):
+            # TreeBandit is compatible with these learning policies
+            return isinstance(learning_policy, (LearningPolicy.EpsilonGreedy,
+                                                LearningPolicy.UCB1,
+                                                LearningPolicy.ThompsonSampling))
+
 
 class MAB:
     """**MABWiser: Contextual Multi-Armed Bandit Library**
@@ -633,7 +690,7 @@ class MAB:
     """
 
     def __init__(self,
-                 arms: List[Arm],                                                   # The list of arms
+                 arms: List[Arm],  # The list of arms
                  learning_policy: Union[LearningPolicy.EpsilonGreedy,
                                         LearningPolicy.Popularity,
                                         LearningPolicy.Random,
@@ -641,15 +698,16 @@ class MAB:
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
                                         LearningPolicy.LinTS,
-                                        LearningPolicy.LinUCB],                     # The learning policy
+                                        LearningPolicy.LinUCB],  # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
-                                            NeighborhoodPolicy.Radius] = None,      # The context policy, optional
-                 seed: int = Constants.default_seed,                                # The random seed
-                 n_jobs: int = 1,                                                   # Number of parallel jobs
-                 backend: str = None                                                # Parallel backend implementation
+                                            NeighborhoodPolicy.Radius,
+                                            NeighborhoodPolicy.TreeBandit] = None,  # The context policy, optional
+                 seed: int = Constants.default_seed,  # The random seed
+                 n_jobs: int = 1,  # Number of parallel jobs
+                 backend: str = None  # Parallel backend implementation
                  ):
         """Initializes a multi-armed bandit (MAB) with the given arguments.
 
@@ -784,6 +842,9 @@ class MAB:
                 self._imp = _Radius(self._rng, self.arms, self.n_jobs, self.backend, lp,
                                     neighborhood_policy.radius, neighborhood_policy.metric,
                                     neighborhood_policy.no_nhood_prob_of_arm)
+            elif isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
+                self._imp = _TreeBandit(self._rng, self.arms, self.n_jobs, self.backend, lp,
+                                        neighborhood_policy.tree_parameters)
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
@@ -804,7 +865,7 @@ class MAB:
         NotImplementedError: MAB learning_policy property not implemented for this learning policy.
 
         """
-        if isinstance(self._imp, (_LSHNearest, _KNearest, _Radius)):
+        if isinstance(self._imp, (_LSHNearest, _KNearest, _Radius, _TreeBandit)):
             lp = self._imp.lp
         elif isinstance(self._imp, _Clusters):
             lp = self._imp.lp_list[0]
@@ -853,7 +914,8 @@ class MAB:
                                                  self._imp.no_nhood_prob_of_arm)
         elif isinstance(self._imp, _Radius):
             return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric, self._imp.no_nhood_prob_of_arm)
-
+        elif isinstance(self._imp, _TreeBandit):
+            return NeighborhoodPolicy.TreeBandit(self._imp.tree_parameters)
         else:
             return None
 
@@ -908,10 +970,10 @@ class MAB:
         self._imp.add_arm(arm, binarizer, scaler)
 
     def fit(self,
-            decisions: Union[List[Arm], np.ndarray, pd.Series],                     # Decisions that are made
-            rewards: Union[List[Num], np.ndarray, pd.Series],                       # Rewards that are received
+            decisions: Union[List[Arm], np.ndarray, pd.Series],  # Decisions that are made
+            rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
             contexts: Union[None, List[List[Num]],
-                            np.ndarray, pd.Series, pd.DataFrame] = None             # Contexts, optional
+                            np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
             ) -> NoReturn:
         """Fits the multi-armed bandit to the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
@@ -965,7 +1027,8 @@ class MAB:
         # Turn initial to true
         self._is_initial_fit = True
 
-    def partial_fit(self, decisions: Union[List[Arm], np.ndarray, pd.Series],
+    def partial_fit(self,
+                    decisions: Union[List[Arm], np.ndarray, pd.Series],
                     rewards: Union[List[Num], np.ndarray, pd.Series],
                     contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> NoReturn:
         """Updates the multi-armed bandit with the given *decisions*, their corresponding *rewards*
@@ -1022,7 +1085,7 @@ class MAB:
 
     def predict(self,
                 contexts: Union[None, List[Num], List[List[Num]],
-                                np.ndarray, pd.Series, pd.DataFrame] = None                  # Contexts, optional
+                                np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                 ) -> Union[Arm, List[Arm]]:
         """Returns the "best" arm (or arms list if multiple contexts are given) based on the expected reward.
 
@@ -1062,7 +1125,7 @@ class MAB:
 
     def predict_expectations(self,
                              contexts: Union[None, List[Num], List[List[Num]],
-                                             np.ndarray, pd.Series, pd.DataFrame] = None     # Contexts, optional
+                                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                              ) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         """Returns a dictionary of arms (key) to their expected rewards (value).
 
@@ -1099,14 +1162,13 @@ class MAB:
         return self._imp.predict_expectations(contexts)
 
     @staticmethod
-    def _validate_mab_args(arms, learning_policy, context_policy, seed, n_jobs, backend) -> NoReturn:
+    def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend) -> NoReturn:
         """
         Validates arguments for the MAB constructor.
         """
 
         # Arms
         check_true(isinstance(arms, list), TypeError("The arms should be provided in a list."))
-        check_true(len(arms) > 1, ValueError("The number of arms should be greater than 1."))
         check_false(None in arms, ValueError("The arm list cannot contain None."))
         check_false(np.nan in arms, ValueError("The arm list cannot contain NaN."))
         check_false(np.Inf in arms, ValueError("The arm list cannot contain Infinity."))
@@ -1123,13 +1185,19 @@ class MAB:
         learning_policy._validate()
 
         # Contextual Policy
-        if context_policy:
-            check_true(isinstance(context_policy,
-                                  (NeighborhoodPolicy.LSHNearest,
-                                   NeighborhoodPolicy.KNearest, NeighborhoodPolicy.Radius,
-                                   NeighborhoodPolicy.Clusters)),
+        if neighborhood_policy:
+            check_true(isinstance(neighborhood_policy,
+                                  (NeighborhoodPolicy.Clusters, NeighborhoodPolicy.KNearest,
+                                   NeighborhoodPolicy.LSHNearest, NeighborhoodPolicy.Radius,
+                                   NeighborhoodPolicy.TreeBandit)),
                        TypeError("Context Policy type mismatch."))
-            context_policy._validate()
+            neighborhood_policy._validate()
+
+            # Tree-Bandit learning policy compatibility
+            if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
+                check_true(neighborhood_policy._is_compatible(learning_policy),
+                           ValueError(
+                               "Tree-Bandit is not compatible with the learning policy: " + str(learning_policy)))
 
         # Seed
         check_true(isinstance(seed, int), TypeError("The seed must be an integer."))
@@ -1291,12 +1359,21 @@ class MAB:
 
             else:  # For predictions, compare the shape to the stored context history
 
+                # We need to find out the number of features (to distinguish Series shape)
                 if isinstance(self.learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size
                     else:
                         num_features = self._imp.contexts.shape[1]
+                elif isinstance(self._imp, _TreeBandit):
+                    # Even when fit() happened, the first arm might not necessarily have a fitted tree
+                    # So we have to search for a fitted tree
+                    for arm in self.arms:
+                        try:
+                            num_features = len(self._imp.arm_to_tree[arm].feature_importances_)
+                        except:
+                            continue
                 else:
                     num_features = self._imp.contexts.shape[1]
 

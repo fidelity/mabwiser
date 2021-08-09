@@ -492,6 +492,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp) or isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    continue
+
                 arm, mab = self.predict(arms=[0, 1],
                                         decisions=[1, 1, 1],
                                         rewards=[0, 0, 0],
@@ -503,10 +507,16 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
         for cp in BaseTest.cps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 arm, mab = self.predict(arms=[0, 1],
                                         decisions=[1, 1, 1],
                                         rewards=[0, 0, 0],
@@ -518,7 +528,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
     def test_context_series(self):
 
@@ -539,6 +551,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 arm, mab = self.predict(arms=[0, 1],
                                         decisions=[1, 1, 1, 1, 1, 1],
                                         rewards=[0, 0, 0, 0, 0, 0],
@@ -550,10 +566,16 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
         for cp in BaseTest.cps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 arm, mab = self.predict(arms=[0, 1],
                                         decisions=[1, 1, 1, 1, 1, 1],
                                         rewards=[0, 0, 0, 0, 0, 0],
@@ -565,7 +587,9 @@ class MABTest(BaseTest):
                                         num_run=1,
                                         is_predict=True)
 
-                self.assertEqual(np.ndim(mab._imp.contexts), 2)
+                # Tree Bandit does not store contexts
+                if not isinstance(cp, NeighborhoodPolicy.TreeBandit):
+                    self.assertEqual(np.ndim(mab._imp.contexts), 2)
 
     #################################################
     # Test contextual predict() method
@@ -589,6 +613,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -637,6 +665,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=["A", "B", "C", "D"],
                              decisions=["A", "A", "A", "B", "B", "C", "C", "C", "C", "C"],
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -653,6 +685,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=["A", "B", "C", "D"],
                              decisions=["A", "A", "A", "B", "B", "C", "C", "C", "C", "C"],
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -685,6 +721,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=pd.Series([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -701,6 +741,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=pd.Series([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -732,6 +776,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                              rewards=pd.Series([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -748,6 +796,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                              rewards=pd.Series([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -779,6 +831,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=pd.Series([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=pd.Series([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -795,6 +851,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=pd.Series([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=pd.Series([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -827,6 +887,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -843,6 +907,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -875,6 +943,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                              rewards=np.array([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -891,6 +963,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                              rewards=np.array([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -923,6 +999,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=np.array([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -939,6 +1019,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 self.predict(arms=[1, 2, 3, 4],
                              decisions=np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                              rewards=np.array([0, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
@@ -1041,12 +1125,20 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([0, 1], lp, cp)
                 self.assertIs(mab._rng, mab._imp.rng)
                 self.assertIs(mab._rng, mab._imp.lp.rng)
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([0, 1], lp, cp)
                 self.assertIs(mab._rng, mab._imp.rng)
                 self.assertIs(mab._rng, mab._imp.lp_list[0].rng)
@@ -1083,6 +1175,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([0, 1], lp, cp)
                 mab.add_arm(2)
                 self.assertTrue(2 in mab.arms)
@@ -1098,6 +1194,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([0, 1], lp, cp)
                 mab.add_arm(2)
                 self.assertTrue(2 in mab.arms)
@@ -1144,6 +1244,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.nps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 arm, mab = self.predict(arms=["A", "B", "C", "D"],
                                         decisions=["A", "A", "A", "B", "B", "C", "C", "C", "C", "C"],
                                         rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -1161,6 +1265,10 @@ class MABTest(BaseTest):
 
         for cp in MABTest.cps:
             for lp in MABTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 arm, mab = self.predict(arms=["A", "B", "C", "D"],
                                         decisions=["A", "A", "A", "B", "B", "C", "C", "C", "C", "C"],
                                         rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
@@ -1202,6 +1310,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2], lp, cp)
                 mab.partial_fit([1, 2, 2], [0, 1, 0], [[0, 1, 2, 3, 5],
                                                        [1, 1, 1, 1, 1],
@@ -1218,6 +1330,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2], para_lp, cp)
                 mab.partial_fit([1, 2, 2], [0, 1, 0], [[0, 0, 0, 0, 0],
                                                        [0, 0, 0, 0, 0],
@@ -1251,6 +1367,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.cps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2], para_lp, cp)
                 mab.partial_fit([1, 2, 2], [0, 1, 0], [[0, 9, 2, 3, 5],
                                                        [1, 1, 1, 1, 1],
@@ -1286,6 +1406,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2], lp, cp)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 for index, row in test_data.iterrows():
@@ -1295,6 +1419,10 @@ class MABTest(BaseTest):
         # With neighbors based approaches it is difficult to guarantee that
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2], para_lp, cp)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 for index, row in test_data.iterrows():
@@ -1358,6 +1486,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2], lp, cp)
                 file = open('mab.pkl', 'wb')
                 pickle.dump(mab, file)
@@ -1372,6 +1504,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2], para_lp, cp)
                 file = open('mab.pkl', 'wb')
                 pickle.dump(mab, file)
@@ -1421,6 +1557,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2], lp, cp)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 file = open('mab.pkl', 'wb')
@@ -1433,6 +1573,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2], para_lp, cp)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 file = open('mab.pkl', 'wb')
@@ -1492,6 +1636,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2, 3], lp, cp, seed=11)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 p1 = mab.predict(test_data[context_columns])
@@ -1510,6 +1658,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2, 3], para_lp, cp, seed=11)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 p1 = mab.predict(test_data[context_columns])
@@ -1536,9 +1688,12 @@ class MABTest(BaseTest):
                                    'd': [0, 0.1, 0, 0, 0.1, 0, 0.1, 0, 0, 0, 0.1, 0.1, 0, 0.1, 0, 0, 0.1, 0, 0.1, 0],
                                    'decision': [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
                                    'reward': [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1]})
-        test_data = pd.DataFrame({'a': [0, 0.1, 0], 'b': [0.1, 0, 0],
-                                  'c': [0, 0, 0], 'd': [0, 0, 0.1],
-                                  'decision': [1, 1, 2], 'reward': [0, 1, 1]})
+        test_data = pd.DataFrame({'a': [0, 0.1, 0],
+                                  'b': [0.1, 0, 0],
+                                  'c': [0, 0, 0],
+                                  'd': [0, 0, 0.1],
+                                  'decision': [1, 1, 2],
+                                  'reward': [0, 1, 1]})
         context_columns = ['a', 'b', 'c', 'd']
 
         for lp in BaseTest.lps:
@@ -1577,6 +1732,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for lp in BaseTest.lps:
+
+                if not self.is_compatible(lp, cp):
+                    continue
+
                 mab = MAB([1, 2, 3], lp, cp, seed=11)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 pe1 = mab.predict_expectations(test_data[context_columns])
@@ -1595,6 +1754,10 @@ class MABTest(BaseTest):
 
         for cp in BaseTest.nps:
             for para_lp in BaseTest.para_lps:
+
+                if not self.is_compatible(para_lp, cp):
+                    continue
+
                 mab = MAB([1, 2, 3], para_lp, cp, seed=11)
                 mab.fit(train_data['decision'], train_data['reward'], train_data[context_columns])
                 pe1 = mab.predict_expectations(test_data[context_columns])
