@@ -14,17 +14,7 @@ Requirements
 ------------
 
 The library requires Python **3.6+**. The ``requirements.txt`` lists the necessary
-packages. The following packages are used currently:
-
-.. code-block:: python
-
-	joblib
-	numpy
-	pandas
-	scikit-learn>=0.22.0
-	scipy
-	seaborn>=0.9.0
-
+packages.
 
 Source Code
 -----------

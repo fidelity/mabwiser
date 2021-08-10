@@ -19,6 +19,7 @@ In this section, we provide high-level guidelines on how to introduce a new band
 --------------------------
 
 Imagine you would like to introduce a new bandit algorithm, called ``MyCoolPolicy``, with an hyper-parameter ``my_parameter``.
+Here we consider introducing a new learning policy, but the case introducing a new neighborhood policy is similar.
 
 First and foremost, the users of MABWiser need to be able to access your cool bandit algorithm.
 This is how it would look like in a usage example. Notice how the ``mab`` model is created with your new policy.
@@ -183,7 +184,7 @@ Every test starts with the ``test_`` prefix followed by some descriptive name.
 
     from tests.test_base import BaseTest
 
-    class PopularityTest(BaseTest):
+    class MyCoolBanditTest(BaseTest):
 
         # First, implement a simple case using the Public API you created in the first section
         # Utilize the self.predict() utility wrapper method from base test to create test cases quickly
@@ -265,7 +266,6 @@ b. Update the library version. You can use a keyword search for "version" to mak
 c. Update the README.md, if necessary.
 d. Update the documentation rst files under the /docsrc folder , if necessary.
 e. If you update any documentation, make sure to recompile the docs by running ``make github`` under the /docsrc folder. If you have mabwiser installed and it isn't in development mode, you will need to uninstall it, as Sphinx first looks for an installed version before using the local package. To install in development mode use pip install -e.
-f. Build a new wheel package and remove the old one in /dist folder. See installation page on how to build a package.
 
 **Congratulations!!** You are ready to send a Pull Request and include your changes in the MABWiser library.
 How cool is that? :)
