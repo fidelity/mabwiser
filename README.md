@@ -33,21 +33,21 @@ mab.predict()
 ## Available Bandit Policies
 
 Available Learning Policies:
-* Epsilon Greedy
-* LinTS
-* LinUCB
-* Popularity
-* Random
-* Softmax
-* Thompson Sampling (TS)
-* Upper Confidence Bound (UCB1)
+* Epsilon Greedy [1, 2]
+* LinTS [3]
+* LinUCB [4]
+* Popularity [2]
+* Random [2]
+* Softmax [2]
+* Thompson Sampling (TS) [5]
+* Upper Confidence Bound (UCB1) [2]
 
 Available Neighborhood Policies: 
-* Clusters
-* K-Nearest
-* LSH Nearest
-* Radius
-* TreeBandit
+* Clusters [6]
+* K-Nearest [7, 8]
+* LSH Nearest [9]
+* Radius [7, 8]
+* TreeBandit [10]
 
 ## Installation
 
@@ -92,5 +92,18 @@ If you use MABWiser in a publication, please cite it as:
 ## License
 
 MABWiser is licensed under the [Apache License 2.0](LICENSE).
+
+## References
+
+[1] John Langford and Tong Zhang. The epoch-greedy algorithm for contextual multi-armed bandits
+[2] Volodymyr Kuleshov and Doina Precup. Algorithms for multi-armed bandit problems
+[3] Agrawal, Shipra and Navin Goyal. Thompson sampling for contextual bandits with linear payoffs
+[4] Chu, Wei, Li, Lihong, Reyzin Lev, and Schapire Robert. Contextual bandits with linear payoff functions
+[5] Osband, Ian, Daniel Russo, and Benjamin Van Roy. More efficient reinforcement learning via posterior sampling
+[6] Nguyen, Trong T. and Hady W. Lauw. Dynamic clustering of contextual multi-armed bandits
+[7] Melody Y. Guan and Heinrich Jiang, Nonparametric stochastic contextual bandits
+[8] Philippe Rigollet and Assaf Zeevi. Nonparametric bandits with covariates 
+[9] Indyk, Piotr, Motwani, Rajeev, Raghavan, Prabhakar, Vempala, Santosh. Locality-preserving hashing in multidimensional spaces
+[10] Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik, A practical method for solving contextual bandit problems using decision trees
 
 <br>
