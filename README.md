@@ -95,15 +95,15 @@ MABWiser is licensed under the [Apache License 2.0](LICENSE).
 
 ## References
 
-[1] John Langford and Tong Zhang. The epoch-greedy algorithm for contextual multi-armed bandits
-[2] Volodymyr Kuleshov and Doina Precup. Algorithms for multi-armed bandit problems
-[3] Agrawal, Shipra and Navin Goyal. Thompson sampling for contextual bandits with linear payoffs
-[4] Chu, Wei, Li, Lihong, Reyzin Lev, and Schapire Robert. Contextual bandits with linear payoff functions
-[5] Osband, Ian, Daniel Russo, and Benjamin Van Roy. More efficient reinforcement learning via posterior sampling
-[6] Nguyen, Trong T. and Hady W. Lauw. Dynamic clustering of contextual multi-armed bandits
-[7] Melody Y. Guan and Heinrich Jiang, Nonparametric stochastic contextual bandits
-[8] Philippe Rigollet and Assaf Zeevi. Nonparametric bandits with covariates 
-[9] Indyk, Piotr, Motwani, Rajeev, Raghavan, Prabhakar, Vempala, Santosh. Locality-preserving hashing in multidimensional spaces
-[10] Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik, A practical method for solving contextual bandit problems using decision trees
+1. John Langford and Tong Zhang. The epoch-greedy algorithm for contextual multi-armed bandits
+2. Volodymyr Kuleshov and Doina Precup. Algorithms for multi-armed bandit problems
+3. Agrawal, Shipra and Navin Goyal. Thompson sampling for contextual bandits with linear payoffs
+4. Chu, Wei, Li, Lihong, Reyzin Lev, and Schapire Robert. Contextual bandits with linear payoff functions
+5. Osband, Ian, Daniel Russo, and Benjamin Van Roy. More efficient reinforcement learning via posterior sampling
+6. Nguyen, Trong T. and Hady W. Lauw. Dynamic clustering of contextual multi-armed bandits
+7. Melody Y. Guan and Heinrich Jiang, Nonparametric stochastic contextual bandits
+8. Philippe Rigollet and Assaf Zeevi. Nonparametric bandits with covariates 
+9. Indyk, Piotr, Motwani, Rajeev, Raghavan, Prabhakar, Vempala, Santosh. Locality-preserving hashing in multidimensional spaces
+10. Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik, A practical method for solving contextual bandit problems using decision trees
 
 <br>
