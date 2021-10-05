@@ -11,3 +11,6 @@ You can run the notebooks linked below in the environments they are named after 
 - Run the [MacOS Darwin MKL](MacOSDarwin_MKL.ipynb) notebook when using the [MacOS Darwin MKL](../environments/MacOSDarwin_MKL) environment.
 - Run the [MacOS Darwin OpenBLAS](MacOSDarwin_OpenBLAS.ipynb) notebook when using the [MacOS Darwin OpenBLAS](../environments/MacOSDarwin_OpenBLAS) environment.
 - Run the [Windows OpenBLAS](Windows_OpenBLAS.ipynb) notebook when using the [Windows OpenBLAS](../environments/Windows_OpenBLAS) environment.
+
+Once the notebooks are run, the [Analysis](Analysis.ipynb) notebook can be run in **any** environment.
+This notebook will generate the numbers used in tables 2 & 3, in the appropriately marked locations of the notebook.
