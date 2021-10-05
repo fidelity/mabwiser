@@ -1,0 +1,4 @@
+jupyter
+mabwiser
+numpy==1.18.1
+pandas
