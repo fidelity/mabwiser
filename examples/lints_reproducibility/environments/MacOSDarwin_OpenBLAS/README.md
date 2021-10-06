@@ -10,8 +10,8 @@ This readme sets up the MacOS Darwin OpenBLAS environment required to run the no
 From the anaconda prompt, run the following commands:
 
 ```bash
-conda create -n mac_openblas python=3.8
-conda activate mac_openblas
+conda create -n mac_dar_openblas python=3.8
+conda activate mac_dar_openblas
 pip install -r requirements.txt
 ```
 
@@ -26,6 +26,6 @@ This should not show any entries related to MKL.
 Once installed, you can run the relevant notebooks by using the following commands and navigating to the notebook you want to run:
 
 ```bash
-conda activate mac_openblas
+conda activate mac_dar_openblas
 jupyter notebook
 ```

@@ -20,9 +20,6 @@ This reproducibility issue forms the basis of our contribution, as even though t
 - [Table 4 & 5](table_4_5) folder shows the experiments run to generate tables 4 and 5, which demonstrate the reproducibility issues on the MovieLens data set across 5 different environments.
 - [DBB_Reproducibility notebook](DBB_Reproducibility.ipynb) shows the reproducibility issues with the [Deep Bayesian Bandits library](https://github.com/tensorflow/models/tree/archive/research/deep_contextual_bandits).
 
-## Data
-- `mushroom.data` contains the Mushroom dataset used in Deep Bayesian Bandits reproducibility notebook, downloaded from the links in the [Deep Bayesian Bandits Readme](https://github.com/tensorflow/models/tree/36101ab4095065a4196ff4f6437e94f0d91df4e9/research/deep_contextual_bandits)
-
 ## Misc
 - `example_ssh_config.json` shows the config necessary to run some of the experiments over ssh in the general reproducibility notebooks
 - `utils.py` contains minor utilities for ensuring correctness
