@@ -18,7 +18,7 @@ This reproducibility issue forms the basis of our contribution, as even though t
 ## Experiment Reproducibility
 - [Table 2 & 3](table_2_3) folder shows the experiments run to generate tables 2 and 3, which demonstrate the reproducibility issues on a simulated data set across 5 different environments.
 - [Table 4 & 5](table_4_5) folder shows the experiments run to generate tables 4 and 5, which demonstrate the reproducibility issues on the MovieLens data set across 5 different environments.
-- [DBB_Reproducibility notebook](DBB_Reproducibility.ipynb) shows the reproducibility issues with the [Deep Bayesian Bandits library](https://github.com/tensorflow/models/tree/archive/research/deep_contextual_bandits).
+- [Table 6](table_6) folder shows the reproducibility issues with the [Deep Bayesian Bandits library](https://github.com/tensorflow/models/tree/archive/research/deep_contextual_bandits).
 
 ## Misc
 - `example_ssh_config.json` shows the config necessary to run some of the experiments over ssh in the general reproducibility notebooks
