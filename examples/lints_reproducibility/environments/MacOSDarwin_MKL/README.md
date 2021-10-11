@@ -17,6 +17,7 @@ conda install scikit-learn==0.24.1
 conda install jupyter
 pip install pandas
 pip install mabwiser
+pip install jurity
 ```
 
 These steps correctly install numpy with MKL backend on MacOS. You can check the NumPy backend using:
