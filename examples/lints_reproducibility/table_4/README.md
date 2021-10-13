@@ -1,7 +1,7 @@
-# Table 6 - Deep Bayesian Bandits
+# Table 4 - Deep Bayesian Bandits
 
 This directory contains the notebooks required to create the data and metrics for table 6.
-Tables 6 shows how the reproducibility problem can be created in Google's [Deep Bayesian Bandits](https://github.com/tensorflow/models/tree/archive/research/deep_contextual_bandits) work.
+Table 4 shows how the reproducibility problem can be created in Google's [Deep Bayesian Bandits](https://github.com/tensorflow/models/tree/archive/research/deep_contextual_bandits) work.
 We look at their LinTS implementation, which forms the baseline of their experiments.
 We show how using Cholesky decomposition creates systematic and reproducible results.
 
