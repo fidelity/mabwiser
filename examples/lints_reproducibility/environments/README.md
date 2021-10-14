@@ -19,14 +19,14 @@ Below, you can find the distribution of environments and which tables they are u
 
 ### Additional Experiments
 
-| Environment  | Multivariate Normal Sampling | LinTS Reproducibility | Synthetic Data (Table 5 & 6) |
-|---|---|---|---|
-| Linux RedHat OpenBLAS | ✘ | ✔ | ✔ |
-| Linux Sagemaker LAPACK | ✘ | ✔ | ✔ |
-| MacOS Darwin MKL | ✘ | ✔ | ✔ |
-| MacOS Darwin OpenBLAS | ✘ | ✔ | ✔ |
-| Windows OpenBLAS | ✘ | ✔ | ✔ |
-| MacOS Big Sur MKL | ✔ | ✘ | ✘ |
-| MacOS Big Sur OpenBLAS | ✔ | ✘ | ✘ |
-| Linux Ubuntu MKL | ✔ | ✘ | ✘ |
-| Linux Ubuntu OpenBLAS | ✔ | ✘ | ✘ |
+| Environment  | Multivariate Normal Sampling | LinTS Reproducibility | Synthetic Data (Table 5 & 6) | Goodreads Data |
+|---|---|---|---|---|
+| Linux RedHat OpenBLAS | ✘ | ✔ | ✔ | ✘ |
+| Linux Sagemaker LAPACK | ✘ | ✔ | ✔ | ✘ |
+| MacOS Darwin MKL | ✘ | ✔ | ✔ | ✘ |
+| MacOS Darwin OpenBLAS | ✘ | ✔ | ✔ | ✘ |
+| Windows OpenBLAS | ✘ | ✔ | ✔ | ✘ |
+| MacOS Big Sur MKL | ✔ | ✘ | ✘ | ✔ |
+| MacOS Big Sur OpenBLAS | ✔ | ✘ | ✘ | ✔ |
+| Linux Ubuntu MKL | ✔ | ✘ | ✘ | ✔ |
+| Linux Ubuntu OpenBLAS | ✔ | ✘ | ✘ | ✔ |
