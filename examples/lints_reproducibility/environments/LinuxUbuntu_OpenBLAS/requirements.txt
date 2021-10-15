@@ -1,0 +1,6 @@
+jupyter
+mabwiser
+numpy==1.18.5
+pandas
+scikit-learn==0.24.1
+tensorflow==1.15.5
