@@ -173,13 +173,13 @@ class _NumpyRNG(_BaseRNG):
 
     def __init__(self, seed):
         super().__init__(seed)
-        self.rng = np.random.RandomState(self.seed)
+        self.rng = np.random.default_rng(self.seed)
 
     def rand(self):
-        return self.rng.rand()
+        return self.rng.random()
 
     def randint(self, low: int, high: int = None, size: int = None):
-        return self.rng.randint(low=low, high=high, size=size)
+        return self.rng.integers(low=low, high=high, size=size)
 
     def choice(self, a: Union[int, Iterable[int]], size: Union[int, Tuple[int]] = None, p: Iterable[float] = None):
         return self.rng.choice(a=a, size=size, p=p)

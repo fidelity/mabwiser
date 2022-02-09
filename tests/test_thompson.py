@@ -59,7 +59,7 @@ class ThompsonTest(BaseTest):
         self.assertEqual(mab._imp.arm_to_fail_count[2], 3)
         self.assertEqual(mab._imp.arm_to_fail_count[3], 1)
 
-        self.assertEqual(arm, 2)
+        self.assertEqual(arm, 3)
 
     def test_thompson_multiple(self):
 
@@ -71,7 +71,7 @@ class ThompsonTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertEqual(arms, [1, 3, 2, 3, 1])
+        self.assertEqual(arms, [1, 3, 3, 1, 1])
 
     def test_thompson_unused_arm(self):
 
@@ -83,7 +83,7 @@ class ThompsonTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertEqual(arms, [4, 4, 1, 3, 1])
+        self.assertEqual(arms, [4, 4, 4, 1, 1])
 
     def test_thompson_numpy(self):
 
@@ -95,7 +95,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [1, 1, 1, 3])
+        self.assertEqual(arms, [3, 2, 1, 3])
 
     def test_thompson_series(self):
 
@@ -107,7 +107,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 3, 1, 3])
+        self.assertEqual(arms, [3, 3, 3, 3])
 
     def test_thompson_df(self):
 
@@ -122,7 +122,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 3, 3, 3])
+        self.assertEqual(arms, [3, 3, 1, 3])
 
     def test_thompson_df_list(self):
 
@@ -137,7 +137,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 3, 3, 3])
+        self.assertEqual(arms, [3, 3, 1, 3])
 
     def test_thompson_non_binary_without_threshold(self):
 
@@ -175,7 +175,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [1, 1, 1, 3])
+        self.assertEqual(arms, [3, 2, 1, 2])
 
     def test_thompson_t2(self):
 
@@ -187,7 +187,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [1, 3, 1, 1])
+        self.assertEqual(arms, [1, 3, 3, 1])
 
     def test_thompson_t3(self):
 
@@ -204,7 +204,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 4, 2, 2])
+        self.assertEqual(arms, [4, 2, 2, 2])
 
     def test_thompson_t4(self):
 
@@ -221,7 +221,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 2, 4, 2])
+        self.assertEqual(arms, [4, 4, 2, 4])
 
     def test_thompson_t5(self):
 
@@ -233,7 +233,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['one', 'one', 'one', 'three'])
+        self.assertEqual(arms, ['three', 'two', 'one', 'three'])
 
     def test_thompson_t6(self):
 
@@ -250,7 +250,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['one', 'three', 'two', 'three'])
+        self.assertEqual(arms, ['one', 'two', 'two', 'two'])
 
     def test_thompson_t7(self):
 
@@ -267,7 +267,7 @@ class ThompsonTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['b', 'c', 'b', 'b', 'c'])
+        self.assertEqual(arms, ['c', 'b', 'b', 'b', 'b'])
 
     def test_thompson_t8(self):
 
@@ -284,7 +284,7 @@ class ThompsonTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['c', 'c', 'c', 'c', 'c'])
+        self.assertEqual(arms, ['b', 'c', 'c', 'c', 'c'])
 
     def test_thompson_t9(self):
 
@@ -306,7 +306,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [b, a, b, c])
+        self.assertEqual(arms, [c, b, c, c])
 
     def test_thompson_t10(self):
 
@@ -328,7 +328,7 @@ class ThompsonTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [a, b, b, b])
+        self.assertEqual(arms, [b, c, b, a])
 
     def test_fit_twice(self):
 
@@ -354,7 +354,7 @@ class ThompsonTest(BaseTest):
         self.assertEqual(mab._imp.arm_to_fail_count[2], 3)
         self.assertEqual(mab._imp.arm_to_fail_count[3], 1)
 
-        self.assertEqual(arm, 2)
+        self.assertEqual(arm, 3)
 
         decisions = [1, 2, 3, 1, 2, 3]
         rewards = [1, 0, 3, 7, 11, 22]
@@ -392,7 +392,7 @@ class ThompsonTest(BaseTest):
         self.assertEqual(mab._imp.arm_to_fail_count[2], 3)
         self.assertEqual(mab._imp.arm_to_fail_count[3], 1)
 
-        self.assertEqual(arm, 2)
+        self.assertEqual(arm, 3)
 
         decisions = [1, 2, 3, 1, 2, 3]
         rewards = [1, 0, 3, 7, 11, 22]

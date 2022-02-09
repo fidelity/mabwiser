@@ -115,7 +115,7 @@ class NearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 1])
+        self.assertListEqual(arms, [2, 1])
 
     def test_thompson_k2(self):
 
@@ -133,7 +133,7 @@ class NearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 4])
+        self.assertListEqual(arms, [2, 1])
 
     def test_ucb_k2(self):
 
@@ -169,7 +169,7 @@ class NearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 2])
+        self.assertListEqual(arms, [4, 1])
 
     def test_max_k(self):
 
@@ -243,7 +243,7 @@ class NearestTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [4, 4])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -260,7 +260,7 @@ class NearestTest(BaseTest):
         self.assertEqual(len(mab._imp.contexts), 13)
         self.assertEqual(np.ndim(mab._imp.decisions), 1)
         arm = mab.predict([[0, 1, 2, 3, 5]])
-        self.assertEqual(arm, 3)
+        self.assertEqual(arm, 2)
         self.assertListEqual(list(set(mab._imp.rewards)), [0, 1])
 
     def test_fit_twice_thompson_thresholds(self):
@@ -285,7 +285,7 @@ class NearestTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [4, 4])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)

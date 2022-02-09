@@ -108,7 +108,7 @@ class TreeBanditTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 4])
+        self.assertListEqual(arms, [2, 1])
 
     def test_thompson(self):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
@@ -125,7 +125,7 @@ class TreeBanditTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 1])
+        self.assertListEqual(arms, [2, 1])
 
     def test_ucb(self):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
@@ -230,7 +230,7 @@ class TreeBanditTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [1, 1])
+        self.assertListEqual(arms, [2, 1])
 
         decisions2 = [1, 2, 3]
         rewards2 = [11, 1, 6]
@@ -279,7 +279,7 @@ class TreeBanditTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [1, 1])
+        self.assertListEqual(arms, [2, 1])
 
         decisions2 = [1, 2, 3]
         rewards2 = [11, 1, 6]
