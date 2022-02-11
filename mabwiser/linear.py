@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, argmax, _BaseRNG
+from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
 
 class _RidgeRegression:
@@ -217,7 +217,7 @@ class _Linear(BaseMAB):
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
             # Each row needs a separately seeded rng for reproducibility in parallel
-            rng = np.random.RandomState(seed=seeds[index])
+            rng = create_rng(seed=seeds[index])
 
             for arm in arms:
                 # Copy the row rng to the deep copied model in arm_to_model

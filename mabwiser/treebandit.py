@@ -17,7 +17,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, Arm, Num, _BaseRNG, create_rng
 
 
 class _TreeBandit(BaseMAB):
@@ -114,7 +114,7 @@ class _TreeBandit(BaseMAB):
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
             # Each row needs a separately seeded rng for reproducibility in parallel
-            rng = np.random.RandomState(seed=seeds[index])
+            rng = create_rng(seed=seeds[index])
 
             for arm in arms:
 

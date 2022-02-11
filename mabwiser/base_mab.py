@@ -43,7 +43,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     Attributes
     ----------
-    rng: np.random.RandomState
+    rng: _BaseRNG
         The random number generator.
     arms: List
         The list of all arms.
