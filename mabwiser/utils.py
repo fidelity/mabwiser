@@ -6,7 +6,7 @@ This module provides a number of constants and helper functions.
 """
 
 import abc
-from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn
+from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn, List
 
 import numpy as np
 
@@ -168,15 +168,16 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         """
         pass
 
-    def multivariate_normal(self, mean, covariance, size=None):
+    def multivariate_normal(self, mean: List[float], covariance: List[List[float]], size=None):
         """ Draw samples from a multivariate Normal distribution with given mean and covariance.
 
             Parameters
             ----------
             mean : list of floats
-                The mean of each random variable.
+                The mean of each random variable, of length ``N``.
             covariance : list of list of floats
-                The covariance of each random variable.
+                The covariance of each random variable. If the length of parameter ``mean``
+                is ``N``, this parameter should contain ``N`` lists, each with ``N`` floats.
             size : int or tuple of ints or None
                 Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
                 ``m * n * k * N`` samples are drawn, where ``N`` is the length of
@@ -185,16 +186,10 @@ class _BaseRNG(metaclass=abc.ABCMeta):
             Returns
             -------
             out : ndarray
-                A floating-point array of shape ``size`` of drawn samples
+                A floating-point array of shape ``m * n * k * N`` of drawn samples based on
+                the ``size`` and the length of ``mean`` parameters.
         """
-        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
-        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
-        sampled_norm = self.standard_normal(len(mean))
-
-        # Randomly sample coefficients from Normal Distribution N(mean=beta, std=covar_decomposed)
-        covar_decomposed = np.linalg.cholesky(covariance)
-
-        return mean + np.dot(sampled_norm, covar_decomposed)
+        pass
 
 
 class _NumpyRNG(_BaseRNG):
@@ -218,7 +213,8 @@ class _NumpyRNG(_BaseRNG):
     def standard_normal(self, size):
         return self.rng.standard_normal(size)
 
-    def multivariate_normal(self, mean, covariance, size=None):
+    def multivariate_normal(self, mean: Union[np.ndarray, List[float]],
+                            covariance: Union[np.ndarray, List[List[float]]], size=None):
         return np.squeeze(self.rng.multivariate_normal(mean, covariance, size=size, method='cholesky'))
 
 
