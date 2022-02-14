@@ -168,6 +168,34 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         """
         pass
 
+    def multivariate_normal(self, mean, covariance, size=None):
+        """ Draw samples from a multivariate Normal distribution with given mean and covariance.
+
+            Parameters
+            ----------
+            mean : list of floats
+                The mean of each random variable.
+            covariance : list of list of floats
+                The covariance of each random variable.
+            size : int or tuple of ints or None
+                Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+                ``m * n * k * N`` samples are drawn, where ``N`` is the length of
+                parameter ``mean``. If ``None``, a vector of length ``N`` is returned.
+
+            Returns
+            -------
+            out : ndarray
+                A floating-point array of shape ``size`` of drawn samples
+        """
+        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
+        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
+        sampled_norm = self.standard_normal(len(mean))
+
+        # Randomly sample coefficients from Normal Distribution N(mean=beta, std=covar_decomposed)
+        covar_decomposed = np.linalg.cholesky(covariance)
+
+        return mean + np.dot(sampled_norm, covar_decomposed)
+
 
 class _NumpyRNG(_BaseRNG):
 
@@ -189,6 +217,9 @@ class _NumpyRNG(_BaseRNG):
 
     def standard_normal(self, size):
         return self.rng.standard_normal(size)
+
+    def multivariate_normal(self, mean, covariance, size=None):
+        return np.squeeze(self.rng.multivariate_normal(mean, covariance, size=size, method='cholesky'))
 
 
 def create_rng(seed: int) -> _BaseRNG:

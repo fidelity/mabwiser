@@ -759,7 +759,7 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=1)
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
@@ -775,7 +775,7 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=2)
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
@@ -791,22 +791,22 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=-1)
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
 
     def test_linTS_expectations(self):
 
         rng = np.random.RandomState(seed=111)
         contexts = rng.randint(0, 5, (5, 5))
 
-        expected_pred = [[1.2937562841261403, 0.31301116380098903, 1.113052880363625,
+        expected_pred = [[0.9167267352065508, 0.6800548963827412, 1.4147481760827891,
                           2.061680527026926, -0.6516833696912612],
-                         [0.6875507933987515, 0.2262754792947894, 0.8930833950309628,
+                         [0.8104296620172513, 0.26691232761493117, 0.6503604017431508,
                           0.9977263420741849, -0.6447229745688157],
-                         [-0.042582599807656385, 1.324506971438789, 0.6605983808088807,
+                         [-0.009581460000014294, 0.881059511216882, 1.0576520008395551,
                           0.4150322121520029, -0.26918983719229994],
-                         [-0.4572256998368498, -0.7719506311556441, 1.437665150083228,
+                         [-0.38164469675190177, -0.3264960369736939, 1.3695993885284545,
                           0.55178010066725, 0.021790663220199458],
-                         [-1.204017511381842, -0.6911898028280702, 0.4531216028169213,
+                         [-1.2613045626465647, -0.7305818793806982, 0.41438283892450944,
                           0.5208181269433911, -0.2673124934389858]]
 
         exps, mab = self.predict(arms=[1, 2, 3, 4, 5],
@@ -1098,7 +1098,7 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend=None)
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
@@ -1115,7 +1115,7 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend='loky')
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                 decisions=[1, 1, 4, 2, 2, 2, 3, 3, 3, 1],
@@ -1132,4 +1132,4 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend='threading')
 
-        self.assertEqual(arm, [4, 4, 2, 3, 4, 4, 4, 3, 4, 3])
+        self.assertEqual(arm, [4, 4, 3, 3, 4, 4, 4, 3, 4, 5])
