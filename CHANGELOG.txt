@@ -3,6 +3,17 @@ MABWiser CHANGELOG
 =====================
 
 -------------------------------------------------------------------------------
+February, 14, 2022 2.0.0
+-------------------------------------------------------------------------------
+major:
+- Breaking: Updated NumPy RNG backend to utilize the new Generator class. This is a breaking change for algorithms with random components.
+- Updated NumPy version dependency to >=1.17.0 to reflect the utilization of the new Generator class.
+
+minor:
+- Added multivariate sampling to base RNG class
+- Updated multivariate sampling logic in LinTS to utilize updated NumPy RNG backend
+
+-------------------------------------------------------------------------------
 August, 01, 2021 1.12.0
 -------------------------------------------------------------------------------
 major:
