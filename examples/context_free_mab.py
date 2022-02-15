@@ -44,7 +44,7 @@ expectations = greedy.predict_expectations()
 
 # Results
 print("Epsilon Greedy: ", prediction, " ", expectations)
-assert(prediction == 1)
+assert(prediction == 2)
 
 # Additional historical data becomes available which allows _online learning
 additional_layouts = [1, 2, 1, 2]
@@ -77,7 +77,7 @@ expectations = popularity.predict_expectations()
 
 # Results
 print("Randomized Popularity: ", prediction, " ", expectations)
-assert(prediction == 1)
+assert(prediction == 2)
 
 ###################################
 # Softmax Learning Policy
@@ -111,7 +111,7 @@ thompson.fit(decisions=layouts, rewards=[1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 
 prediction = thompson.predict()
 expectations = thompson.predict_expectations()
 print("Thompson Sampling (0/1): ", prediction, " ", expectations)
-assert(prediction == 2)
+assert(prediction == 1)
 
 # Online updating of the model
 thompson.partial_fit(additional_layouts, [0, 1, 0, 1])
@@ -186,7 +186,7 @@ greedy.fit(decisions=df['layouts'], rewards=df['revenues'])
 prediction = greedy.predict()
 expectations = greedy.predict_expectations()
 print("Greedy (Data Series): ", prediction, " ", expectations)
-assert(prediction == 1)
+assert(prediction == 2)
 
 ##############################################
 # Numpy Arrays as Input
@@ -201,4 +201,4 @@ greedy.fit(decisions=np.array([1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1]),
 prediction = greedy.predict()
 expectations = greedy.predict_expectations()
 print("Greedy (Numpy Arrays): ", prediction, " ", expectations)
-assert(prediction == 1)
+assert(prediction == 2)
