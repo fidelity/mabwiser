@@ -17,7 +17,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [2, 1, 1, 2, 2])
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
@@ -40,7 +40,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
         # print(arm)
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 2])
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
@@ -63,7 +63,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
         # print(arm)
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 2])
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
@@ -86,7 +86,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3, 2])
+        self.assertEqual(arm, [2, 2, 1, 3, 3])
 
         exp, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
@@ -111,7 +111,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
         # print(arm)
-        self.assertEqual(arm, [1, 3, 2, 3, 2])
+        self.assertEqual(arm, [2, 2, 1, 3, 3])
 
         exp, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
@@ -143,9 +143,9 @@ class PopularityTest(BaseTest):
                                 is_predict=True)
         # print("arm:", arm)
         # Result for each run. At each we have 2 context to predict
-        self.assertListEqual(arm[0], [3, 1])
-        self.assertListEqual(arm[1], [1, 1])
-        self.assertListEqual(arm[2], [1, 1])
+        self.assertListEqual(arm[0], [4, 1])
+        self.assertListEqual(arm[1], [4, 1])
+        self.assertListEqual(arm[2], [2, 1])
 
         exp, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
@@ -182,7 +182,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
         # print(arm)
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [2, 1, 1, 2, 2])
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
@@ -330,7 +330,7 @@ class PopularityTest(BaseTest):
 
         # Initial probabilities and arm decision
         arm = mab.predict()
-        self.assertEqual("one", arm)
+        self.assertEqual('two', arm)
         self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
         self.assertAlmostEqual(exp["one"], 0.6)
         self.assertAlmostEqual(exp["two"], 0.4)
@@ -346,7 +346,7 @@ class PopularityTest(BaseTest):
 
         # Assert that the other arm is chose with the same expectations
         arm = mab.predict()
-        self.assertEqual("two", arm)
+        self.assertEqual('one', arm)
         self.assertAlmostEqual(1.0, exp["one"] + exp["two"])
         self.assertAlmostEqual(exp["one"], 0.6)
         self.assertAlmostEqual(exp["two"], 0.4)

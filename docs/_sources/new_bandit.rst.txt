@@ -99,7 +99,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
         # See for example how the Popularity bandit inherits
         # from the Greedy bandit and leverages from its training methods.
 
-        def __init__(self, rng: np.random.RandomState, arms: List[Arm], n_jobs: int, backend: Optional[str]):
+        def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
             # The BaseMAB provides every bandit policy with:
             #   - rng: a random number generator, in case it is needed
             #   - arms: the list of arms

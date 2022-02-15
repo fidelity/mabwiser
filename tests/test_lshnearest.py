@@ -56,10 +56,10 @@ class LSHNearestTest(BaseTest):
         seed = 11
         n_dimensions = 5
         n_tables = 5
-        rng = np.random.RandomState(seed)
-        contexts = np.array([[rng.rand() for _ in range(7)] for _ in range(10)])
-        decisions = np.array([rng.randint(0, 2) for _ in range(10)])
-        rewards = np.array([rng.rand() for _ in range(10)])
+        rng = np.random.default_rng(seed)
+        contexts = np.array([[rng.random() for _ in range(7)] for _ in range(10)])
+        decisions = np.array([rng.integers(0, 2) for _ in range(10)])
+        rewards = np.array([rng.random() for _ in range(10)])
         lsh = MAB(arms=[0, 1], learning_policy=LearningPolicy.Softmax(),
                   neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions, n_tables),
                   seed=seed)
@@ -68,10 +68,11 @@ class LSHNearestTest(BaseTest):
 
         lsh.fit(decisions, rewards, contexts)
         self.assertListAlmostEqual(list(lsh._imp.table_to_plane[0][0]),
-                             [1.74945474, -0.286073, -0.48456513, -2.65331856, -0.00828463])
-        self.assertListEqual(list(lsh._imp.table_to_hash_to_index[0].keys()), [1, 4, 5, 12, 13, 14, 15])
-        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][1], [3])
-        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][14], [0, 4, 8])
+                                   [0.03419276725318417, 1.3597475403099617, 1.2247210785859324,
+                                    -0.5103070767876675, -0.2979695111064471])
+        self.assertListEqual(list(lsh._imp.table_to_hash_to_index[0].keys()), [0, 1, 2, 3, 7, 11])
+        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][1], [2, 3])
+        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][14], [])
 
     def test_partial_fit_indices(self):
         seed = 11
@@ -90,8 +91,8 @@ class LSHNearestTest(BaseTest):
         rewards2 = np.array([rng.rand() for _ in range(10)])
         lsh.partial_fit(decisions2, rewards2, contexts2)
 
-        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][4], [1, 15, 16])
-        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][12], [9, 10, 11, 19])
+        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][4], [])
+        self.assertListEqual(lsh._imp.table_to_hash_to_index[0][12], [])
 
     def test_greedy0_d2(self):
 
@@ -109,7 +110,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 1])
+        self.assertListEqual(arms, [1, 3])
 
     def test_greedy0_d2_single_test(self):
 
@@ -127,7 +128,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, 3)
+        self.assertEqual(arms, 1)
 
     def test_greedy0_d2_single_list(self):
 
@@ -145,7 +146,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, 3)
+        self.assertEqual(arms, 1)
 
     def test_greedy0_d2_exps(self):
 
@@ -163,8 +164,8 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertDictEqual(exps[0], {1: 0.5, 2: 0.0, 3: 0.6, 4: 0})
-        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0})
+        self.assertDictEqual(exps[0], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0})
+        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.75, 4: 0})
 
     def test_greedy0_d5(self):
 
@@ -200,7 +201,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [2, 2])
+        self.assertListEqual(arms, [3, 4])
 
     def test_thompson_d2(self):
 
@@ -218,7 +219,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [3, 1])
 
     def test_ucb_d2(self):
 
@@ -254,7 +255,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 3])
+        self.assertListEqual(arms, [1, 1])
 
     def test_no_neighbors_hash(self):
         contexts = [[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
@@ -306,7 +307,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [2, 3, 2, 3, 4])
+        self.assertListEqual(arms, [4, 3, 4, 3, 4])
 
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 2],
@@ -321,7 +322,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 2, 4, 1, 4])
+        self.assertListEqual(arms, [3, 3, 1, 3, 2])
 
     def test_no_neighbors_expectations(self):
 
@@ -373,7 +374,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 1])
+        self.assertListEqual(arms, [1, 3])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -411,7 +412,7 @@ class LSHNearestTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [3, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -451,7 +452,7 @@ class LSHNearestTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [3, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -507,8 +508,8 @@ class LSHNearestTest(BaseTest):
                                  is_predict=True)
 
         # 3rd arm was never seen but picked up by random neighborhood in both tests
-        self.assertListEqual(arms[0], [2, 3])
-        self.assertListEqual(arms[1], [2, 1])
+        self.assertListEqual(arms[0], [3, 3])
+        self.assertListEqual(arms[1], [1, 1])
 
     def test_greedy0_no_nhood_predict_weighted(self):
 
@@ -528,7 +529,7 @@ class LSHNearestTest(BaseTest):
                                  is_predict=True)
 
         # 2nd arm is weighted highly but 3rd is picked too
-        self.assertListEqual(arms[0], [2, 2])
+        self.assertListEqual(arms[0], [3, 2])
         self.assertListEqual(arms[1], [2, 2])
 
     def test_greedy0_no_nhood_expectation_nan(self):

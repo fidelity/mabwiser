@@ -63,7 +63,7 @@ Context-Free MAB
 
     # Results
     print("Epsilon Greedy: ", prediction, " ", expectations)
-    assert(prediction == 1)
+    assert(prediction == 2)
 
     # Additional historical data becomes available which allows online learning
     additional_layouts = [1, 2, 1, 2]

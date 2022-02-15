@@ -6,7 +6,7 @@ This module provides a number of constants and helper functions.
 """
 
 import abc
-from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn
+from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn, List
 
 import numpy as np
 
@@ -168,18 +168,41 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         """
         pass
 
+    def multivariate_normal(self, mean: List[float], covariance: List[List[float]], size=None):
+        """ Draw samples from a multivariate Normal distribution with given mean and covariance.
+
+            Parameters
+            ----------
+            mean : list of floats
+                The mean of each random variable, of length ``N``.
+            covariance : list of list of floats
+                The covariance of each random variable. If the length of parameter ``mean``
+                is ``N``, this parameter should contain ``N`` lists, each with ``N`` floats.
+            size : int or tuple of ints or None
+                Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+                ``m * n * k * N`` samples are drawn, where ``N`` is the length of
+                parameter ``mean``. If ``None``, a vector of length ``N`` is returned.
+
+            Returns
+            -------
+            out : ndarray
+                A floating-point array of shape ``m * n * k * N`` of drawn samples based on
+                the ``size`` and the length of ``mean`` parameters.
+        """
+        pass
+
 
 class _NumpyRNG(_BaseRNG):
 
     def __init__(self, seed):
         super().__init__(seed)
-        self.rng = np.random.RandomState(self.seed)
+        self.rng = np.random.default_rng(self.seed)
 
     def rand(self):
-        return self.rng.rand()
+        return self.rng.random()
 
     def randint(self, low: int, high: int = None, size: int = None):
-        return self.rng.randint(low=low, high=high, size=size)
+        return self.rng.integers(low=low, high=high, size=size)
 
     def choice(self, a: Union[int, Iterable[int]], size: Union[int, Tuple[int]] = None, p: Iterable[float] = None):
         return self.rng.choice(a=a, size=size, p=p)
@@ -189,6 +212,10 @@ class _NumpyRNG(_BaseRNG):
 
     def standard_normal(self, size):
         return self.rng.standard_normal(size)
+
+    def multivariate_normal(self, mean: Union[np.ndarray, List[float]],
+                            covariance: Union[np.ndarray, List[List[float]]], size=None):
+        return np.squeeze(self.rng.multivariate_normal(mean, covariance, size=size, method='cholesky'))
 
 
 def create_rng(seed: int) -> _BaseRNG:

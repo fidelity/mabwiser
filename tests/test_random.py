@@ -15,7 +15,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 1)
+        self.assertEqual(arm, 3)
 
     def test_random_expectations(self):
         exp, mab = self.predict(arms=[1, 2, 3],
@@ -36,7 +36,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 2)
+        self.assertEqual(arm, 1)
 
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
@@ -46,7 +46,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 3)
+        self.assertEqual(arm, 1)
 
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
@@ -56,7 +56,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 1)
+        self.assertEqual(arm, 3)
 
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],

@@ -46,7 +46,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3, 1])
+        self.assertEqual(arm, [3, 1, 1, 3, 3])
 
     def test_tau1_expectations(self):
 
@@ -70,7 +70,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3, 1])
+        self.assertEqual(arm, [3, 1, 1, 3, 3])
 
     def test_tau1_df(self):
 
@@ -84,7 +84,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3, 1])
+        self.assertEqual(arm, [3, 1, 1, 3, 3])
 
     def test_tau1_df_list(self):
 
@@ -98,7 +98,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3, 1])
+        self.assertEqual(arm, [3, 1, 1, 3, 3])
 
     def test_softmax_t1(self):
 
@@ -110,7 +110,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 3, 1, 3])
+        self.assertEqual(arm, [2, 1, 1, 3])
 
     def test_softmax_t2(self):
 
@@ -122,7 +122,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 1, 3, 1])
+        self.assertEqual(arm, [1, 2, 3, 2])
 
     def test_softmax_t3(self):
 
@@ -146,7 +146,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [4, 4, 4, 4])
+        self.assertEqual(arm, [4, 4, 2, 2])
 
     def test_softmax_t5(self):
 
@@ -158,7 +158,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, ['one', 'three', 'one', 'three'])
+        self.assertEqual(arm, ['two', 'two', 'one', 'three'])
 
     def test_softmax_t6(self):
 
@@ -170,7 +170,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, ['two', 'three', 'one', 'one'])
+        self.assertEqual(arm, ['three', 'one', 'three', 'three'])
 
     def test_softmax_t7(self):
 
@@ -182,7 +182,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, ['b', 'c', 'b', 'c', 'b'])
+        self.assertEqual(arm, ['c', 'b', 'b', 'c', 'c'])
 
     def test_softmax_t8(self):
 
@@ -211,7 +211,7 @@ class SoftmaxTest(BaseTest):
                                 num_run=4,
                                 is_predict=True)
 
-        self.assertEqual(arm, [c, c, c, c])
+        self.assertEqual(arm, [c, c, a, c])
 
     def test_softmax_t10(self):
 
@@ -241,7 +241,7 @@ class SoftmaxTest(BaseTest):
                                 is_predict=True)
 
         self.assertTrue(4 in mab._imp.arm_to_expectation.keys())
-        self.assertEqual(arm[13], 4)
+        self.assertEqual(arm[13], 3)
 
         e_x = mab._imp.arm_to_exponent[4]
         prob = mab._imp.arm_to_expectation[4]

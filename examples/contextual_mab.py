@@ -172,7 +172,7 @@ expectations = lshnearest.predict_expectations(test)
 
 # Results
 print("LSH Nearest: ", prediction, " ", expectations)
-assert(prediction == [1, 1])
+assert(prediction == [1, 4])
 
 # Online update of model
 lshnearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)

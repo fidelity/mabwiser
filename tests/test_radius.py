@@ -114,7 +114,7 @@ class RadiusTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 1])
+        self.assertListEqual(arms, [2, 1])
 
     def test_thompson_r2(self):
 
@@ -132,7 +132,7 @@ class RadiusTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 4])
+        self.assertListEqual(arms, [2, 1])
 
     def test_ucb_r2(self):
 
@@ -168,7 +168,7 @@ class RadiusTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [4, 1])
 
     def test_no_neighbors(self):
 
@@ -187,7 +187,7 @@ class RadiusTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 3, 4, 1, 4])
+        self.assertListEqual(arms, [3, 1, 1, 4, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
@@ -204,7 +204,7 @@ class RadiusTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 2, 1, 4, 4])
+        self.assertListEqual(arms, [2, 4, 1, 2, 2])
 
     def test_no_neighbors_expectations(self):
 
@@ -300,7 +300,7 @@ class RadiusTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [3, 4])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -340,7 +340,7 @@ class RadiusTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp.is_contextual_binarized)
-        self.assertListEqual(arms, [3, 4])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -396,8 +396,8 @@ class RadiusTest(BaseTest):
                                  is_predict=True)
 
         # 3rd arm was never seen but picked up by random neighborhood in both tests
-        self.assertListEqual(arms[0], [3, 3])
-        self.assertListEqual(arms[1], [1, 1])
+        self.assertListEqual(arms[0], [3, 1])
+        self.assertListEqual(arms[1], [1, 3])
 
     def test_greedy0_no_nhood_predict_weighted(self):
 
@@ -417,8 +417,8 @@ class RadiusTest(BaseTest):
                                  is_predict=True)
 
         # 2nd arm is weighted highly but 3rd is picked too
-        self.assertListEqual(arms[0], [3, 2])
-        self.assertListEqual(arms[1], [2, 2])
+        self.assertListEqual(arms[0], [2, 2])
+        self.assertListEqual(arms[1], [3, 3])
 
     def test_greedy0_no_nhood_expectation_nan(self):
 

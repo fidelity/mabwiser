@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, argmax, _BaseRNG
+from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
 
 class _RidgeRegression:
@@ -72,51 +72,18 @@ class _RidgeRegression:
 
 class _LinTS(_RidgeRegression):
 
-    def __init__(self, rng: _BaseRNG, l2_lambda: Num = 1.0, alpha: Num = 1.0,
-                 scaler: Optional[Callable] = None):
-        super().__init__(rng, l2_lambda, alpha, scaler)
-
-        # Set covariance to none
-        self.covar_decomposed = None
-
-    def init(self, num_features):
-        super().init(num_features)
-
-        # Calculate covariance
-        self.covar_decomposed = self._cholesky()
-
-    def fit(self, X, y):
-        super().fit(X, y)
-
-        # Calculate covariance
-        self.covar_decomposed = self._cholesky()
-
     def predict(self, x):
 
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
-        # Multivariate Normal Sampling
-        # Adapted from the implementation in numpy.random.generator.multivariate_normal version 1.18.0
-        # Uses the cholesky implementation from numpy.linalg instead of numpy.dual
-        sampled_norm = self.rng.standard_normal(self.beta.shape[0])
-
-        # Randomly sample coefficients from Normal Distribution N(mean=beta, std=covar_decomposed)
-        beta_sampled = self.beta + np.dot(sampled_norm, self.covar_decomposed)
+        # Randomly sample coefficients from multivariate normal distribution
+        # Covariance is enhanced with the exploration factor
+        beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv)
 
         # Calculate expectation y = x * beta_sampled
         return np.dot(x, beta_sampled)
-
-    def _cholesky(self):
-
-        # Calculate exploration factor
-        exploration = np.square(self.alpha) * self.A_inv
-
-        # Covariance using cholesky decomposition
-        covar_decomposed = np.linalg.cholesky(exploration)
-
-        return covar_decomposed
 
 
 class _LinUCB(_RidgeRegression):
@@ -217,7 +184,7 @@ class _Linear(BaseMAB):
         predictions = [None] * len(contexts)
         for index, row in enumerate(contexts):
             # Each row needs a separately seeded rng for reproducibility in parallel
-            rng = np.random.RandomState(seed=seeds[index])
+            rng = create_rng(seed=seeds[index])
 
             for arm in arms:
                 # Copy the row rng to the deep copied model in arm_to_model

@@ -1,3 +1,6 @@
+[![ci](https://github.com/fidelity/mabwiser/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/fidelity/mabwiser/actions/workflows/ci.yml)
+[![Downloads](https://static.pepy.tech/personalized-badge/mabwiser?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/mabwiser)
+
 # MABWiser: Parallelizable Contextual Multi-Armed Bandits 
 
 MABWiser ([IJAIT 2021](https://www.worldscientific.com/doi/10.1142/S0218213021500214), [ICTAI 2019](https://ieeexplore.ieee.org/document/8995418)) is a research library written in Python for rapid prototyping of multi-armed bandit algorithms. It supports **context-free**, **parametric** and **non-parametric** **contextual** bandit models and provides built-in parallelization for both training and testing components. 

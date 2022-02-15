@@ -121,7 +121,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 1])
+        self.assertListEqual(arms, [2, 1])
 
     def test_thompson_n3(self):
 
@@ -139,7 +139,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 4])
+        self.assertListEqual(arms, [2, 1])
 
     def test_ucb_n3(self):
 
@@ -175,7 +175,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [4, 1])
 
     def test_partial_fit_greedy0_n3(self):
 
@@ -231,7 +231,7 @@ class ClustersTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp_list[0].is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
@@ -271,7 +271,7 @@ class ClustersTest(BaseTest):
                                  is_predict=True)
 
         self.assertTrue(mab._imp.lp_list[0].is_contextual_binarized)
-        self.assertListEqual(arms, [3, 3])
+        self.assertListEqual(arms, [2, 1])
         self.assertEqual(len(mab._imp.decisions), 10)
         self.assertEqual(len(mab._imp.rewards), 10)
         self.assertEqual(len(mab._imp.contexts), 10)
