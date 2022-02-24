@@ -97,4 +97,3 @@ class _UCB1(BaseMAB):
         self.arm_to_sum.pop(arm)
         self.arm_to_count.pop(arm)
         self.arm_to_mean.pop(arm)
-        # TODO: Should self.total_count be decremented with self.arm_to_count[arm]?

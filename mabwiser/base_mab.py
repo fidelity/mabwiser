@@ -95,7 +95,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self._uptake_new_arm(arm, binarizer, scaler)
 
     def remove_arm(self, arm: Arm) -> NoReturn:
-        """Removes arm to the bandit.
+        """Removes arm from the bandit.
         """
         self.arm_to_expectation.pop(arm)
         self._drop_existing_arm(arm)
@@ -157,7 +157,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
     def _drop_existing_arm(self, arm: Arm):
         """Abstract method.
 
-        Removes existing arm from multi-armed bandit
+        Removes existing arm from multi-armed bandit.
         """
         pass
 

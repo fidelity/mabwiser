@@ -1211,7 +1211,7 @@ class MAB:
         TypeError:  Distance quantile is not given as a float.
 
         ValueError:  Distance quantile is not between 0 and 1.
-        ValueError:  The arms in arm_to_features do not match arms
+        ValueError:  The arms in arm_to_features do not match arms.
         """
         check_true(isinstance(arm_to_features, dict), TypeError("Arm features are not given as a dictionary."))
         check_true(isinstance(distance_quantile, float), TypeError("Distance quantile is not given as a float."))
@@ -1332,14 +1332,14 @@ class MAB:
             check_true(isinstance(contexts, (pd.Series, pd.DataFrame)),
                        TypeError("The contexts should be given as 2D list, numpy array, pandas series or data frames."))
 
-    def _validate_arm(self, arm):
+    @staticmethod
+    def _validate_arm(arm):
         """
         Validates new arm.
         """
         check_false(arm is None, ValueError("The arm cannot be None."))
         check_false(np.nan in [arm], ValueError("The arm cannot be NaN."))
         check_false(np.inf in [arm], ValueError("The arm cannot be Infinity."))
-
 
     @staticmethod
     def _convert_array(array_like) -> np.ndarray:

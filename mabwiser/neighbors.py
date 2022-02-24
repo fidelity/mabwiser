@@ -71,7 +71,7 @@ class _Neighbors(BaseMAB):
         return self._parallel_predict(contexts, is_predict=False)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
-        pass  # TODO: Warm start relevant for neighbor policies?
+        pass
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         pass
