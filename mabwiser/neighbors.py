@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -70,6 +70,12 @@ class _Neighbors(BaseMAB):
         # Return predict expectations within the neighborhood
         return self._parallel_predict(contexts, is_predict=False)
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        pass  # TODO: Warm start relevant for neighbor policies?
+
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        pass
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
         """Abstract method to be implemented by child classes."""
         pass
@@ -111,6 +117,9 @@ class _Neighbors(BaseMAB):
 
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
         self.lp.add_arm(arm, binarizer)
+
+    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+        self.lp.remove_arm(arm)
 
 
 class _Radius(_Neighbors):

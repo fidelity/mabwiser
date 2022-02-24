@@ -30,6 +30,9 @@ train_df = pd.DataFrame({'ad': [1, 1, 1, 2, 4, 5, 3, 3, 2, 1, 4, 5, 3, 2, 5],
                          'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
                         )
 
+# Arm features for warm start
+arm_to_features = {1: [0, 1, 1], 2: [0, 0.5, 0.5], 3: [1, 1, 0.5], 4: [0.2, 1, 0], 5: [0, 1, 0.1], 6: [0, 0.5, 0.5]}
+
 # Test data to for new prediction
 test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
 test_df_revenue = pd.Series([7, 13])
@@ -65,6 +68,9 @@ linucb.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
 
 # Update the model with new arm
 linucb.add_arm(6)
+
+# Warm start new arm
+linucb.warm_start(arm_to_features, distance_quantile=0.75)
 
 ###################################################################
 # LinUCB Learning Policy combined with Radius Neighborhood Policy

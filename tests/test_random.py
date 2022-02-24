@@ -67,3 +67,29 @@ class RandomTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(arm, 1)
+
+    def test_add_arm(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True)
+        mab.add_arm(4)
+        self.assertTrue(4 in mab.arms)
+        self.assertTrue(4 in mab._imp.arm_to_expectation)
+
+    def test_remove_arm(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)

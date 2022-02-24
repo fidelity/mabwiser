@@ -30,6 +30,12 @@ class _Random(BaseMAB):
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        pass
+
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        pass
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
         pass
 
@@ -38,4 +44,7 @@ class _Random(BaseMAB):
         pass
 
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
+        pass
+
+    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
         pass

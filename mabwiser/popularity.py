@@ -46,3 +46,8 @@ class _Popularity(_EpsilonGreedy):
         else:
             for k, v in self.arm_to_expectation.items():
                 self.arm_to_expectation[k] = v / total
+
+    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+        self.arm_to_sum.pop(arm)
+        self.arm_to_count.pop(arm)
+        self._normalize_expectations()

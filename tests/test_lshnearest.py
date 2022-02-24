@@ -551,3 +551,52 @@ class LSHNearestTest(BaseTest):
         # When there are no neighborhoods, expectations will be nan
         self.assertDictEqual(exps[0], {1: np.nan, 2: np.nan, 3: np.nan})
         self.assertDictEqual(exps[1], {1: np.nan, 2: np.nan, 3: np.nan})
+
+    def test_remove_arm(self):
+        arms, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertTrue(mab.arms is mab._imp.arms)
+        self.assertTrue(mab.arms is mab._imp.lp.arms)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.lp.arms)
+        self.assertTrue(3 not in mab._imp.lp.arm_to_expectation)
+
+    def test_warm_start(self):
+        exps, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=2),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=False)
+
+        # Before warm start
+        self.assertDictEqual(exps[0], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0})
+        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.75, 4: 0})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5], 4: [0, 1]}, distance_quantile=0.5)
+        exps = mab.predict_expectations([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
+
+        # After warm start
+        self.assertDictEqual(exps[0], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0})
+        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.75, 4: 0})

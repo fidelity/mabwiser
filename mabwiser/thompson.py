@@ -59,6 +59,14 @@ class _ThompsonSampling(BaseMAB):
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        super().warm_start(arm_to_features, distance_quantile)
+
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_success_count[cold_arm] = self.arm_to_success_count[warm_arm]
+            self.arm_to_fail_count[cold_arm] = self.arm_to_fail_count[warm_arm]
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 
         arm_rewards = rewards[decisions == arm]
@@ -86,3 +94,7 @@ class _ThompsonSampling(BaseMAB):
             self.binarizer = binarizer
         self.arm_to_success_count[arm] = 1
         self.arm_to_fail_count[arm] = 1
+
+    def _drop_existing_arm(self, arm: Arm):
+        self.arm_to_success_count.pop(arm)
+        self.arm_to_fail_count.pop(arm)

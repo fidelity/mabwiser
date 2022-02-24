@@ -24,6 +24,9 @@ options = [1, 2]
 layouts = [1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1]
 revenues = [10, 17, 22, 9, 4, 0, 7, 8, 20, 9, 50, 5, 7, 12, 10]
 
+# Arm to features
+arm_to_features = {1: [0, 0, 1], 2: [1, 1, 0], 3: [1, 1, 0]}
+
 ###################################
 # Epsilon Greedy Learning Policy
 ###################################
@@ -55,6 +58,9 @@ greedy.partial_fit(additional_layouts, additional_revenues)
 
 # Adding a new layout option
 greedy.add_arm(3)
+
+# Warm start new arm
+greedy.warm_start(arm_to_features, distance_quantile=0.5)
 
 #################################################
 # Randomized Popularity Learning Policy

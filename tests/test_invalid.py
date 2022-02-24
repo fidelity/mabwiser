@@ -45,6 +45,12 @@ class InvalidTest(BaseTest):
             def _uptake_new_arm(self, arm, binarizer=None, scaler=None):
                 pass
 
+            def _drop_existing_arm(self, arm):
+                pass
+
+            def _copy_arms(self, cold_arm_to_warm_arm):
+                pass
+
             def fit(self, decisions, rewards, contexts=None):
                 pass
 
@@ -55,6 +61,9 @@ class InvalidTest(BaseTest):
                 pass
 
             def predict_expectations(self, contexts=None):
+                pass
+
+            def warm_start(self, arm_to_features, distance_quantile):
                 pass
 
         mab = MAB([0, 1], learning_policy=LearningPolicy.EpsilonGreedy())
@@ -829,5 +838,22 @@ class InvalidTest(BaseTest):
         with self.assertRaises(ValueError):
             sim._set_stats('validation', decisions, rewards)
 
+    def test_invalid_warm_start_features(self):
+        mab = MAB(arms=[1, 2, 3], learning_policy=LearningPolicy.EpsilonGreedy())
+        with self.assertRaises(TypeError):
+            mab.warm_start([0.1, 0.2, 0.3], 0.5)
 
+    def test_invalid_warm_start_features_none(self):
+        mab = MAB(arms=[1, 2, 3], learning_policy=LearningPolicy.EpsilonGreedy())
+        with self.assertRaises(TypeError):
+            mab.warm_start(None, 0.5)
 
+    def test_invalid_warm_start_quantile_value(self):
+        mab = MAB(arms=[1, 2, 3], learning_policy=LearningPolicy.EpsilonGreedy())
+        with self.assertRaises(ValueError):
+            mab.warm_start({1: [1, 0.5], 2: [1, 0], 3: [0.2, 0.5]}, 50.)
+
+    def test_invalid_warm_start_quantile_none(self):
+        mab = MAB(arms=[1, 2, 3], learning_policy=LearningPolicy.EpsilonGreedy())
+        with self.assertRaises(TypeError):
+            mab.warm_start({1: [1, 0.5], 2: [1, 0], 3: [0.2, 0.5]}, None)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from typing import List, Union, Optional
+from typing import Dict, List, Union, Optional
 
 import numpy as np
 import pandas as pd

@@ -964,10 +964,37 @@ class MAB:
                        TypeError("Scaler must be a scaler object from sklearn.preprocessing with a transform method"))
             check_true(hasattr(scaler, 'mean_') and hasattr(scaler, 'var_'),
                        TypeError("Scaler must be fit with calculated mean_ and var_ attributes"))
+        check_false(arm in self.arms, ValueError("The arm is already in the list of arms."))
 
         self._validate_arm(arm)
         self.arms.append(arm)
         self._imp.add_arm(arm, binarizer, scaler)
+
+    def remove_arm(self, arm: Arm) -> NoReturn:
+        """Removes an _arm_ from the list of arms.
+
+        Parameters
+        ----------
+        arm: Arm
+            The existing arm to be removed.
+
+        Returns
+        -------
+        No return.
+
+        Raises
+        ------
+        ValueError: The arm does not exist.
+        ValueError: The arm is ``None``.
+        ValueError: The arm is ``NaN``.
+        ValueError: The arm is ``Infinity``.
+        """
+
+        check_true(arm in self.arms, ValueError("The arm is not in the list of arms."))
+
+        self._validate_arm(arm)
+        self.arms.remove(arm)
+        self._imp.remove_arm(arm)
 
     def fit(self,
             decisions: Union[List[Arm], np.ndarray, pd.Series],  # Decisions that are made
@@ -1161,8 +1188,40 @@ class MAB:
         # Return a dictionary from arms (key) to expectations (value)
         return self._imp.predict_expectations(contexts)
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+        """Warm-start untrained (cold) arms of the multi-armed bandit.
+
+        Validates arguments and raises exceptions in case there are violations.
+
+        Parameters
+        ----------
+        arm_to_features : Dict[Arm, List[Num]]
+            Numeric representation for each arm.
+        distance_quantile : float
+            Value between 0 and 1 used to determine if an item can be warm started or not using closest item.
+            All cold items will be warm started if 1 and none will be warm started if 0.
+
+        Returns
+        -------
+        No return.
+
+        Raises
+        ------
+        TypeError:  Arm features are not given as a dictionary.
+        TypeError:  Distance quantile is not given as a float.
+
+        ValueError:  Distance quantile is not between 0 and 1.
+        ValueError:  The arms in arm_to_features do not match arms
+        """
+        check_true(isinstance(arm_to_features, dict), TypeError("Arm features are not given as a dictionary."))
+        check_true(isinstance(distance_quantile, float), TypeError("Distance quantile is not given as a float."))
+        check_true(0 <= distance_quantile <= 1, ValueError("Distance quantile is not between 0 and 1."))
+        check_true(set(self.arms) == set(arm_to_features.keys()),
+                   ValueError("The arms in arm features do not match arms."))
+        self._imp.warm_start(arm_to_features, distance_quantile)
+
     @staticmethod
-    def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend) -> NoReturn:
+    def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend):
         """
         Validates arguments for the MAB constructor.
         """
@@ -1208,7 +1267,7 @@ class MAB:
         if backend is not None:
             check_true(isinstance(backend, str), TypeError("Parallel backend must be a string."))
 
-    def _validate_fit_args(self, decisions, rewards, contexts) -> NoReturn:
+    def _validate_fit_args(self, decisions, rewards, contexts):
         """"
         Validates argument types for fit and partial_fit functions.
         """
@@ -1246,7 +1305,7 @@ class MAB:
                         ValueError("Thompson Sampling requires binary rewards when binarizer function is not "
                                    "provided."))
 
-    def _validate_predict_args(self, contexts) -> NoReturn:
+    def _validate_predict_args(self, contexts):
         """"
         Validates argument types for predict and predict_expectation functions.
         """
@@ -1259,7 +1318,7 @@ class MAB:
             check_true(contexts is None, ValueError("Prediction with no context policy cannot handle context data."))
 
     @staticmethod
-    def _validate_context_type(contexts) -> NoReturn:
+    def _validate_context_type(contexts):
         """
         Validates that context data is 2D
         """
@@ -1280,7 +1339,7 @@ class MAB:
         check_false(arm is None, ValueError("The arm cannot be None."))
         check_false(np.nan in [arm], ValueError("The arm cannot be NaN."))
         check_false(np.inf in [arm], ValueError("The arm cannot be Infinity."))
-        check_false(arm in self.arms, ValueError("The arm is already in the list of arms."))
+
 
     @staticmethod
     def _convert_array(array_like) -> np.ndarray:

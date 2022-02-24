@@ -67,6 +67,14 @@ class _TreeBandit(BaseMAB):
 
         return self._parallel_predict(contexts, is_predict=False)
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        # TODO: Add warm start?
+        pass
+
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        # TODO: Add copy arms?
+        pass
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 
         # Create dataset for the given arm
@@ -155,6 +163,11 @@ class _TreeBandit(BaseMAB):
         self.lp.add_arm(arm, binarizer)
         self.arm_to_tree[arm] = DecisionTreeRegressor(**self.tree_parameters)
         self.arm_to_leaf_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
+
+    def _drop_existing_arm(self, arm: Arm):
+        self.lp.remove_arm(arm)
+        self.arm_to_tree.pop(arm)
+        self.arm_to_leaf_to_rewards.pop(arm)
 
     def _create_leaf_lp(self, arm: Arm):
 
