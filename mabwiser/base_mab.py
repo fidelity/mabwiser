@@ -64,7 +64,6 @@ class BaseMAB(metaclass=abc.ABCMeta):
         The dictionary of arms (keys) to their expected rewards (values).
     cold_arm_to_warm_arm: Dict[Arm, Arm]:
         Mapping indicating what arm was used to warm-start cold arms.
-        None if warm start has not been run.
     trained_arms: List[Arm]
         List of trained arms.
         Arms for which at least one decision has been observed are deemed trained.
@@ -191,11 +190,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
                               arm, decisions, rewards, contexts)
                           for arm in self.arms)
 
-        # Set/update warm arms
+        # Get list of arms in decisions
+        # If decision is observed for cold arm, drop arm from cold arm dictionary
         arms = np.unique(decisions).tolist()
         for arm in arms:
             if arm in self.cold_arm_to_warm_arm:
                 self.cold_arm_to_warm_arm.pop(arm)
+
+        # Set/update list of arms for which at least one decision has been observed
         if len(self.trained_arms) == 0:
             self.trained_arms = arms
         else:
