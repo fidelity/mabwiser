@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
+from copy import deepcopy
 from typing import Dict, List, NoReturn, Optional, Callable
 
 import numpy as np
@@ -64,8 +65,8 @@ class _ThompsonSampling(BaseMAB):
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
-            self.arm_to_success_count[cold_arm] = self.arm_to_success_count[warm_arm]
-            self.arm_to_fail_count[cold_arm] = self.arm_to_fail_count[warm_arm]
+            self.arm_to_success_count[cold_arm] = deepcopy(self.arm_to_success_count[warm_arm])
+            self.arm_to_fail_count[cold_arm] = deepcopy(self.arm_to_fail_count[warm_arm])
 
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 

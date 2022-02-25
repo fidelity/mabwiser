@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
+from copy import deepcopy
 from typing import Callable, Dict, List, NoReturn, Optional
 
 import numpy as np
@@ -60,10 +61,10 @@ class _UCB1(BaseMAB):
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
-            self.arm_to_sum[cold_arm] = self.arm_to_sum[warm_arm]
-            self.arm_to_count[cold_arm] = self.arm_to_count[warm_arm]
-            self.arm_to_mean[cold_arm] = self.arm_to_mean[warm_arm]
-            self.arm_to_expectation[cold_arm] = self.arm_to_expectation[warm_arm]
+            self.arm_to_sum[cold_arm] = deepcopy(self.arm_to_sum[warm_arm])
+            self.arm_to_count[cold_arm] = deepcopy(self.arm_to_count[warm_arm])
+            self.arm_to_mean[cold_arm] = deepcopy(self.arm_to_mean[warm_arm])
+            self.arm_to_expectation[cold_arm] = deepcopy(self.arm_to_expectation[warm_arm])
 
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 
