@@ -373,7 +373,10 @@ class BaseMAB(metaclass=abc.ABCMeta):
             # Collect distance from cold arm to warm arms
             arm_to_distance = {}
             for arm in self.trained_arms:
-                arm_to_distance[arm] = distance_from_to[cold_arm][arm]
+                if arm in self.arms:
+                    arm_to_distance[arm] = distance_from_to[cold_arm][arm]
+            if len(arm_to_distance) == 0:
+                continue
 
             # Select the closest warm arm
             closest_arm = argmin(arm_to_distance)

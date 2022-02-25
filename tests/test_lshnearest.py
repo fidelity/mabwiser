@@ -598,5 +598,5 @@ class LSHNearestTest(BaseTest):
         exps = mab.predict_expectations([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
 
         # After warm start
-        self.assertDictEqual(exps[0], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0})
-        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.75, 4: 0})
+        self.assertDictEqual(exps[0], {1: 0.6666666666666666, 2: 0.0, 3: 0.6, 4: 0.6666666666666666})
+        self.assertDictEqual(exps[1], {1: 0.6666666666666666, 2: 0.0, 3: 0.75, 4: 0.6666666666666666})

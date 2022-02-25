@@ -370,5 +370,5 @@ class NearestTest(BaseTest):
         exps = mab.predict_expectations([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
 
         # After warm start
-        self.assertDictEqual(exps[0], {1: 0.0, 2: 0.0, 3: 1.0, 4: 0})
-        self.assertDictEqual(exps[1], {1: 1.0, 2: 0.0, 3: 0, 4: 0})
+        self.assertDictEqual(exps[0], {1: 0.0, 2: 0.0, 3: 1.0, 4: 0.0})
+        self.assertDictEqual(exps[1], {1: 1.0, 2: 0.0, 3: 0, 4: 1.0})
