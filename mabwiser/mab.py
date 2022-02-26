@@ -10,7 +10,7 @@ This module defines the public interface of the **MABWiser Library** providing a
     - ``NeighborhoodPolicy``
 """
 
-from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
+from typing import List, Union, Dict, NamedTuple, Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -919,7 +919,7 @@ class MAB:
         else:
             return None
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> None:
         """ Adds an _arm_ to the list of arms.
 
         Incorporates the arm into the learning and neighborhood policies with no training data.
@@ -974,7 +974,7 @@ class MAB:
             rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
             contexts: Union[None, List[List[Num]],
                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
-            ) -> NoReturn:
+            ) -> None:
         """Fits the multi-armed bandit to the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1030,7 +1030,7 @@ class MAB:
     def partial_fit(self,
                     decisions: Union[List[Arm], np.ndarray, pd.Series],
                     rewards: Union[List[Num], np.ndarray, pd.Series],
-                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> NoReturn:
+                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> None:
         """Updates the multi-armed bandit with the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1162,7 +1162,7 @@ class MAB:
         return self._imp.predict_expectations(contexts)
 
     @staticmethod
-    def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend) -> NoReturn:
+    def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend) -> None:
         """
         Validates arguments for the MAB constructor.
         """
@@ -1208,7 +1208,7 @@ class MAB:
         if backend is not None:
             check_true(isinstance(backend, str), TypeError("Parallel backend must be a string."))
 
-    def _validate_fit_args(self, decisions, rewards, contexts) -> NoReturn:
+    def _validate_fit_args(self, decisions, rewards, contexts) -> None:
         """"
         Validates argument types for fit and partial_fit functions.
         """
@@ -1246,7 +1246,7 @@ class MAB:
                         ValueError("Thompson Sampling requires binary rewards when binarizer function is not "
                                    "provided."))
 
-    def _validate_predict_args(self, contexts) -> NoReturn:
+    def _validate_predict_args(self, contexts) -> None:
         """"
         Validates argument types for predict and predict_expectation functions.
         """
@@ -1259,7 +1259,7 @@ class MAB:
             check_true(contexts is None, ValueError("Prediction with no context policy cannot handle context data."))
 
     @staticmethod
-    def _validate_context_type(contexts) -> NoReturn:
+    def _validate_context_type(contexts) -> None:
         """
         Validates that context data is 2D
         """

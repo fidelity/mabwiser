@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, List, NoReturn, Optional, Union
+from typing import Callable, List, Optional, Union
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -37,7 +37,7 @@ class _Neighbors(BaseMAB):
         # When there are no neighbors, return nan expectations
         reset(self.arm_to_expectation, np.nan)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -49,7 +49,7 @@ class _Neighbors(BaseMAB):
         else:
             self.rewards = rewards
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:

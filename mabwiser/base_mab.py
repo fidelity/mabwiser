@@ -7,7 +7,7 @@ This module defines the abstract base class for contextual multi-armed bandit al
 
 import abc
 from itertools import chain
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, Optional
 import multiprocessing as mp
 
 from joblib import Parallel, delayed
@@ -76,7 +76,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
         self.arm_to_expectation: Dict[Arm, float] = dict.fromkeys(self.arms, 0)
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> None:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
@@ -87,7 +87,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+            contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fits the multi-armed bandit to the given
@@ -97,7 +97,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the given
@@ -122,7 +122,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
@@ -131,7 +131,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray,
-                 contexts: Optional[np.ndarray] = None) -> NoReturn:
+                 contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fit operation for individual arm.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List, NoReturn, Optional, Callable
+from typing import Dict, List, Optional, Callable
 
 import numpy as np
 
@@ -21,7 +21,7 @@ class _ThompsonSampling(BaseMAB):
         self.arm_to_success_count = dict.fromkeys(self.arms, 1)
         self.arm_to_fail_count = dict.fromkeys(self.arms, 1)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # If rewards are non binary, convert them
         rewards = self._get_binary_rewards(decisions, rewards)
@@ -36,7 +36,7 @@ class _ThompsonSampling(BaseMAB):
         # Leave the calculation of expectations to predict methods
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # If rewards are non binary, convert them
         rewards = self._get_binary_rewards(decisions, rewards)

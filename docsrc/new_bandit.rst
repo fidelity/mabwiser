@@ -113,7 +113,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # These fields are declared here and initialized to zero.
             self.my_value_to_arm = dict.fromkeys(self.arms, 0)
 
-        def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
             # TODO:
             # This method trains your algorithm from scratch each time its called.
             # You might need to reset the internal fields
@@ -124,7 +124,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # This automatically activates parallelization in the training phase.
             self._parallel_fit(decisions, rewards, contexts)
 
-        def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
             # This method trains your algorithm in a continuous fashion.
             # Unlike fit() operation, the partial_fit() does not reset internal fields typically.
             # This allows us to continue learning online

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import List, Optional, NoReturn
+from typing import List, Optional
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
@@ -15,7 +15,7 @@ class _Popularity(_EpsilonGreedy):
         # Init the parent greedy policy with zero epsilon
         super().__init__(rng, arms, n_jobs, backend, epsilon=0.0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Fit as usual greedy
         super().fit(decisions, rewards, contexts)
@@ -23,7 +23,7 @@ class _Popularity(_EpsilonGreedy):
         # Make sure expectations sum up to 1 like probabilities
         self._normalize_expectations()
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Fit as usual greedy
         super().partial_fit(decisions, rewards, contexts)

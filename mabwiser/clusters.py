@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, List, NoReturn, Optional, Union
+from typing import Callable, List, Optional, Union
 
 import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -48,7 +48,7 @@ class _Clusters(BaseMAB):
         reset(self.arm_to_expectation, np.nan)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+            contexts: Optional[np.ndarray] = None) -> None:
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -67,7 +67,7 @@ class _Clusters(BaseMAB):
         self._fit_operation()
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp_list[0], _ThompsonSampling) and self.lp_list[0].binarizer:

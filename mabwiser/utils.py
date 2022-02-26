@@ -6,7 +6,7 @@ This module provides a number of constants and helper functions.
 """
 
 import abc
-from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, NoReturn, List
+from typing import Dict, Union, Iterable, NamedTuple, Tuple, NewType, List
 
 import numpy as np
 
@@ -38,7 +38,7 @@ def argmax(dictionary: Dict[Arm, Num]) -> Arm:
     return max(dictionary, key=dictionary.get)
 
 
-def check_false(expression: bool, exception: Exception) -> NoReturn:
+def check_false(expression: bool, exception: Exception) -> None:
     """
     Checks that given expression is false, otherwise raises the given exception.
     """
@@ -46,7 +46,7 @@ def check_false(expression: bool, exception: Exception) -> NoReturn:
         raise exception
 
 
-def check_true(expression: bool, exception: Exception) -> NoReturn:
+def check_true(expression: bool, exception: Exception) -> None:
     """
     Checks that given expression is true, otherwise raises the given exception.
     """
@@ -54,7 +54,7 @@ def check_true(expression: bool, exception: Exception) -> NoReturn:
         raise exception
 
 
-def reset(dictionary: Dict, value) -> NoReturn:
+def reset(dictionary: Dict, value) -> None:
     """
     Maps every key to the given value.
     """

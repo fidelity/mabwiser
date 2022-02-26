@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 
@@ -14,10 +14,10 @@ class _Random(BaseMAB):
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
         super().__init__(rng, arms, n_jobs, backend)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         pass
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         pass
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
