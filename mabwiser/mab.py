@@ -1193,6 +1193,11 @@ class MAB:
 
         Validates arguments and raises exceptions in case there are violations.
 
+        The warm-start procedure depends on the learning and neighborhood policy. Note that for certain neighborhood
+        policies (e.g., LSHNearest, KNearest, Radius) warm start can only be performed after the nearest neighbors
+        have been determined in the "predict" step. Accordingly, warm start has to be executed for each context being
+        predicted which is computationally expensive.
+
         Parameters
         ----------
         arm_to_features : Dict[Arm, List[Num]]
