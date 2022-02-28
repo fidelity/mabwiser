@@ -39,6 +39,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - ``partial_fit`` method for _online learning
         - ``predict_expectations`` method to retrieve the expectation of each arm
         - ``predict`` method for testing to retrieve the best arm based on the policy
+        - ``remove_arm`` method for removing an arm
+        - ``warm_start`` method for warm starting untrained (cold) arms
 
         To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
 
