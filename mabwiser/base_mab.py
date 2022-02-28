@@ -135,7 +135,6 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         pass
 
-    @abc.abstractmethod
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
         self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
         self._copy_arms(self.cold_arm_to_warm_arm)

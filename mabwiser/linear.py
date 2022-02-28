@@ -143,9 +143,6 @@ class _Linear(BaseMAB):
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
-        super().warm_start(arm_to_features, distance_quantile)
-
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
             self.arm_to_model[cold_arm] = deepcopy(self.arm_to_model[warm_arm])
