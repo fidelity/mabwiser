@@ -584,9 +584,10 @@ class LinUCBTest(BaseTest):
                                           is_predict=False)
 
             for i in range(len(contexts)):
-                self.assertEqual(exp[i][arm], exp_check[i][arm])
+                self.assertAlmostEqual(exp[i][arm], exp_check[i][arm])
 
-    def test_add_arm_scaler(self):
+    @staticmethod
+    def test_add_arm_scaler():
         scaler = StandardScaler()
         scaler.fit(np.array([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]).astype('float64'))
         arm_to_scaler = {0: deepcopy(scaler), 1: deepcopy(scaler)}
