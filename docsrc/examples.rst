@@ -43,6 +43,9 @@ Context-Free MAB
     layouts = [1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1]
     revenues = [10, 17, 22, 9, 4, 0, 7, 8, 20, 9, 50, 5, 7, 12, 10]
 
+    # Arm to features
+    arm_to_features = {1: [0, 0, 1], 2: [1, 1, 0], 3: [1, 1, 0]}
+
     ###################################
     # Epsilon Greedy Learning Policy
     ###################################
@@ -74,6 +77,9 @@ Context-Free MAB
 
     # Adding a new layout option
     greedy.add_arm(3)
+
+    # Warm start new arm
+    greedy.warm_start(arm_to_features, distance_quantile=0.5)
 
 
 Parametric Contextual MAB
@@ -111,6 +117,9 @@ Parametric Contextual MAB
 							 'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
 							 )
 
+	# Arm features for warm start
+    arm_to_features = {1: [0, 1, 1], 2: [0, 0.5, 0.5], 3: [1, 1, 0.5], 4: [0.2, 1, 0], 5: [0, 1, 0.1], 6: [0, 0.5, 0.5]}
+
 	# Test data to for new prediction
 	test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
 	test_df_revenue = pd.Series([7, 13])
@@ -147,6 +156,8 @@ Parametric Contextual MAB
 	# Update the model with new arm
 	linucb.add_arm(6)
 
+	# Warm start new arm
+    radius.warm_start(arm_to_features, distance_quantile=0.75)
 
 
 Non-Parametric Contextual MAB
@@ -183,6 +194,9 @@ Non-Parametric Contextual MAB
 											0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
 							'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
 							)
+
+	# Arm features for warm start
+    arm_to_features = {1: [0, 1, 1], 2: [0, 0.5, 0.5], 3: [1, 1, 0.5], 4: [0.2, 1, 0], 5: [0, 1, 0.1], 6: [0, 0.5, 0.5]}
 
 	# Test data to for new prediction
 	test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
@@ -221,6 +235,8 @@ Non-Parametric Contextual MAB
 	# Updating of the model with new arm
 	radius.add_arm(6)
 
+	# Warm start new arm
+    radius.warm_start(arm_to_features, distance_quantile=0.75)
 
 
 Parallel MAB 
