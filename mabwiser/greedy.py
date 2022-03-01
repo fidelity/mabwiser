@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
+from copy import deepcopy
 from typing import Callable, Dict, List, NoReturn, Optional
 
 import numpy as np
@@ -45,6 +46,12 @@ class _EpsilonGreedy(BaseMAB):
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()
 
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_sum[cold_arm] = deepcopy(self.arm_to_sum[warm_arm])
+            self.arm_to_count[cold_arm] = deepcopy(self.arm_to_count[warm_arm])
+            self.arm_to_expectation[cold_arm] = deepcopy(self.arm_to_expectation[warm_arm])
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 
         arm_rewards = rewards[decisions == arm]
@@ -60,3 +67,7 @@ class _EpsilonGreedy(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
         self.arm_to_sum[arm] = 0
         self.arm_to_count[arm] = 0
+
+    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+        self.arm_to_sum.pop(arm)
+        self.arm_to_count.pop(arm)

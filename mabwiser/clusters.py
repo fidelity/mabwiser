@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -92,11 +92,23 @@ class _Clusters(BaseMAB):
         # Return predict expectations within the cluster
         return self._parallel_predict(contexts, is_predict=False)
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        for c in range(self.n_clusters):
+            self.lp_list[c].warm_start(arm_to_features, distance_quantile)
+
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        pass
+
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
 
         # Update each learning policy
         for lp in self.lp_list:
             lp.add_arm(arm, binarizer)
+
+    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+        # Update each learning policy
+        for lp in self.lp_list:
+            lp.remove_arm(arm)
 
     def _fit_operation(self):
 

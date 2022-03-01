@@ -584,14 +584,77 @@ class LinUCBTest(BaseTest):
                                           is_predict=False)
 
             for i in range(len(contexts)):
-                self.assertEqual(exp[i][arm], exp_check[i][arm])
+                self.assertAlmostEqual(exp[i][arm], exp_check[i][arm])
 
-    def test_add_arm_scaler(self):
+    @staticmethod
+    def test_add_arm_scaler():
         scaler = StandardScaler()
         scaler.fit(np.array([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]).astype('float64'))
         arm_to_scaler = {0: deepcopy(scaler), 1: deepcopy(scaler)}
         mab = MAB([0, 1], LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler))
         mab.add_arm(2, scaler=deepcopy(scaler))
+
+    def test_add_arm(self):
+        arm, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3, 1],
+                                rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=1.5),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=4,
+                                is_predict=True)
+        mab.add_arm(4)
+        self.assertTrue(4 in mab.arms)
+        self.assertTrue(4 in mab._imp.arms)
+        self.assertTrue(4 in mab._imp.arm_to_expectation.keys())
+        self.assertTrue(mab._imp.arm_to_model[4] is not None)
+
+    def test_remove_arm(self):
+        arm, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3, 1],
+                                rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=1.5),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=4,
+                                is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)
+        self.assertTrue(3 not in mab._imp.arm_to_model)
+
+    def test_warm_start(self):
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 1, 2, 2, 2, 1, 2, 1],
+                              rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                              learning_policy=LearningPolicy.LinTS(alpha=0.24),
+                              context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                               [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                               [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                               [0, 2, 1, 0, 0]],
+                              contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                              seed=123456,
+                              num_run=4,
+                              is_predict=True)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
 
 

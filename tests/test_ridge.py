@@ -474,3 +474,46 @@ class RidgeRegressionTest(BaseTest):
         self.assertEqual(mab._imp.arm_to_model[2].beta[2], 0)
         self.assertEqual(mab._imp.arm_to_model[2].beta[3], 0)
         self.assertEqual(mab._imp.arm_to_model[2].beta[4], 0)
+
+    def test_remove_arm(self):
+        arm, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3, 1],
+                                rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinTS(alpha=0.24),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=4,
+                                is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)
+        self.assertTrue(3 not in mab._imp.arm_to_model)
+
+    def test_warm_start(self):
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 1, 2, 2, 2, 1, 2, 1],
+                              rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                              learning_policy=LearningPolicy.LinTS(alpha=0.24),
+                              context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                               [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                               [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                               [0, 2, 1, 0, 0]],
+                              contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                              seed=123456,
+                              num_run=4,
+                              is_predict=True)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])

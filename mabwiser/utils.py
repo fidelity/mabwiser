@@ -38,6 +38,13 @@ def argmax(dictionary: Dict[Arm, Num]) -> Arm:
     return max(dictionary, key=dictionary.get)
 
 
+def argmin(dictionary: Dict) -> Arm:
+    """
+    Returns the first key that has the minimum value.
+    """
+    return min(dictionary, key=dictionary.get)
+
+
 def check_false(expression: bool, exception: Exception) -> NoReturn:
     """
     Checks that given expression is false, otherwise raises the given exception.

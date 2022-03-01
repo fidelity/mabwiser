@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adding a New Bandit &mdash; MABWiser 2.0.0 documentation</title>
+  <title>Adding a New Bandit &mdash; MABWiser 2.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -217,6 +217,23 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># so that the user cannot accidentally break your policy.</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+<span class="k">def</span> <span class="nf">warm_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm_to_features</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Num</span><span class="p">]],</span> <span class="n">distance_quantile</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="c1"># This method warm starts untrained (cold) arms for which no decisions has been observed</span>
+    <span class="c1"># A cold arm is warm started using a warm arm that is within some minimum distance from the cold arm</span>
+    <span class="c1"># based on the given arm_to_features and distance_quantile inputs.</span>
+
+    <span class="c1"># Calculate pairwise distances between arms and determine cold arm to warm arm mapping</span>
+    <span class="c1"># Call _copy_arms from the base class.</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">warm_start</span><span class="p">(</span><span class="n">arm_to_features</span><span class="p">,</span> <span class="n">distance_quantile</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_copy_arms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cold_arm_to_warm_arm</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Arm</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="c1"># TODO:</span>
+    <span class="c1"># This method tells the policy how to warm start cold arms, given a cold arm to warm arm mapping.</span>
+    <span class="c1"># It will typically involve copying attributes from a warm arm to a cold arm, e.g.</span>
+    <span class="k">for</span> <span class="n">cold_arm</span><span class="p">,</span> <span class="n">warm_arm</span> <span class="ow">in</span> <span class="n">cold_arm_to_warm_arm</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span><span class="p">[</span><span class="n">cold_arm</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span><span class="p">[</span><span class="n">cold_arm</span><span class="p">])</span>
+
+
 <span class="k">def</span> <span class="nf">_fit_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm</span><span class="p">:</span> <span class="n">Arm</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This is the MOST IMPORTANT function to implement.</span>
@@ -305,8 +322,15 @@ Every test starts with the <code class="docutils literal notranslate"><span clas
     <span class="k">def</span> <span class="nf">test_add_new_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Test adding a new arm and assert that it is handled properly</span>
 
+    <span class="k">def</span> <span class="nf">test_remove_existing_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test removing an arm and assert that it is handled properly</span>
+
     <span class="k">def</span> <span class="nf">test_parallelization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Test how parallelization behaves for your new bandit using the n_jobs param</span>
+
+    <span class="k">def</span> <span class="nf">test_warm_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test warm start can be executed</span>
+        <span class="c1"># Assert warm start behavior is as expected</span>
 
     <span class="k">def</span> <span class="nf">test_input_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Test different input types such as</span>

@@ -364,3 +364,25 @@ class TreeBanditTest(BaseTest):
         mab.fit(decisions, rewards, contexts['column1'])
         result = mab.predict(pd.Series([1]))
         self.assertEqual(result, 1)
+
+    def test_remove_arm(self):
+        arms, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)
+        self.assertTrue(3 not in mab._imp.arm_to_tree)
+        self.assertTrue(3 not in mab._imp.arm_to_leaf_to_rewards)
+        self.assertTrue(3 not in mab._imp.lp.arms)

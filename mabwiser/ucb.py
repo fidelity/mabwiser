@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
+from copy import deepcopy
 from typing import Callable, Dict, List, NoReturn, Optional
 
 import numpy as np
@@ -55,6 +56,13 @@ class _UCB1(BaseMAB):
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()
 
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_sum[cold_arm] = deepcopy(self.arm_to_sum[warm_arm])
+            self.arm_to_count[cold_arm] = deepcopy(self.arm_to_count[warm_arm])
+            self.arm_to_mean[cold_arm] = deepcopy(self.arm_to_mean[warm_arm])
+            self.arm_to_expectation[cold_arm] = deepcopy(self.arm_to_expectation[warm_arm])
+
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
 
         # Fit individual arm
@@ -79,7 +87,11 @@ class _UCB1(BaseMAB):
         return arm_mean + alpha * math.sqrt((2 * math.log(total_count)) / arm_count)
 
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
-
         self.arm_to_sum[arm] = 0
         self.arm_to_count[arm] = 0
         self.arm_to_mean[arm] = 0
+
+    def _drop_existing_arm(self, arm: Arm):
+        self.arm_to_sum.pop(arm)
+        self.arm_to_count.pop(arm)
+        self.arm_to_mean.pop(arm)

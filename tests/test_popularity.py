@@ -396,3 +396,34 @@ class PopularityTest(BaseTest):
                                     num_run=5,
                                     is_predict=True)
 
+    def test_remove_arm(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)
+
+    def test_warm_start(self):
+
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 2, 2, 2, 1, 1, 1],
+                              rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
+                              learning_policy=LearningPolicy.Popularity(),
+                              seed=7,
+                              num_run=1,
+                              is_predict=False)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 0.0})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})

@@ -11,9 +11,10 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import multiprocessing as mp
 
 from joblib import Parallel, delayed
+from scipy.spatial.distance import cdist
 import numpy as np
 
-from mabwiser.utils import Arm, Num, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG, argmin
 from mabwiser._version import __author__, __email__, __version__, __copyright__
 
 __author__ = __author__
@@ -38,6 +39,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - ``partial_fit`` method for _online learning
         - ``predict_expectations`` method to retrieve the expectation of each arm
         - ``predict`` method for testing to retrieve the best arm based on the policy
+        - ``remove_arm`` method for removing an arm
+        - ``warm_start`` method for warm starting untrained (cold) arms
 
         To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
 
@@ -59,8 +62,13 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
         Default value is None. In this case the default backend selected by joblib will be used.
-    arm_to_expectation: Dict[Arm, floot]
+    arm_to_expectation: Dict[Arm, float]
         The dictionary of arms (keys) to their expected rewards (values).
+    cold_arm_to_warm_arm: Dict[Arm, Arm]:
+        Mapping indicating what arm was used to warm-start cold arms.
+    trained_arms: List[Arm]
+        List of trained arms.
+        Arms for which at least one decision has been observed are deemed trained.
     """
 
     @abc.abstractmethod
@@ -75,6 +83,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.backend: str = backend
 
         self.arm_to_expectation: Dict[Arm, float] = dict.fromkeys(self.arms, 0)
+        self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
+        self.trained_arms: List[Arm] = list()
 
     def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
         """Introduces a new arm to the bandit.
@@ -84,6 +94,12 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         self.arm_to_expectation[arm] = 0
         self._uptake_new_arm(arm, binarizer, scaler)
+
+    def remove_arm(self, arm: Arm) -> NoReturn:
+        """Removes arm from the bandit.
+        """
+        self.arm_to_expectation.pop(arm)
+        self._drop_existing_arm(arm)
 
     @abc.abstractmethod
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
@@ -121,11 +137,27 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         pass
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+        self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
+        self._copy_arms(self.cold_arm_to_warm_arm)
+
+    @abc.abstractmethod
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
+        pass
+
     @abc.abstractmethod
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
+        """
+        pass
+
+    @abc.abstractmethod
+    def _drop_existing_arm(self, arm: Arm):
+        """Abstract method.
+
+        Removes existing arm from multi-armed bandit.
         """
         pass
 
@@ -158,6 +190,19 @@ class BaseMAB(metaclass=abc.ABCMeta):
                           delayed(self._fit_arm)(
                               arm, decisions, rewards, contexts)
                           for arm in self.arms)
+
+        # Get list of arms in decisions
+        # If decision is observed for cold arm, drop arm from cold arm dictionary
+        arms = np.unique(decisions).tolist()
+        for arm in arms:
+            if arm in self.cold_arm_to_warm_arm:
+                self.cold_arm_to_warm_arm.pop(arm)
+
+        # Set/update list of arms for which at least one decision has been observed
+        if len(self.trained_arms) == 0:
+            self.trained_arms = arms
+        else:
+            self.trained_arms = np.unique(self.trained_arms + arms).tolist()
 
     def _parallel_predict(self, contexts: np.ndarray, is_predict: bool):
 
@@ -203,3 +248,144 @@ class BaseMAB(metaclass=abc.ABCMeta):
             n_jobs = max(mp.cpu_count() + 1 + n_jobs, 1)
         n_jobs = min(n_jobs, size)
         return n_jobs
+
+    @staticmethod
+    def _get_arm_distances(from_arm: Arm, arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
+                           self_distance: int = 999999) -> Dict[Arm, Num]:
+        """
+        Calculates the distances of the given from_arm to all the arms.
+
+        Distances calculated based on the feature vectors given in arm_to_features using the given distance metric.
+        The distance of the arm to itself is set as the given self_distance.
+
+        Parameters
+        ---------
+        from_arm: Arm
+            Distances from this arm.
+        arm_to_features: Dict[Arm, list[Num]]
+            Features for each arm used to calculate distances.
+        metric: str
+            Distance metric to use.
+            Default value is 'cosine'.
+        self_distance: int
+            The value to set as the distance to itself.
+            Default value is 999999.
+
+        Returns
+        -------
+        Returns distance from given arm to arm v as arm_to_distance[v].
+        """
+
+        # Find the distance of given from_arm to all arms including self
+        arm_to_distance = {}
+        for to_arm in arm_to_features.keys():
+            if from_arm == to_arm:
+                arm_to_distance[to_arm] = self_distance
+            else:
+                arm_to_distance[to_arm] = cdist(np.asarray([arm_to_features[from_arm]]),
+                                                np.asarray([arm_to_features[to_arm]]),
+                                                metric=metric)[0][0]
+
+                # Cosine similarity can be nan when a feature vector is all-zeros
+                if np.isnan(arm_to_distance[to_arm]):
+                    arm_to_distance[to_arm] = self_distance
+
+        return arm_to_distance
+
+    @staticmethod
+    def _get_pairwise_distances(arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
+                                self_distance: int = 999999) -> Dict[Arm, Dict[Arm, Num]]:
+        """
+        Calculates the distances between each pair of arms.
+
+        Distances calculated based on the feature vectors given in arm_to_features using the given distance metric.
+        The distance of the arm to itself is set as the given self_distance.
+
+        Parameters
+        ---------
+        arm_to_features: Dict[Arm, list[Num]]
+            Features for each arm used to calculate distances.
+        metric: str
+            Distance metric to use.
+            Default value is 'cosine'.
+        self_distance: int
+            The value to set as the distance to itself.
+            Default value is 999999.
+
+        Returns
+        -------
+        Returns the distance between two arms u and v as distance_from_to[u][v].
+        """
+
+        # For every arm, calculate its distance to all arms including itself
+        distance_from_to = {}
+        for from_arm in arm_to_features.keys():
+            distance_from_to[from_arm] = BaseMAB._get_arm_distances(from_arm, arm_to_features, metric, self_distance)
+        return distance_from_to
+
+    @staticmethod
+    def _get_distance_threshold(distance_from_to: Dict[Arm, Dict[Arm, Num]], quantile: Num,
+                                self_distance: int = 999999) -> Num:
+        """
+        Calculates a threshold for doing warm-start conditioned on minimum pairwise distances of arms.
+
+        Parameters
+        ---------
+        distance_from_to: Dict[Arm, Dict[Arm, Num]]
+            Dictionary of pairwise distances from arms to arms.
+        quantile: Num
+            Quantile used to compute threshold.
+        self_distance: int
+            The distance of arm to itself.
+            Default value is 999999.
+
+        Returns
+        -------
+        A threshold on pairwise distance for doing warm-start.
+        """
+
+        closest_distances = []
+        for arm, arm_to_distance in distance_from_to.items():
+
+            # Get distances from one arm to others
+            distances = [distance for distance in arm_to_distance.values()]
+
+            # Get the distance to closest arm (if not equal to self_distance)
+            if min(distances) != self_distance:
+                closest_distances.append(min(distances))
+
+        # Calculate threshold distance based on quantile
+        threshold = np.quantile(closest_distances, q=quantile)
+
+        return threshold
+
+    def _get_cold_arm_to_warm_arm(self, arm_to_features, distance_quantile):
+
+        # Calculate from-to distances between all pairs of arms based on features
+        # and then find minimum distance (threshold) required to warm start an untrained arm
+        distance_from_to = self._get_pairwise_distances(arm_to_features)
+        distance_threshold = self._get_distance_threshold(distance_from_to, quantile=distance_quantile)
+
+        # Cold arms
+        cold_arms = [arm for arm in self.arms if arm not in self.trained_arms]
+
+        cold_arm_to_warm_arm = {}
+        for cold_arm in cold_arms:
+
+            # Collect distance from cold arm to warm arms
+            arm_to_distance = {}
+            for arm in self.trained_arms:
+                if arm in self.arms:
+                    arm_to_distance[arm] = distance_from_to[cold_arm][arm]
+            if len(arm_to_distance) == 0:
+                continue
+
+            # Select the closest warm arm
+            closest_arm = argmin(arm_to_distance)
+            closest_distance = distance_from_to[cold_arm][closest_arm]
+
+            # Warm start if closest distance lower than minimum required distance
+            if closest_distance <= distance_threshold:
+                cold_arm_to_warm_arm[cold_arm] = closest_arm
+
+        return cold_arm_to_warm_arm

@@ -449,8 +449,7 @@ class ThompsonTest(BaseTest):
         arm, mab = self.predict(arms=[0, 1],
                                 decisions=[1, 0, 1, 1, 0],
                                 rewards=[10, 4, 3, 70, 6],
-                                learning_policy=
-                                LearningPolicy.ThompsonSampling(bin1),
+                                learning_policy=LearningPolicy.ThompsonSampling(bin1),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -479,3 +478,39 @@ class ThompsonTest(BaseTest):
         self.assertTrue(mab._imp.arm_to_fail_count[2] == 1)
         self.assertTrue(mab._imp.arm_to_success_count[2] == 1)
         self.assertIs(mab._imp.binarizer, bin2)
+
+    def test_remove_arm(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.ThompsonSampling(),
+                                 seed=123456,
+                                 num_run=4,
+                                 is_predict=True)
+        mab.remove_arm(3)
+        self.assertTrue(3 not in mab.arms)
+        self.assertTrue(3 not in mab._imp.arms)
+        self.assertTrue(3 not in mab._imp.arm_to_expectation)
+        self.assertTrue(3 not in mab._imp.arm_to_fail_count)
+        self.assertTrue(3 not in mab._imp.arm_to_success_count)
+
+    def test_warm_start(self):
+
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 2, 2, 2, 1, 1, 1],
+                              rewards=[1, 0, 0, 0, 0, 0, 1, 1, 1],
+                              learning_policy=LearningPolicy.ThompsonSampling(),
+                              seed=7,
+                              num_run=1,
+                              is_predict=False)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 1})
+        self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 1})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 3})
+        self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 5})

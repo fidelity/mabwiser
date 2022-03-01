@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
+from copy import deepcopy
 from typing import Dict, Callable, List, NoReturn, Optional, Union
 
 import numpy as np
@@ -59,6 +60,13 @@ class _Softmax(BaseMAB):
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()
 
+    def _copy_arms(self, cold_arm_to_warm_arm):
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_sum[cold_arm] = deepcopy(self.arm_to_sum[warm_arm])
+            self.arm_to_count[cold_arm] = deepcopy(self.arm_to_count[warm_arm])
+            self.arm_to_mean[cold_arm] = deepcopy(self.arm_to_mean[warm_arm])
+        self._expectation_operation()
+
     def _expectation_operation(self):
 
         # Scaling range
@@ -93,6 +101,15 @@ class _Softmax(BaseMAB):
         self.arm_to_count[arm] = 0
         self.arm_to_mean[arm] = 0
         self.arm_to_exponent[arm] = 0
+
+        # Recalculate the expected values
+        self._expectation_operation()
+
+    def _drop_existing_arm(self, arm: Arm):
+        self.arm_to_sum.pop(arm)
+        self.arm_to_count.pop(arm)
+        self.arm_to_mean.pop(arm)
+        self.arm_to_exponent.pop(arm)
 
         # Recalculate the expected values
         self._expectation_operation()
