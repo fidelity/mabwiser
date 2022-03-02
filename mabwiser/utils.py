@@ -77,7 +77,7 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         self.rng = None
 
     @abc.abstractmethod
-    def rand(self, size: int = None):
+    def rand(self):
         """ Return a single float in the range [0, 1)
             Returns
             -------
@@ -225,8 +225,8 @@ class _NumpyRNG(_BaseRNG):
         super().__init__(seed)
         self.rng = np.random.default_rng(self.seed)
 
-    def rand(self, size: int = None):
-        return self.rng.random(size)
+    def rand(self):
+        return self.rng.random()
 
     def randint(self, low: int, high: int = None, size: int = None):
         return self.rng.integers(low=low, high=high, size=size)

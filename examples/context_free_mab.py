@@ -66,8 +66,8 @@ greedy.warm_start(arm_to_features, distance_quantile=0.5)
 # Randomized Popularity Learning Policy
 #################################################
 
-# Randomized Popularity learning policy that makes
-# random selection out of the k (most popular) arms with highest expected rewards
+# Randomized Popularity learning policy that makes a random selection
+# out of the k (most popular) arms with highest expected rewards
 popularity = MAB(arms=options,
                  learning_policy=LearningPolicy.Popularity(k=2),
                  seed=123456)

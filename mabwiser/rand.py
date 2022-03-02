@@ -21,10 +21,12 @@ class _Random(BaseMAB):
         pass
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
+
         # Return the first arm with maximum expectation
         return argmax(self.predict_expectations())
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+
         # Return a random expectation (between 0 and 1) for each arm
         return dict((arm, self.rng.rand()) for arm in self.arms).copy()
 
