@@ -24,8 +24,8 @@ class ExampleTest(BaseTest):
         mab = MAB(list_of_arms, LearningPolicy.Popularity())
         mab.fit(decisions, rewards)
         mab.predict()
-        self.assertEqual("Arm2", mab.predict())
-        self.assertDictEqual({'Arm1': 0.906050936603124, 'Arm2': 0.4569695548539072},
+        self.assertEqual("Arm1", mab.predict())
+        self.assertDictEqual({'Arm1': 0.9674354610872193, 'Arm2': 0.032564538912780716},
                              mab.predict_expectations())
 
     def test_random(self):

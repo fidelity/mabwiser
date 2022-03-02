@@ -17,7 +17,7 @@ class PopularityTest(BaseTest):
                                 num_run=5,
                                 is_predict=True)
 
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 1])
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
@@ -27,8 +27,8 @@ class PopularityTest(BaseTest):
                                 num_run=1,
                                 is_predict=False)
 
-        self.assertAlmostEqual(exp[1], 0.6365137498589308)
-        self.assertAlmostEqual(exp[2], 0.3848116648885752)
+        self.assertAlmostEqual(exp[1], 0.9948500327379373)
+        self.assertAlmostEqual(exp[2], 0.005149967262062828)
 
     def test_2arm_diff_prob(self):
         arm, mab = self.predict(arms=[1, 2],
@@ -38,43 +38,43 @@ class PopularityTest(BaseTest):
                                 seed=123456,
                                 num_run=5,
                                 is_predict=True)
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 1])
 
     def test_2arm_diff_prob_2(self):
         arm, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
                                 rewards=[1, 1, 1, 0, 0, 1],
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=5,
                                 is_predict=True)
-        self.assertEqual(arm, [1, 1, 1, 1, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 1])
 
     def test_3arm_equal_prob(self):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 rewards=[1, 1, 1, 1, 1, 1, 1, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=5,
                                 is_predict=True)
-        self.assertEqual(arm, [1, 1, 1, 1, 1])
+        self.assertEqual(arm, [3, 2, 3, 3, 3])
 
     def test_3arm_diff_prob(self):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 rewards=[1, 0, 0, 1, 1, 1, 1, 0, 1],
-                                learning_policy=LearningPolicy.Popularity(k=2),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=5,
                                 is_predict=True)
-        self.assertEqual(arm, [2, 3, 2, 3, 2])
+        self.assertEqual(arm, [3, 2, 3, 3, 3])
 
     def test_with_context(self):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=2),
+                                learning_policy=LearningPolicy.Popularity(),
                                 neighborhood_policy=NeighborhoodPolicy.KNearest(),
                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -84,9 +84,9 @@ class PopularityTest(BaseTest):
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
-        self.assertListEqual(arm[0], [1, 2])
+        self.assertListEqual(arm[0], [1, 1])
         self.assertListEqual(arm[1], [1, 1])
-        self.assertListEqual(arm[2], [1, 1])
+        self.assertListEqual(arm[2], [3, 1])
 
     def test_zero_reward(self):
         arm, mab = self.predict(arms=[1, 2],
@@ -96,7 +96,7 @@ class PopularityTest(BaseTest):
                                 seed=123456,
                                 num_run=5,
                                 is_predict=True)
-        self.assertEqual(arm, [1, 2, 1, 2, 1])
+        self.assertEqual(arm, [1, 1, 1, 2, 1])
 
     def test_epsilon_has_no_impact(self):
 
@@ -110,7 +110,7 @@ class PopularityTest(BaseTest):
         mab.fit(np.array(decisions), np.array(rewards))
 
         # Original result
-        self.assertDictEqual({'Arm1': 0.12696983303810094, 'Arm2': 0.966717838482003},
+        self.assertDictEqual({'Arm1': 0.03702697841958926, 'Arm2': 0.9629730215804108},
                              mab.predict_expectations())
 
         # Hack into epsilon from underlying greedy bandit
@@ -121,54 +121,54 @@ class PopularityTest(BaseTest):
 
         # Assert epsilon change has no impact
         # self.assertEqual("Arm1", mab.predict())
-        self.assertDictEqual({'Arm1': 0.12696983303810094, 'Arm2': 0.966717838482003},
+        self.assertDictEqual({'Arm1': 0.03702697841958926, 'Arm2': 0.9629730215804108},
                              mab.predict_expectations())
 
     def test_2arm_partial_fit(self):
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
                                 rewards=[1, 1, 1, 0, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
         # Initial probabilities
-        self.assertAlmostEqual(exp[1], 0.6365137498589308)
-        self.assertAlmostEqual(exp[2], 0)
+        self.assertAlmostEqual(exp[1], 0.9991137956839969)
+        self.assertAlmostEqual(exp[2], 0.0008862043160030626)
 
         # Partial fit
         mab.partial_fit([1, 1, 1, 2, 2, 2], [0, 0, 0, 1, 1, 1])
         exp = mab.predict_expectations()
 
-        self.assertAlmostEqual(exp[1], 0)
-        self.assertAlmostEqual(exp[2], 0.3848116648885752)
+        self.assertAlmostEqual(exp[1], 0.9162612769403672)
+        self.assertAlmostEqual(exp[2], 0.08373872305963273)
 
     def test_fit_twice(self):
 
         exp, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 2, 2],
                                 rewards=[1, 1, 1, 0, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
 
         # Initial probabilities
-        self.assertAlmostEqual(exp[1], 0.6365137498589308)
-        self.assertAlmostEqual(exp[2], 0)
+        self.assertAlmostEqual(exp[1], 0.9991137956839969)
+        self.assertAlmostEqual(exp[2], 0.0008862043160030626)
 
         # Fit the other way around
         mab.fit([2, 2, 2, 1, 1, 1], [1, 1, 1, 0, 1, 1])
         exp = mab.predict_expectations()
-        self.assertAlmostEqual(exp[1], 0)
-        self.assertAlmostEqual(exp[2], 0.3848116648885752)
+        self.assertAlmostEqual(exp[1], 0.9262956187781518)
+        self.assertAlmostEqual(exp[2], 0.07370438122184816)
 
     def test_unused_arm(self):
 
         exp, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2],
                                 rewards=[1, 1, 1, 0, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=2),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
@@ -206,7 +206,7 @@ class PopularityTest(BaseTest):
                                  seed=123456,
                                  num_run=5,
                                  is_predict=True)
-        self.assertEqual(arms, ['one', 'two', 'one', 'two', 'one'])
+        self.assertEqual(arms, ['one', 'one', 'one', 'two', 'one'])
 
     def test_different_seeds(self):
 
@@ -224,7 +224,7 @@ class PopularityTest(BaseTest):
                                 decisions=["one", "one", "one", "two", "two", "two"],
                                 rewards=[1, 1, 1, 0, 1, 1],
                                 learning_policy=LearningPolicy.Popularity(),
-                                seed=8879719,
+                                seed=12234,
                                 num_run=1,
                                 is_predict=True)
         self.assertEqual('two', arm)
@@ -234,12 +234,12 @@ class PopularityTest(BaseTest):
         exp, mab = self.predict(arms=["one", "two"],
                                 decisions=["one", "one", "one", "two", "two", "two"],
                                 rewards=np.array([1, 1, 1, 0, 1, 1]),
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
-        self.assertAlmostEqual(exp["one"], 0.6365137498589308)
-        self.assertAlmostEqual(exp["two"], 0)
+        self.assertAlmostEqual(exp["one"], 0.9991137956839969)
+        self.assertAlmostEqual(exp["two"], 0.0008862043160030626)
 
     def test_data_frame(self):
 
@@ -249,22 +249,23 @@ class PopularityTest(BaseTest):
         exp, mab = self.predict(arms=["one", "two"],
                                 decisions=df["decisions"],
                                 rewards=df["rewards"],
-                                learning_policy=LearningPolicy.Popularity(k=1),
+                                learning_policy=LearningPolicy.Popularity(),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
-        self.assertAlmostEqual(exp["one"], 0.6365137498589308)
-        self.assertAlmostEqual(exp["two"], 0)
+        self.assertAlmostEqual(exp["one"], 0.9991137956839969)
+        self.assertAlmostEqual(exp["two"], 0.0008862043160030626)
 
     def test_negative_rewards(self):
-        arm, mab = self.predict(arms=[1, 2],
-                                decisions=[1, 1, 1, 2, 2, 2],
-                                rewards=[-1, -1, 1, 1, 1, 1],
-                                learning_policy=LearningPolicy.Popularity(k=1),
-                                seed=123456,
-                                num_run=5,
-                                is_predict=True)
-        self.assertEqual(arm, [2, 2, 2, 2, 2])
+        with self.assertRaises(ValueError):
+            arm, mab = self.predict(arms=[1, 2],
+                                    decisions=[1, 1, 1, 2, 2, 2],
+                                    rewards=[-1, -1, 1, 1, 1, 1],
+                                    learning_policy=LearningPolicy.Popularity(),
+                                    seed=123456,
+                                    num_run=5,
+                                    is_predict=True)
+            self.assertEqual(arm, [2, 2, 2, 2, 2])
 
     def test_remove_arm(self):
 
@@ -292,8 +293,8 @@ class PopularityTest(BaseTest):
 
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
-        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.5, 2: 0.0, 3: 0})
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 0.0})
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
-        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.5, 2: 0.0, 3: 0.5})
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})

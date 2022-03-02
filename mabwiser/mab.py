@@ -193,34 +193,31 @@ class LearningPolicy(NamedTuple):
     class Popularity(NamedTuple):
         """Randomized Popularity Learning Policy.
 
-        Returns a random arm from the k most popular arms with the highest expected reward.
-        The probability of selecting any one of popular arms is the same.
+        Returns a randomized popular arm for each prediction.
+        The probability of selection for each arm is weighted by their mean reward.
+        It assumes that the rewards are non-negative.
 
-        Attributes
-        ----------
-        k: int
-            The number popular arms to consider.
-            Integer. Must be larger than 0.
-            If None, all arms are considered and policy is identical to random.
-            Default value is None.
+        The probability of selection is calculated as:
+
+        .. math::
+            P(arm) = \\frac{ \\mu_i } { \\Sigma{ \\mu }  }
+
+        where :math:`\\mu_i` is the mean reward for that arm.
 
         Example
         -------
             >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2', 'Arm3']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1', 'Arm3']
-            >>> rewards = [20, 17, 25, 9, 1]
-            >>> mab = MAB(list_of_arms, LearningPolicy.Popularity(k=2))
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> mab = MAB(list_of_arms, LearningPolicy.Popularity())
             >>> mab.fit(decisions, rewards)
             >>> mab.predict()
-            'Arm2'
+            'Arm1'
         """
-        k: int = None
 
         def _validate(self):
-            if self.k is not None:
-                check_true(isinstance(self.k, int), TypeError("k must be an integer."))
-                check_true(self.k > 0, TypeError("k must be positive."))
+            pass
 
     class Random(NamedTuple):
         """Random Learning Policy.
@@ -806,7 +803,7 @@ class MAB:
         if isinstance(learning_policy, LearningPolicy.EpsilonGreedy):
             lp = _EpsilonGreedy(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.epsilon)
         elif isinstance(learning_policy, LearningPolicy.Popularity):
-            lp = _Popularity(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.k)
+            lp = _Popularity(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Random):
             lp = _Random(self._rng, self.arms, self.n_jobs, self.backend)
         elif isinstance(learning_policy, LearningPolicy.Softmax):
@@ -877,7 +874,7 @@ class MAB:
 
         if isinstance(lp, _EpsilonGreedy):
             if issubclass(type(lp), _Popularity):
-                return LearningPolicy.Popularity(lp.k)
+                return LearningPolicy.Popularity()
             else:
                 return LearningPolicy.EpsilonGreedy(lp.epsilon)
         elif isinstance(lp, _Linear):
