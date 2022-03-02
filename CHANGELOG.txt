@@ -3,6 +3,13 @@ MABWiser CHANGELOG
 =====================
 
 -------------------------------------------------------------------------------
+March, 2, 2022 2.2.0
+-------------------------------------------------------------------------------
+major:
+- Modified `predict_expectations` of Epsilon Greedy, Random, and Softmax learning policies, such that `predict` can simply use argmax of `predict_expectations` (as in Thompson Sampling and UCB1).
+- Modified Popularity learning policy to randomly predict one of k most popular arms.
+
+-------------------------------------------------------------------------------
 February, 25, 2022 2.1.0
 -------------------------------------------------------------------------------
 major:

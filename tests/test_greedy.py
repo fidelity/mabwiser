@@ -57,7 +57,7 @@ class GreedyTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 3, 3, 1, 3])
+        self.assertListEqual(arms, [3, 3, 3, 2, 3])
 
     def test_seed_epsilon50(self):
 
@@ -69,7 +69,7 @@ class GreedyTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 2, 3, 3, 1])
+        self.assertListEqual(arms, [3, 2, 3, 3, 3])
 
         # change seed and assert a different result
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -80,7 +80,7 @@ class GreedyTest(BaseTest):
                                  num_run=5,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [3, 3, 1, 2, 3])
+        self.assertListEqual(arms, [3, 1, 3, 3, 2])
 
     def test_predict_expectation(self):
 
@@ -104,7 +104,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
 
     def test_epsilon25_series(self):
 
@@ -116,7 +116,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
 
     def test_epsilon25_df(self):
 
@@ -131,7 +131,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
 
     def test_epsilon25_df_list(self):
 
@@ -146,7 +146,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
 
     def test_unused_arm(self):
 
@@ -159,7 +159,7 @@ class GreedyTest(BaseTest):
                                  is_predict=True)
 
         # not used arm (4) can still be picked up thanks to randomness
-        self.assertEqual(arms, [3, 3, 3, 3, 3])
+        self.assertEqual(arms, [3, 3, 3, 1, 4])
 
     def test_fit_twice(self):
 
@@ -175,7 +175,8 @@ class GreedyTest(BaseTest):
 
         # Second fit
         mab.fit([1, 1, 2, 2, 3, 3], [2, 4, 4, 6, 6, 8])
-        self.assertDictEqual(mab.predict_expectations(), {1: 3.0, 2: 5.0, 3: 7.0})
+        self.assertDictEqual(mab.predict_expectations(), {1: 0.0474454214269846, 2: 0.9552527396157818,
+                                                          3: 0.906050936603124})
 
     def test_mismatch_context(self):
 
@@ -212,7 +213,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [2, 1, 1, 2])
+        self.assertEqual(arms, [2, 2, 1, 1])
 
     def test_greedy_t3(self):
 
@@ -236,7 +237,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, [4, 4, 2, 4])
+        self.assertEqual(arms, [4, 4, 4, 2])
 
     def test_greedy_t5(self):
 
@@ -260,7 +261,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['three', 'two', 'two', 'two'])
+        self.assertEqual(arms, ['three', 'one', 'three', 'two'])
 
     def test_greedy_t7(self):
 
@@ -284,7 +285,7 @@ class GreedyTest(BaseTest):
                                  num_run=4,
                                  is_predict=True)
 
-        self.assertEqual(arms, ['c', 'a', 'c', 'c'])
+        self.assertEqual(arms, ['c', 'b', 'c', 'c'])
 
     def test_greedy_t9(self):
 
@@ -317,7 +318,7 @@ class GreedyTest(BaseTest):
                                  seed=7,
                                  num_run=4,
                                  is_predict=True)
-        self.assertEqual(arms, [b, b, b, a])
+        self.assertEqual(arms, [b, b, b, b])
 
     def test_partial_fit(self):
 
@@ -333,7 +334,8 @@ class GreedyTest(BaseTest):
 
         # Second fit
         mab.partial_fit([1, 1, 2, 2, 3, 3], [2, 4, 4, 6, 6, 8])
-        self.assertDictEqual(mab.predict_expectations(), {1: 13.2, 2: 3.2, 3: 5.2})
+        self.assertDictEqual(mab.predict_expectations(), {1: 0.0474454214269846, 2: 0.9552527396157818,
+                                                          3: 0.906050936603124})
 
     def test_add_arm(self):
 

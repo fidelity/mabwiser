@@ -25,7 +25,7 @@ class ExampleTest(BaseTest):
         mab.fit(decisions, rewards)
         mab.predict()
         self.assertEqual("Arm2", mab.predict())
-        self.assertDictEqual({'Arm1': 0.38016528925619836, 'Arm2': 0.6198347107438016},
+        self.assertDictEqual({'Arm1': 0.906050936603124, 'Arm2': 0.4569695548539072},
                              mab.predict_expectations())
 
     def test_random(self):

@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, Arm, Num, _BaseRNG
 
 
 class _Random(BaseMAB):
@@ -21,14 +21,12 @@ class _Random(BaseMAB):
         pass
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
-
-        # Return a random arm
-        return self.arms[self.rng.randint(0, len(self.arms))]
+        # Return the first arm with maximum expectation
+        return argmax(self.predict_expectations())
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
-
-        # Return a copy of expectations dictionary from arms (key) to expectations (values)
-        return self.arm_to_expectation.copy()
+        # Return a random expectation (between 0 and 1) for each arm
+        return dict((arm, self.rng.rand()) for arm in self.arms).copy()
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
         pass

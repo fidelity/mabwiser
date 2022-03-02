@@ -1063,7 +1063,7 @@ class MABTest(BaseTest):
                                  is_predict=True)
 
         self.assertEqual(len(arms), 4)
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
         self.assertIs(mab._rng, mab._imp.rng)
 
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -1075,7 +1075,7 @@ class MABTest(BaseTest):
                                  is_predict=True)
 
         self.assertEqual(len(arms), 4)
-        self.assertEqual(arms, [3, 3, 3, 3])
+        self.assertEqual(arms, [3, 1, 1, 3])
         self.assertIs(mab._rng, mab._imp.rng)
 
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -1087,7 +1087,7 @@ class MABTest(BaseTest):
                                  is_predict=True)
 
         self.assertEqual(len(arms), 4)
-        self.assertEqual(arms, [3, 3, 1, 3])
+        self.assertEqual(arms, [3, 3, 1, 2])
         self.assertIs(mab._rng, mab._imp.rng)
 
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -1099,7 +1099,7 @@ class MABTest(BaseTest):
                                  is_predict=True)
 
         self.assertEqual(len(arms), 4)
-        self.assertEqual(arms, [3, 3, 3, 1])
+        self.assertEqual(arms, [3, 3, 3, 2])
         self.assertIs(mab._rng, mab._imp.rng)
 
         arms, mab = self.predict(arms=[1, 2, 3],
@@ -1111,7 +1111,7 @@ class MABTest(BaseTest):
                                  is_predict=True)
 
         self.assertEqual(len(arms), 4)
-        self.assertEqual(arms, [3, 3, 3, 3])
+        self.assertEqual(arms, [3, 1, 1, 3])
         self.assertIs(mab._rng, mab._imp.rng)
 
     def test_set_rng(self):

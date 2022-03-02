@@ -15,7 +15,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 3)
+        self.assertEqual(arm, 2)
 
     def test_random_expectations(self):
         exp, mab = self.predict(arms=[1, 2, 3],
@@ -25,7 +25,7 @@ class RandomTest(BaseTest):
                                 seed=7,
                                 num_run=1,
                                 is_predict=False)
-        self.assertDictEqual(exp, {1: 0, 2: 0, 3: 0})
+        self.assertDictEqual(exp, {1: 0.625095466604667, 2: 0.8972138009695755, 3: 0.7756856902451935})
 
     def test_random_seed(self):
         arm, mab = self.predict(arms=[1, 2, 3],
@@ -56,7 +56,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 3)
+        self.assertEqual(arm, 1)
 
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
@@ -66,7 +66,7 @@ class RandomTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, 1)
+        self.assertEqual(arm, 3)
 
     def test_add_arm(self):
 

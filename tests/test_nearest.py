@@ -169,7 +169,7 @@ class NearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 1])
+        self.assertListEqual(arms, [1, 3])
 
     def test_max_k(self):
 

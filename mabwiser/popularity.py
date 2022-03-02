@@ -1,53 +1,30 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import List, Optional, NoReturn
+from typing import Dict, List, Optional
+import heapq
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.utils import Arm, reset, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG
 
 
 class _Popularity(_EpsilonGreedy):
 
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
+    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
+                 k: Optional[int] = None):
 
         # Init the parent greedy policy with zero epsilon
         super().__init__(rng, arms, n_jobs, backend, epsilon=0.0)
+        self.k = k
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
 
-        # Fit as usual greedy
-        super().fit(decisions, rewards, contexts)
-
-        # Make sure expectations sum up to 1 like probabilities
-        self._normalize_expectations()
-
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
-
-        # Fit as usual greedy
-        super().partial_fit(decisions, rewards, contexts)
-
-        # Make sure expectations sum up to 1 like probabilities
-        self._normalize_expectations()
-
-    def predict(self, contexts: np.ndarray = None) -> Arm:
-
-        # Select an arm randomized by expectation probability
-        # TODO: this would not work for negative rewards!
-        return self.rng.choice(self.arms, p=list(self.arm_to_expectation.values()))
-
-    def _normalize_expectations(self):
-        # TODO: this would not work for negative rewards!
-        total = sum(self.arm_to_expectation.values())
-        if total == 0:
-            # set equal probabilities
-            reset(self.arm_to_expectation, 1.0 / len(self.arms))
+        # Find the k (most popular) arms with the highest arm to expectations
+        if self.k is not None:
+            popular_arms = heapq.nlargest(self.k, self.arm_to_expectation, key=self.arm_to_expectation.__getitem__)
         else:
-            for k, v in self.arm_to_expectation.items():
-                self.arm_to_expectation[k] = v / total
+            popular_arms = self.arms
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
-        self.arm_to_sum.pop(arm)
-        self.arm_to_count.pop(arm)
-        self._normalize_expectations()
+        # Return a random expectation (between 0 and 1) for each of the popular arms and 0 for other arms
+        return dict((arm, self.rng.rand() if arm in popular_arms else 0) for arm in self.arms).copy()
