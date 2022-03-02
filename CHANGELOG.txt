@@ -6,7 +6,7 @@ MABWiser CHANGELOG
 March, 2, 2022 2.2.0
 -------------------------------------------------------------------------------
 major:
-- Modified `predict_expectations` of Epsilon Greedy, Popularity, Random, and Softmax learning policies, such that `predict` is based purely on `predict_expectations` (as in Thompson Sampling and UCB1).
+- Modified `predict_expectations`, such that `predict` can use `predict_expectations` directly in all non-contextual learning policies
 
 -------------------------------------------------------------------------------
 February, 25, 2022 2.1.0
