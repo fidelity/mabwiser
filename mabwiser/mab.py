@@ -194,7 +194,7 @@ class LearningPolicy(NamedTuple):
         """LinGreedy Learning Policy.
 
         This policy trains a ridge regression for each arm.
-        Then, given a given context, it predicts a regression value. 
+        Then, given a given context, it predicts a regression value.
         This policy selects the arm with the highest regression value with probability 1 - :math:`\\epsilon`,
         and with probability :math:`\\epsilon` it selects an arm at random for exploration.
 
@@ -1249,6 +1249,11 @@ class MAB:
 
         Validates arguments and raises exceptions in case there are violations.
 
+        The warm-start procedure depends on the learning and neighborhood policy. Note that for certain neighborhood
+        policies (e.g., LSHNearest, KNearest, Radius) warm start can only be performed after the nearest neighbors
+        have been determined in the "predict" step. Accordingly, warm start has to be executed for each context being
+        predicted which is computationally expensive.
+
         Parameters
         ----------
         arm_to_features : Dict[Arm, List[Num]]
@@ -1339,6 +1344,7 @@ class MAB:
         # Type check for contexts --don't use "if contexts" since it's n-dim array
         if contexts is not None:
             MAB._validate_context_type(contexts)
+
             # Sync contexts data with contextual policy
             check_true(self.is_contextual,
                        TypeError("Fitting contexts data requires context policy or parametric learning policy."))

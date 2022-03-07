@@ -39,6 +39,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - ``partial_fit`` method for _online learning
         - ``predict_expectations`` method to retrieve the expectation of each arm
         - ``predict`` method for testing to retrieve the best arm based on the policy
+        - ``remove_arm`` method for removing an arm
+        - ``warm_start`` method for warm starting untrained (cold) arms
 
         To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
 
@@ -290,7 +292,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
         return arm_to_distance
 
-    def _get_pairwise_distances(self, arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
+    @staticmethod
+    def _get_pairwise_distances(arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
                                 self_distance: int = 999999) -> Dict[Arm, Dict[Arm, Num]]:
         """
         Calculates the distances between each pair of arms.
@@ -317,7 +320,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         # For every arm, calculate its distance to all arms including itself
         distance_from_to = {}
         for from_arm in arm_to_features.keys():
-            distance_from_to[from_arm] = self._get_arm_distances(from_arm, arm_to_features, metric, self_distance)
+            distance_from_to[from_arm] = BaseMAB._get_arm_distances(from_arm, arm_to_features, metric, self_distance)
         return distance_from_to
 
     @staticmethod
