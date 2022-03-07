@@ -12,13 +12,14 @@ from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
 class _RidgeRegression:
 
-    def __init__(self, rng: _BaseRNG, l2_lambda: Num = 1.0, alpha: Num = 1.0,
+    def __init__(self, rng: _BaseRNG, l2_lambda: Num = 1.0, alpha: Num = 1.0, epsilon: Num = 0,
                  scaler: Optional[Callable] = None):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
         self.rng = rng                      # random number generator
         self.l2_lambda = l2_lambda          # regularization parameter
-        self.alpha = alpha                  # exploration parameter
+        self.alpha = alpha
+        self.epsilon = epsilon                  # exploration parameter
         self.scaler = scaler                # standard scaler object
 
         self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
@@ -106,10 +107,11 @@ class _Linear(BaseMAB):
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 l2_lambda: Num, alpha: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
+                 l2_lambda: Num, alpha: Num, epsilon: Num, regression: str, arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
         super().__init__(rng, arms, n_jobs, backend)
         self.l2_lambda = l2_lambda
         self.alpha = alpha
+        self.epsilon = epsilon
         self.regression = regression
 
         # Create ridge regression model for each arm
@@ -119,7 +121,7 @@ class _Linear(BaseMAB):
             arm_to_scaler = dict((arm, None) for arm in arms)
 
         self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, l2_lambda,
-                                                                       alpha, arm_to_scaler[arm])) for arm in arms)
+                                                                       alpha, epsilon, arm_to_scaler[arm])) for arm in arms)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -150,7 +152,7 @@ class _Linear(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
 
         # Add to untrained_arms arms
-        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.l2_lambda, self.alpha, scaler)
+        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.l2_lambda, self.alpha, self.epsilon, scaler)
 
         # If fit happened, initialize the new arm to defaults
         is_fitted = self.num_features is not None
@@ -190,12 +192,18 @@ class _Linear(BaseMAB):
             # Each row needs a separately seeded rng for reproducibility in parallel
             rng = create_rng(seed=seeds[index])
 
-            for arm in arms:
-                # Copy the row rng to the deep copied model in arm_to_model
-                arm_to_model[arm].rng = rng
+            # implement logic for lingreedy when epsilon > 0
+            if rng.rand() < self.epsilon:
+                for arm in arms:
+                    arm_to_expectation[arm] = rng.rand()
 
-                # Get the expectation of each arm from its trained model
-                arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+            else:
+                for arm in arms:
+                # Copy the row rng to the deep copied model in arm_to_model
+                    arm_to_model[arm].rng = rng
+
+                    # Get the expectation of each arm from its trained model
+                    arm_to_expectation[arm] = arm_to_model[arm].predict(row)
 
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)

@@ -190,6 +190,56 @@ class LearningPolicy(NamedTuple):
             if self.arm_to_scaler is not None:
                 check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
 
+    class LinGreedy(NamedTuple):
+        """LinGreedy Learning Policy.
+
+        This policy trains a ridge regression for each arm.
+        Then, given a given context, it predicts a regression value. 
+        This policy selects the arm with the highest regression value with probability 1 - :math:`\\epsilon`,
+        and with probability :math:`\\epsilon` it selects an arm at random for exploration.
+
+        Attributes
+        ----------
+        epsilon: Num
+            The probability of selecting a random arm for exploration.
+            Integer or float. Must be between 0 and 1.
+            Default value is 0.
+        l2_lambda: Num
+            The regularization strength.
+            Integer or float. Cannot be negative.
+            Default value is 1.0.
+        arm_to_scaler: Dict[Arm, Callable]
+            Standardize context features by arm.
+            Dictionary mapping each arm to a scaler object. It is assumed
+            that the scaler objects are already fit and will only be used
+            to transform context features.
+            Default value is None.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+            >>> mab = MAB(list_of_arms, LearningPolicy.LinGreedy(epsilon=0.5))
+            >>> mab.fit(decisions, rewards, contexts)
+            >>> mab.predict([[3, 2, 0, 1]])
+            'Arm2'
+        """
+        epsilon: Num = 0
+        l2_lambda: Num = 1.0
+        arm_to_scaler: Dict[Arm, Callable] = None
+
+        def _validate(self):
+            check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
+            check_true(0 <= self.epsilon <= 1, TypeError("Epsilon must be between zero and one."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
+            check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
+            if self.arm_to_scaler is not None:
+                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+
+
     class Popularity(NamedTuple):
         """Randomized Popularity Learning Policy.
 
@@ -698,7 +748,8 @@ class MAB:
                                         LearningPolicy.ThompsonSampling,
                                         LearningPolicy.UCB1,
                                         LearningPolicy.LinTS,
-                                        LearningPolicy.LinUCB],  # The learning policy
+                                        LearningPolicy.LinUCB,
+                                        LearningPolicy.LinGreedy],  # The learning policy
                  neighborhood_policy: Union[None,
                                             NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
@@ -814,10 +865,13 @@ class MAB:
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinTS):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
-                         learning_policy.alpha, "ts", learning_policy.arm_to_scaler)
+                         learning_policy.alpha, 0, "ts", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
-                         learning_policy.alpha, "ucb", learning_policy.arm_to_scaler)
+                         learning_policy.alpha, 0, "ucb", learning_policy.arm_to_scaler)
+        elif isinstance(learning_policy, LearningPolicy.LinGreedy):
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
+                         0, learning_policy.epsilon, "ridge", learning_policy.arm_to_scaler)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
 
@@ -848,7 +902,7 @@ class MAB:
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
-            self.is_contextual = isinstance(learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB))
+            self.is_contextual = isinstance(learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB, LearningPolicy.LinGreedy))
             self._imp = lp
 
     @property
@@ -883,8 +937,10 @@ class MAB:
                 arm_to_scaler[arm] = lp.arm_to_model[arm].scaler
             if lp.regression == 'ts':
                 return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, arm_to_scaler)
-            else:
+            elif lp.regression == 'ucb':
                 return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, arm_to_scaler)
+            else:
+                return LearningPolicy.LinGreedy(lp.alpha, lp.l2_lambda, arm_to_scaler)
         elif isinstance(lp, _Random):
             return LearningPolicy.Random()
         elif isinstance(lp, _Softmax):
@@ -1237,7 +1293,7 @@ class MAB:
         check_true(isinstance(learning_policy,
                               (LearningPolicy.EpsilonGreedy, LearningPolicy.Popularity, LearningPolicy.Random,
                                LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
-                               LearningPolicy.LinTS, LearningPolicy.LinUCB)),
+                               LearningPolicy.LinTS, LearningPolicy.LinUCB, LearningPolicy.LinGreedy)),
                    TypeError("Learning Policy type mismatch."))
 
         # Learning policy value
@@ -1283,7 +1339,6 @@ class MAB:
         # Type check for contexts --don't use "if contexts" since it's n-dim array
         if contexts is not None:
             MAB._validate_context_type(contexts)
-
             # Sync contexts data with contextual policy
             check_true(self.is_contextual,
                        TypeError("Fitting contexts data requires context policy or parametric learning policy."))
