@@ -274,6 +274,8 @@ Every test starts with the ``test_`` prefix followed by some descriptive name.
 To strengthen your test suite, consider other unittests with different number of arms,
 decisions and rewards to assert that your bandit behaves correctly.
 
+Add corresponding unittests in ``test_invalid.py`` to validate the parameters that are passed to your ``_MyCoolPolicy`` class.
+
 **Congratulations!!** You are now ready to share your new cool policy with everyone. Next, let's send a pull request for code review.
 
 4. Sending a Pull Request
