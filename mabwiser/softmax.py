@@ -50,8 +50,9 @@ class _Softmax(BaseMAB):
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
-        # expectation of the arm, by sampling from a Dirichlet distribution
-        # Add a very small epsilon to ensure each of the expectations is positive
+        # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.
+        # The Dirichlet distribution can be seen as a multivariate generalization of the Beta distribution.
+        # Add a very small epsilon to ensure each of the expectations is positive.
         expectations = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
         return dict(zip(self.arm_to_expectation.keys(), self.rng.dirichlet(expectations))).copy()
 
