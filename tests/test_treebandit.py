@@ -108,7 +108,7 @@ class TreeBanditTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [2, 1])
+        self.assertListEqual(arms, [1, 4])
 
     def test_thompson(self):
         arms, mab = self.predict(arms=[1, 2, 3, 4],

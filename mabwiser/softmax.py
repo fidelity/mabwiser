@@ -8,7 +8,7 @@ from typing import Dict, Callable, List, NoReturn, Optional, Union
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import reset, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
 
 
 class _Softmax(BaseMAB):
@@ -44,21 +44,17 @@ class _Softmax(BaseMAB):
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
-        # Generate the stopping value in the range [0, 1)
-        stop = self.rng.rand()
-
-        # For each arm, add the probability to the cumulative sum
-        # until the stopping value is exceeded
-        cumulative = 0
-        for arm in self.arms:
-            cumulative += self.arm_to_expectation[arm]
-            if cumulative > stop:
-                return arm
+        # Return the first arm with maximum expectation
+        return argmax(self.predict_expectations())
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
 
-        # Return a copy of expectations dictionary from arms (key) to expectations (values)
-        return self.arm_to_expectation.copy()
+        # Return a random value between 0 and 1 for each arm that is "proportional" to the
+        # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.
+        # The Dirichlet distribution can be seen as a multivariate generalization of the Beta distribution.
+        # Add a very small epsilon to ensure each of the expectations is positive.
+        expectations = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
+        return dict(zip(self.arm_to_expectation.keys(), self.rng.dirichlet(expectations))).copy()
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

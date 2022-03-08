@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import List, Optional, NoReturn
+from typing import Dict, List, Optional, NoReturn
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.utils import Arm, reset, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
 
 
 class _Popularity(_EpsilonGreedy):
@@ -33,9 +33,18 @@ class _Popularity(_EpsilonGreedy):
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
-        # Select an arm randomized by expectation probability
+        # Return the first arm with maximum expectation
+        return argmax(self.predict_expectations())
+
+    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+
+        # Return a random value between 0 and 1 for each arm that is "proportional" to the
+        # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.
+        # The Dirichlet distribution can be seen as a multivariate generalization of the Beta distribution.
+        # Add a very small epsilon to ensure each of the expectations is positive.
         # TODO: this would not work for negative rewards!
-        return self.rng.choice(self.arms, p=list(self.arm_to_expectation.values()))
+        expectations = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
+        return dict(zip(self.arm_to_expectation.keys(), self.rng.dirichlet(expectations))).copy()
 
     def _normalize_expectations(self):
         # TODO: this would not work for negative rewards!

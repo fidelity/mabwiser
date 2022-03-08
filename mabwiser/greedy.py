@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import reset, argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
 
 
 class _EpsilonGreedy(BaseMAB):
@@ -34,17 +34,17 @@ class _EpsilonGreedy(BaseMAB):
 
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
-        # Return a random arm with less than epsilon probability
-        if self.rng.rand() < self.epsilon:
-            return self.arms[self.rng.randint(0, len(self.arms))]
-
-        # Return the first arm with maximum expectation.
-        return argmax(self.arm_to_expectation)
+        # Return the first arm with maximum expectation
+        return argmax(self.predict_expectations())
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
 
-        # Return a copy of expectations dictionary from arms (key) to expectations (values)
-        return self.arm_to_expectation.copy()
+        # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
+        # and the actual arm expectations otherwise
+        if self.rng.rand() < self.epsilon:
+            return dict((arm, self.rng.rand()) for arm in self.arms).copy()
+        else:
+            return self.arm_to_expectation.copy()
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

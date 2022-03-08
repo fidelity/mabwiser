@@ -175,7 +175,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [4, 1])
+        self.assertListEqual(arms, [1, 3])
 
     def test_partial_fit_greedy0_n3(self):
 

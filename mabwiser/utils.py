@@ -198,6 +198,26 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
+    def dirichlet(self, alpha: List[float], size=None):
+        """ Draw samples from the Dirichlet distribution.
+
+            Parameters
+            ----------
+            alpha : list of floats
+                Parameter of the distribution (length k)
+            size: int or tuple of ints or None
+                Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+                ``m * n * k * N`` samples are drawn, where ``N`` is the length of
+                parameter ``mean``. If ``None``, a vector of length ``N`` is returned.
+
+            Returns
+            -------
+            samples: ndarray
+                The drawn samples, of shape (size, k).
+        """
+        pass
+
 
 class _NumpyRNG(_BaseRNG):
 
@@ -223,6 +243,9 @@ class _NumpyRNG(_BaseRNG):
     def multivariate_normal(self, mean: Union[np.ndarray, List[float]],
                             covariance: Union[np.ndarray, List[List[float]]], size=None):
         return np.squeeze(self.rng.multivariate_normal(mean, covariance, size=size, method='cholesky'))
+
+    def dirichlet(self, alpha: List[float], size=None):
+        return self.rng.dirichlet(alpha, size)
 
 
 def create_rng(seed: int) -> _BaseRNG:
