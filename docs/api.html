@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MABWiser Public API &mdash; MABWiser 2.1.0 documentation</title>
+  <title>MABWiser Public API &mdash; MABWiser 2.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -101,6 +101,8 @@ implement specific bandit policies using:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> method for _online learning</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">predict_expectations</span></code> method to retrieve the expectation of each arm</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> method for testing to retrieve the best arm based on the policy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove_arm</span></code> method for removing an arm</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start</span></code> method for warm starting untrained (cold) arms</p></li>
 </ul>
 <p>To ensure this is the case, alpha and l2_lambda are required to be greater than zero.</p>
 </div></blockquote>
@@ -164,7 +166,30 @@ If set to -2, all CPUs but one are used, and so on.</p>
 <dd><p>The dictionary of arms (keys) to their expected rewards (values).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Dict[Arm, floot]</p>
+<dd class="field-odd"><p>Dict[Arm, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.cold_arm_to_warm_arm">
+<span class="sig-name descname"><span class="pre">cold_arm_to_warm_arm</span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.cold_arm_to_warm_arm" title="Permalink to this definition"></a></dt>
+<dd><p>Mapping indicating what arm was used to warm-start cold arms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[Arm, Arm]:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.trained_arms">
+<span class="sig-name descname"><span class="pre">trained_arms</span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.trained_arms" title="Permalink to this definition"></a></dt>
+<dd><p>List of trained arms.
+Arms for which at least one decision has been observed are deemed trained.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>List[Arm]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -206,6 +231,17 @@ decision and reward history and corresponding contexts if any.</p>
 <dd><p>Abstract method.</p>
 <p>Returns a dictionary from arms (keys) to their expected rewards (values).</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.remove_arm">
+<span class="sig-name descname"><span class="pre">remove_arm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Arm</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.remove_arm" title="Permalink to this definition"></a></dt>
+<dd><p>Removes arm from the bandit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.warm_start">
+<span class="sig-name descname"><span class="pre">warm_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm_to_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_quantile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.warm_start" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -938,6 +974,59 @@ Contexts should be <code class="docutils literal notranslate"><span class="pre">
 <li><p><strong>TypeError</strong> – Contexts is not given as <code class="docutils literal notranslate"><span class="pre">None</span></code>, list, numpy array or pandas data frames.:</p></li>
 <li><p><strong>ValueError</strong> – Predicting with contexts data when there is no contextual policy.:</p></li>
 <li><p><strong>ValueError</strong> – Contextual policy when predicting with no contexts data.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mabwiser.mab.MAB.remove_arm">
+<span class="sig-name descname"><span class="pre">remove_arm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Arm</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.mab.MAB.remove_arm" title="Permalink to this definition"></a></dt>
+<dd><p>Removes an _arm_ from the list of arms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arm</strong> (<em>Arm</em>) – The existing arm to be removed.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>No return.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – The arm does not exist.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">None</span></code>.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.:</p></li>
+<li><p><strong>ValueError</strong> – The arm is <code class="docutils literal notranslate"><span class="pre">Infinity</span></code>.:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mabwiser.mab.MAB.warm_start">
+<span class="sig-name descname"><span class="pre">warm_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm_to_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_quantile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.mab.MAB.warm_start" title="Permalink to this definition"></a></dt>
+<dd><p>Warm-start untrained (cold) arms of the multi-armed bandit.</p>
+<p>Validates arguments and raises exceptions in case there are violations.</p>
+<p>The warm-start procedure depends on the learning and neighborhood policy. Note that for certain neighborhood
+policies (e.g., LSHNearest, KNearest, Radius) warm start can only be performed after the nearest neighbors
+have been determined in the “predict” step. Accordingly, warm start has to be executed for each context being
+predicted which is computationally expensive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arm_to_features</strong> (<em>Dict</em><em>[</em><em>Arm</em><em>, </em><em>List</em><em>[</em><em>Num</em><em>]</em><em>]</em>) – Numeric representation for each arm.</p></li>
+<li><p><strong>distance_quantile</strong> (<em>float</em>) – Value between 0 and 1 used to determine if an item can be warm started or not using closest item.
+All cold items will be warm started if 1 and none will be warm started if 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>No return.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TypeError</strong> – Arm features are not given as a dictionary.:</p></li>
+<li><p><strong>TypeError</strong> – Distance quantile is not given as a float.:</p></li>
+<li><p><strong>ValueError</strong> – Distance quantile is not between 0 and 1.:</p></li>
+<li><p><strong>ValueError</strong> – The arms in arm_to_features do not match arms.:</p></li>
 </ul>
 </dd>
 </dl>
@@ -1754,6 +1843,12 @@ Used to select the correct index from arm_to_stats if there are separate entries
 <dt class="sig sig-object py" id="mabwiser.utils.argmax">
 <span class="sig-prename descclassname"><span class="pre">mabwiser.utils.</span></span><span class="sig-name descname"><span class="pre">argmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Arm</span></span></span><a class="headerlink" href="#mabwiser.utils.argmax" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the first key with the maximum value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mabwiser.utils.argmin">
+<span class="sig-prename descclassname"><span class="pre">mabwiser.utils.</span></span><span class="sig-name descname"><span class="pre">argmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Arm</span></span></span><a class="headerlink" href="#mabwiser.utils.argmin" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the first key that has the minimum value.</p>
 </dd></dl>
 
 <dl class="py function">

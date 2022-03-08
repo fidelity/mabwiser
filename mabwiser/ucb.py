@@ -8,7 +8,7 @@ from typing import Callable, Dict, List, NoReturn, Optional
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import reset, argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
 
 
 class _UCB1(BaseMAB):
@@ -49,7 +49,7 @@ class _UCB1(BaseMAB):
     def predict(self, contexts: np.ndarray = None) -> Arm:
 
         # Return the first arm with maximum expectation
-        return argmax(self.arm_to_expectation)
+        return argmax(self.predict_expectations())
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
 

@@ -255,7 +255,7 @@ class LSHNearestTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [1, 1])
+        self.assertListEqual(arms, [3, 3])
 
     def test_no_neighbors_hash(self):
         contexts = [[0, -1, -2, -3, -5], [-1, -1, -1, -1, -1], [0, -1, -2, -3, -5], [-1, -1, -1, -1, -1],
