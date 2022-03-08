@@ -198,6 +198,7 @@ class _Linear(BaseMAB):
                     arm_to_expectation[arm] = rng.rand()
 
             else:
+                rng = create_rng(seed=seeds[index])
                 for arm in arms:
                 # Copy the row rng to the deep copied model in arm_to_model
                     arm_to_model[arm].rng = rng
