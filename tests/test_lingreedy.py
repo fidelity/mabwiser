@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 

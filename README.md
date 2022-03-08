@@ -36,9 +36,9 @@ mab.predict()
 
 Available Learning Policies:
 * Epsilon Greedy [1, 2]
+* LinGreedy
 * LinTS [3]
 * LinUCB [4]
-* LinGreedy
 * Popularity [2]
 * Random [2]
 * Softmax [2]

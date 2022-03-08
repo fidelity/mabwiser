@@ -56,6 +56,7 @@ Available Bandit Policies
 Available Learning Policies:
 
 * Epsilon Greedy
+* LinGreedy
 * LinTS
 * LinUCB
 * Popularity

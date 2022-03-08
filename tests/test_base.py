@@ -72,7 +72,7 @@ class BaseTest(unittest.TestCase):
                 rewards: Union[List, np.ndarray, pd.Series],
                 learning_policy: Union[LearningPolicy.EpsilonGreedy, LearningPolicy.Popularity, LearningPolicy.Random,
                                        LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
-                                       LearningPolicy.LinTS, LearningPolicy.LinUCB],
+                                       LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB],
                 neighborhood_policy: Union[None, NeighborhoodPolicy.Clusters, NeighborhoodPolicy.KNearest,
                                            NeighborhoodPolicy.LSHNearest, NeighborhoodPolicy.Radius,
                                            NeighborhoodPolicy.TreeBandit] = None,
