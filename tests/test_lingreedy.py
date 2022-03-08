@@ -1,6 +1,7 @@
 import datetime
 import math
 from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -44,6 +45,64 @@ class LinGreedyTest(BaseTest):
 
         self.assertListAlmostEqual(exps[0].values(), [-0.018378378378378413, 0.0, 0.9966292134831471])
         self.assertListAlmostEqual(exps[1].values(), [0.14054054054054055, 0.0, 0.43258426966292074])
+
+    def test_epsilon_zero_vs_linucb(self):
+        arm_lingreedy, mab_lingreedy = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinGreedy(epsilon=0, l2_lambda=0.87),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=True)
+
+        arm_linucb, mab_linucb = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0, l2_lambda=0.87),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=True)
+
+        self.assertEqual(arm_lingreedy, arm_linucb)
+
+    def test_epsilon_zero_vs_linucb_expectations(self):
+        exps_lingreedy, mab_lingreedy = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinGreedy(epsilon=0, l2_lambda=0.29),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=False)
+
+        exps_linucb, mab_linucb = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0, l2_lambda=0.29),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=False)
+
+        self.assertEqual(exps_lingreedy, exps_linucb)
 
     def test_epsilon_one(self):
         arm, mab = self.predict(arms=[1, 2, 3],
