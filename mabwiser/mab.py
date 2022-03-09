@@ -232,6 +232,7 @@ class LearningPolicy(NamedTuple):
         arm_to_scaler: Dict[Arm, Callable] = None
 
         def _validate(self):
+            print(self.epsilon)
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
@@ -940,7 +941,7 @@ class MAB:
             for arm in lp.arms:
                 arm_to_scaler[arm] = lp.arm_to_model[arm].scaler
             if lp.regression == 'ridge':
-                return LearningPolicy.LinGreedy(lp.alpha, lp.l2_lambda, arm_to_scaler)
+                return LearningPolicy.LinGreedy(lp.epsilon, lp.l2_lambda, arm_to_scaler)
             elif lp.regression == 'ts':
                 return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, arm_to_scaler)
             elif lp.regression == 'ucb':
