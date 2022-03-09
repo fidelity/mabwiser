@@ -68,6 +68,55 @@ class LearningPolicy(NamedTuple):
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("The value of epsilon must be between 0 and 1."))
 
+    class LinGreedy(NamedTuple):
+        """LinGreedy Learning Policy.
+
+        This policy trains a ridge regression for each arm.
+        Then, given a given context, it predicts a regression value.
+        This policy selects the arm with the highest regression value with probability 1 - :math:`\\epsilon`,
+        and with probability :math:`\\epsilon` it selects an arm at random for exploration.
+
+        Attributes
+        ----------
+        epsilon: Num
+            The probability of selecting a random arm for exploration.
+            Integer or float. Must be between 0 and 1.
+            Default value is 0.05.
+        l2_lambda: Num
+            The regularization strength.
+            Integer or float. Cannot be negative.
+            Default value is 1.0.
+        arm_to_scaler: Dict[Arm, Callable]
+            Standardize context features by arm.
+            Dictionary mapping each arm to a scaler object. It is assumed
+            that the scaler objects are already fit and will only be used
+            to transform context features.
+            Default value is None.
+
+        Example
+        -------
+            >>> from mabwiser.mab import MAB, LearningPolicy
+            >>> list_of_arms = ['Arm1', 'Arm2']
+            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+            >>> rewards = [20, 17, 25, 9]
+            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+            >>> mab = MAB(list_of_arms, LearningPolicy.LinGreedy(epsilon=0.5))
+            >>> mab.fit(decisions, rewards, contexts)
+            >>> mab.predict([[3, 2, 0, 1]])
+            'Arm2'
+        """
+        epsilon: Num = 0.05
+        l2_lambda: Num = 1.0
+        arm_to_scaler: Dict[Arm, Callable] = None
+
+        def _validate(self):
+            check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
+            check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
+            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
+            check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
+            if self.arm_to_scaler is not None:
+                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+
     class LinTS(NamedTuple):
         """ LinTS Learning Policy
 
@@ -185,55 +234,6 @@ class LearningPolicy(NamedTuple):
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
-            check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
-            if self.arm_to_scaler is not None:
-                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
-
-    class LinGreedy(NamedTuple):
-        """LinGreedy Learning Policy.
-
-        This policy trains a ridge regression for each arm.
-        Then, given a given context, it predicts a regression value.
-        This policy selects the arm with the highest regression value with probability 1 - :math:`\\epsilon`,
-        and with probability :math:`\\epsilon` it selects an arm at random for exploration.
-
-        Attributes
-        ----------
-        epsilon: Num
-            The probability of selecting a random arm for exploration.
-            Integer or float. Must be between 0 and 1.
-            Default value is 0.05.
-        l2_lambda: Num
-            The regularization strength.
-            Integer or float. Cannot be negative.
-            Default value is 1.0.
-        arm_to_scaler: Dict[Arm, Callable]
-            Standardize context features by arm.
-            Dictionary mapping each arm to a scaler object. It is assumed
-            that the scaler objects are already fit and will only be used
-            to transform context features.
-            Default value is None.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.LinGreedy(epsilon=0.5))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[3, 2, 0, 1]])
-            'Arm2'
-        """
-        epsilon: Num = 0.05
-        l2_lambda: Num = 1.0
-        arm_to_scaler: Dict[Arm, Callable] = None
-
-        def _validate(self):
-            check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
-            check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
             if self.arm_to_scaler is not None:
@@ -1486,7 +1486,7 @@ class MAB:
             else:  # For predictions, compare the shape to the stored context history
 
                 # We need to find out the number of features (to distinguish Series shape)
-                if isinstance(self.learning_policy, (LearningPolicy.LinTS, LearningPolicy.LinUCB)):
+                if isinstance(self.learning_policy, (LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size

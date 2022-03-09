@@ -36,7 +36,13 @@ class BaseTest(unittest.TestCase):
            LearningPolicy.UCB1(alpha=1.0),
            LearningPolicy.UCB1(alpha=5)]
 
-    para_lps = [LearningPolicy.LinTS(alpha=0.00001, l2_lambda=1),
+    para_lps = [LearningPolicy.LinGreedy(epsilon=0, l2_lambda=1),
+                LearningPolicy.LinGreedy(epsilon=0.5, l2_lambda=1),
+                LearningPolicy.LinGreedy(epsilon=1, l2_lambda=1),
+                LearningPolicy.LinGreedy(epsilon=0, l2_lambda=0.5),
+                LearningPolicy.LinGreedy(epsilon=0.5, l2_lambda=0.5),
+                LearningPolicy.LinGreedy(epsilon=1, l2_lambda=0.5),
+                LearningPolicy.LinTS(alpha=0.00001, l2_lambda=1),
                 LearningPolicy.LinTS(alpha=0.5, l2_lambda=1),
                 LearningPolicy.LinTS(alpha=1, l2_lambda=1),
                 LearningPolicy.LinTS(alpha=0.00001, l2_lambda=0.5),
