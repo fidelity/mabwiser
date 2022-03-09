@@ -232,7 +232,6 @@ class LearningPolicy(NamedTuple):
         arm_to_scaler: Dict[Arm, Callable] = None
 
         def _validate(self):
-            print(self.epsilon)
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
