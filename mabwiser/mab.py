@@ -105,7 +105,7 @@ class LearningPolicy(NamedTuple):
             >>> mab.predict([[3, 2, 0, 1]])
             'Arm2'
         """
-        epsilon: Num = 0.05
+        epsilon: Num = 0.1
         l2_lambda: Num = 1.0
         arm_to_scaler: Dict[Arm, Callable] = None
 
@@ -867,14 +867,14 @@ class MAB:
         elif isinstance(learning_policy, LearningPolicy.UCB1):
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinGreedy):
-            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
-                         0, learning_policy.epsilon, "ridge", learning_policy.arm_to_scaler)
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, 0, learning_policy.epsilon,
+                          learning_policy.l2_lambda, "ridge", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinTS):
-            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
-                         learning_policy.alpha, 0, "ts", learning_policy.arm_to_scaler)
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
+                          learning_policy.l2_lambda, "ts", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
-            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.l2_lambda,
-                         learning_policy.alpha, 0, "ucb", learning_policy.arm_to_scaler)
+            lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
+                          learning_policy.l2_lambda, "ucb", learning_policy.arm_to_scaler)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
 
