@@ -17,8 +17,8 @@ class _RidgeRegression:
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
         self.rng = rng                      # random number generator
-        self.l2_lambda = l2_lambda          # regularization parameter
         self.alpha = alpha                  # exploration parameter
+        self.l2_lambda = l2_lambda          # regularization parameter
         self.scaler = scaler                # standard scaler object
 
         self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty

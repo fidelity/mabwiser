@@ -49,7 +49,7 @@ class LearningPolicy(NamedTuple):
         epsilon: Num
             The probability of selecting a random arm for exploration.
             Integer or float. Must be between 0 and 1.
-            Default value is 0.05.
+            Default value is 0.1.
 
         Example
         -------
@@ -81,7 +81,7 @@ class LearningPolicy(NamedTuple):
         epsilon: Num
             The probability of selecting a random arm for exploration.
             Integer or float. Must be between 0 and 1.
-            Default value is 0.05.
+            Default value is 0.1.
         l2_lambda: Num
             The regularization strength.
             Integer or float. Cannot be negative.
