@@ -78,6 +78,10 @@ class InvalidTest(BaseTest):
     def test_invalid_epsilon_value(self):
         with self.assertRaises(ValueError):
             MAB(['a', 'b'], LearningPolicy.EpsilonGreedy(epsilon=2))
+        with self.assertRaises(ValueError):
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=-1))
+        with self.assertRaises(ValueError):
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=2))
 
     def test_invalid_rewards_to_binary_type(self):
         thresholds = {1: 1, 'b': 1}
@@ -164,6 +168,18 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
+                         learning_policy=LearningPolicy.LinGreedy(l2_lambda=None),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         context_history=np.array([1, 1, 1]),
+                         contexts=np.array([[1, 1]]),
+                         seed=123456,
+                         num_run=1,
+                         is_predict=True)
+
+        with self.assertRaises(TypeError):
+            self.predict(arms=[1, 2, 3],
+                         decisions=[1, 1, 1],
+                         rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinUCB(alpha=1, l2_lambda=None),
                          neighborhood_policy=NeighborhoodPolicy.KNearest(2),
                          context_history=np.array([1, 1, 1]),
@@ -212,6 +228,9 @@ class InvalidTest(BaseTest):
 
         with self.assertRaises(TypeError):
             MAB(['a', 'b'], LearningPolicy.Softmax(alpha=2))
+
+        with self.assertRaises(TypeError):
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(alpha=1))
 
         with self.assertRaises(TypeError):
             MAB(['a', 'b'], LearningPolicy.LinUCB(tau=1))

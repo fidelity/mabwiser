@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MABWiser Public API &mdash; MABWiser 2.2.0 documentation</title>
+  <title>MABWiser Public API &mdash; MABWiser 2.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -300,6 +300,88 @@ Default value is 0.05.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="mabwiser.mab.LearningPolicy.LinGreedy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinGreedy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2_lambda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arm_to_scaler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinGreedy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>LinGreedy Learning Policy.</p>
+<p>This policy trains a ridge regression for each arm.
+Then, given a given context, it predicts a regression value.
+This policy selects the arm with the highest regression value with probability 1 - <span class="math notranslate nohighlight">\(\epsilon\)</span>,
+and with probability <span class="math notranslate nohighlight">\(\epsilon\)</span> it selects an arm at random for exploration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mabwiser.mab.LearningPolicy.LinGreedy.epsilon">
+<span class="sig-name descname"><span class="pre">epsilon</span></span><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinGreedy.epsilon" title="Permalink to this definition"></a></dt>
+<dd><p>The probability of selecting a random arm for exploration.
+Integer or float. Must be between 0 and 1.
+Default value is 0.05.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mabwiser.mab.LearningPolicy.LinGreedy.l2_lambda">
+<span class="sig-name descname"><span class="pre">l2_lambda</span></span><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinGreedy.l2_lambda" title="Permalink to this definition"></a></dt>
+<dd><p>The regularization strength.
+Integer or float. Cannot be negative.
+Default value is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Num</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mabwiser.mab.LearningPolicy.LinGreedy.arm_to_scaler">
+<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinGreedy.arm_to_scaler" title="Permalink to this definition"></a></dt>
+<dd><p>Standardize context features by arm.
+Dictionary mapping each arm to a scaler object. It is assumed
+that the scaler objects are already fit and will only be used
+to transform context features.
+Default value is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[Arm, Callable]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mabwiser.mab</span> <span class="kn">import</span> <span class="n">MAB</span><span class="p">,</span> <span class="n">LearningPolicy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_arms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decisions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm2&#39;</span><span class="p">,</span> <span class="s1">&#39;Arm1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rewards</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contexts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span> <span class="o">=</span> <span class="n">MAB</span><span class="p">(</span><span class="n">list_of_arms</span><span class="p">,</span> <span class="n">LearningPolicy</span><span class="o">.</span><span class="n">LinGreedy</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mab</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="go">&#39;Arm2&#39;</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">epsilon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">l2_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="mabwiser.mab.LearningPolicy.LinTS">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinTS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2_lambda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arm_to_scaler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.LearningPolicy.LinTS" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
@@ -371,20 +453,20 @@ Default value is None.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">l2_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">l2_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
@@ -460,20 +542,20 @@ Default value is None.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">arm_to_scaler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">l2_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">l2_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
@@ -561,8 +643,8 @@ Default value is 1.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">tau</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">tau</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -618,8 +700,8 @@ as a success, i.e., <cite>True/1</cite> based on the reward or <cite>False/0</ci
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">binarizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">binarizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -665,8 +747,8 @@ Default value is 1.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -676,7 +758,7 @@ Default value is 1.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mabwiser.mab.MAB">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mabwiser.mab.</span></span><span class="sig-name descname"><span class="pre">MAB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.EpsilonGreedy" title="mabwiser.mab.LearningPolicy.EpsilonGreedy"><span class="pre">mabwiser.mab.LearningPolicy.EpsilonGreedy</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Popularity" title="mabwiser.mab.LearningPolicy.Popularity"><span class="pre">mabwiser.mab.LearningPolicy.Popularity</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Random" title="mabwiser.mab.LearningPolicy.Random"><span class="pre">mabwiser.mab.LearningPolicy.Random</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Softmax" title="mabwiser.mab.LearningPolicy.Softmax"><span class="pre">mabwiser.mab.LearningPolicy.Softmax</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.ThompsonSampling" title="mabwiser.mab.LearningPolicy.ThompsonSampling"><span class="pre">mabwiser.mab.LearningPolicy.ThompsonSampling</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.UCB1" title="mabwiser.mab.LearningPolicy.UCB1"><span class="pre">mabwiser.mab.LearningPolicy.UCB1</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.LinTS" title="mabwiser.mab.LearningPolicy.LinTS"><span class="pre">mabwiser.mab.LearningPolicy.LinTS</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.LinUCB" title="mabwiser.mab.LearningPolicy.LinUCB"><span class="pre">mabwiser.mab.LearningPolicy.LinUCB</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest" title="mabwiser.mab.NeighborhoodPolicy.LSHNearest"><span class="pre">mabwiser.mab.NeighborhoodPolicy.LSHNearest</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.Clusters" title="mabwiser.mab.NeighborhoodPolicy.Clusters"><span class="pre">mabwiser.mab.NeighborhoodPolicy.Clusters</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.KNearest" title="mabwiser.mab.NeighborhoodPolicy.KNearest"><span class="pre">mabwiser.mab.NeighborhoodPolicy.KNearest</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.Radius" title="mabwiser.mab.NeighborhoodPolicy.Radius"><span class="pre">mabwiser.mab.NeighborhoodPolicy.Radius</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.TreeBandit" title="mabwiser.mab.NeighborhoodPolicy.TreeBandit"><span class="pre">mabwiser.mab.NeighborhoodPolicy.TreeBandit</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">123456</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mabwiser.mab.</span></span><span class="sig-name descname"><span class="pre">MAB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.EpsilonGreedy" title="mabwiser.mab.LearningPolicy.EpsilonGreedy"><span class="pre">mabwiser.mab.LearningPolicy.EpsilonGreedy</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Popularity" title="mabwiser.mab.LearningPolicy.Popularity"><span class="pre">mabwiser.mab.LearningPolicy.Popularity</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Random" title="mabwiser.mab.LearningPolicy.Random"><span class="pre">mabwiser.mab.LearningPolicy.Random</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.Softmax" title="mabwiser.mab.LearningPolicy.Softmax"><span class="pre">mabwiser.mab.LearningPolicy.Softmax</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.ThompsonSampling" title="mabwiser.mab.LearningPolicy.ThompsonSampling"><span class="pre">mabwiser.mab.LearningPolicy.ThompsonSampling</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.UCB1" title="mabwiser.mab.LearningPolicy.UCB1"><span class="pre">mabwiser.mab.LearningPolicy.UCB1</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.LinGreedy" title="mabwiser.mab.LearningPolicy.LinGreedy"><span class="pre">mabwiser.mab.LearningPolicy.LinGreedy</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.LinTS" title="mabwiser.mab.LearningPolicy.LinTS"><span class="pre">mabwiser.mab.LearningPolicy.LinTS</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.LearningPolicy.LinUCB" title="mabwiser.mab.LearningPolicy.LinUCB"><span class="pre">mabwiser.mab.LearningPolicy.LinUCB</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.LSHNearest" title="mabwiser.mab.NeighborhoodPolicy.LSHNearest"><span class="pre">mabwiser.mab.NeighborhoodPolicy.LSHNearest</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.Clusters" title="mabwiser.mab.NeighborhoodPolicy.Clusters"><span class="pre">mabwiser.mab.NeighborhoodPolicy.Clusters</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.KNearest" title="mabwiser.mab.NeighborhoodPolicy.KNearest"><span class="pre">mabwiser.mab.NeighborhoodPolicy.KNearest</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.Radius" title="mabwiser.mab.NeighborhoodPolicy.Radius"><span class="pre">mabwiser.mab.NeighborhoodPolicy.Radius</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mabwiser.mab.NeighborhoodPolicy.TreeBandit" title="mabwiser.mab.NeighborhoodPolicy.TreeBandit"><span class="pre">mabwiser.mab.NeighborhoodPolicy.TreeBandit</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">123456</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mabwiser.mab.MAB" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p><strong>MABWiser: Contextual Multi-Armed Bandit Library</strong></p>
 <p>MABWiser is a research library for fast prototyping of multi-armed bandit algorithms.
@@ -870,8 +952,8 @@ and <em>contexts</em>, if any.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id10">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">learning_policy</span></span><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id13">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">learning_policy</span></span><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
 <dd><p>Creates named tuple of the learning policy based on the implementor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -884,8 +966,8 @@ and <em>contexts</em>, if any.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id11">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">neighborhood_policy</span></span><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id14">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">neighborhood_policy</span></span><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
 <dd><p>Creates named tuple of the neighborhood policy based on the implementor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1081,14 +1163,14 @@ Supports <code class="docutils literal notranslate"><span class="pre">KMeans</sp
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">is_minibatch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">is_minibatch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">n_clusters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">n_clusters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -1140,14 +1222,14 @@ Default value is Euclidean distance.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
@@ -1227,20 +1309,20 @@ The probabilities should sum up to 1.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id16">
-<span class="sig-name descname"><span class="pre">n_dimensions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">n_dimensions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id17">
-<span class="sig-name descname"><span class="pre">n_tables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id20">
+<span class="sig-name descname"><span class="pre">n_tables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id20" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-name descname"><span class="pre">no_nhood_prob_of_arm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">no_nhood_prob_of_arm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id21" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
@@ -1305,20 +1387,20 @@ The probabilities should sum up to 1.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id19">
-<span class="sig-name descname"><span class="pre">metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id22" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id20">
-<span class="sig-name descname"><span class="pre">no_nhood_prob_of_arm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id20" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id23">
+<span class="sig-name descname"><span class="pre">no_nhood_prob_of_arm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id23" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id21">
-<span class="sig-name descname"><span class="pre">radius</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id21" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id24">
+<span class="sig-name descname"><span class="pre">radius</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id24" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -1351,7 +1433,7 @@ sklearn.tree.DecisionTreeClassifier will be chosen.
 Default value is an empty dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Dict, <a href="#id22"><span class="problematic" id="id23">**</span></a>kwarg</p>
+<dd class="field-odd"><p>Dict, <a href="#id25"><span class="problematic" id="id26">**</span></a>kwarg</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1369,8 +1451,8 @@ Default value is an empty dictionary.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">tree_parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span></em><a class="headerlink" href="#id24" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id27">
+<span class="sig-name descname"><span class="pre">tree_parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span></em><a class="headerlink" href="#id27" title="Permalink to this definition"></a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 

@@ -56,6 +56,7 @@ Available Bandit Policies
 Available Learning Policies:
 
 * Epsilon Greedy
+* LinGreedy
 * LinTS
 * LinUCB
 * Popularity
@@ -81,32 +82,32 @@ Citation
 ========
 You can cite MABWiser as:
 
-* **[IJAIT 2021]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: Parallelizable Contextual Multi-Armed Bandits"](https://www.worldscientific.com/doi/abs/10.1142/S0218213021500214)
-* **[ICTAI 2019]** [E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python"](https://ieeexplore.ieee.org/document/8995418)
+* **[IJAIT 2021]** `E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: Parallelizable Contextual Multi-Armed Bandits" <https://www.worldscientific.com/doi/abs/10.1142/S0218213021500214>`_
+* **[ICTAI 2019]** `E. Strong,  B. Kleynhans, and S. Kadioglu, "MABWiser: A Parallelizable Contextual Multi-Armed Bandit Library for Python" <https://ieeexplore.ieee.org/document/8995418>`_
 
 .. code-block:: bibtex
 
-       @article{DBLP:journals/ijait/StrongKK21,
-      author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
-      title     = {{MABWiser:} Parallelizable Contextual Multi-armed Bandits},
-      journal   = {Int. J. Artif. Intell. Tools},
-      volume    = {30},
-      number    = {4},
-      pages     = {2150021:1--2150021:19},
-      year      = {2021},
-      url       = {https://doi.org/10.1142/S0218213021500214},
-      doi       = {10.1142/S0218213021500214},
+    @article{DBLP:journals/ijait/StrongKK21,
+        author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
+        title     = {{MABWiser:} Parallelizable Contextual Multi-armed Bandits},
+        journal   = {Int. J. Artif. Intell. Tools},
+        volume    = {30},
+        number    = {4},
+        pages     = {2150021:1--2150021:19},
+        year      = {2021},
+        url       = {https://doi.org/10.1142/S0218213021500214},
+        doi       = {10.1142/S0218213021500214},
     }
 
     @inproceedings{DBLP:conf/ictai/StrongKK19,
-    author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
-    title     = {MABWiser: {A} Parallelizable Contextual Multi-Armed Bandit Library for Python},
-    booktitle = {31st {IEEE} International Conference on Tools with Artificial Intelligence, {ICTAI} 2019, Portland, OR, USA, November 4-6, 2019},
-    pages     = {909--914},
-    publisher = {{IEEE}},
-    year      = {2019},
-    url       = {https://doi.org/10.1109/ICTAI.2019.00129},
-    doi       = {10.1109/ICTAI.2019.00129},
+        author    = {Emily Strong and Bernard Kleynhans and Serdar Kadioglu},
+        title     = {MABWiser: {A} Parallelizable Contextual Multi-Armed Bandit Library for Python},
+        booktitle = {31st {IEEE} International Conference on Tools with Artificial Intelligence, {ICTAI} 2019, Portland, OR, USA, November 4-6, 2019},
+        pages     = {909--914},
+        publisher = {{IEEE}},
+        year      = {2019},
+        url       = {https://doi.org/10.1109/ICTAI.2019.00129},
+        doi       = {10.1109/ICTAI.2019.00129},
     }
 
 

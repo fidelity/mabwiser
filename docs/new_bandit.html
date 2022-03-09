@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adding a New Bandit &mdash; MABWiser 2.2.0 documentation</title>
+  <title>Adding a New Bandit &mdash; MABWiser 2.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -339,6 +339,7 @@ Every test starts with the <code class="docutils literal notranslate"><span clas
 </div>
 <p>To strengthen your test suite, consider other unittests with different number of arms,
 decisions and rewards to assert that your bandit behaves correctly.</p>
+<p>Add corresponding unittests in <code class="docutils literal notranslate"><span class="pre">test_invalid.py</span></code> to validate the parameters that are passed to your <code class="docutils literal notranslate"><span class="pre">_MyCoolPolicy</span></code> class.</p>
 <p><strong>Congratulations!!</strong> You are now ready to share your new cool policy with everyone. Next, let’s send a pull request for code review.</p>
 </section>
 <section id="sending-a-pull-request">
