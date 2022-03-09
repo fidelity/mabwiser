@@ -62,7 +62,7 @@ class LearningPolicy(NamedTuple):
             >>> mab.predict()
             'Arm1'
         """
-        epsilon: Num = 0.05
+        epsilon: Num = 0.1
 
         def _validate(self):
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
