@@ -1174,8 +1174,7 @@ class MAB:
 
     def predict(self,
                 contexts: Union[None, List[Num], List[List[Num]],
-                                np.ndarray, pd.Series, pd.DataFrame] = None,  # Contexts, optional
-                num_predictions: int = None
+                                np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                 ) -> Union[Arm, List[Arm]]:
         """Returns the "best" arm (or arms list if multiple contexts are given) based on the expected reward.
 
@@ -1185,13 +1184,10 @@ class MAB:
 
         Parameters
         ----------
-        contexts : Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
-            The context under which each decision is made. Default value is None.
-            Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
-        num_predictions : int
-            The number of predictions to return for context-free bandits. Default value is None.
-            If None, a single prediction will be returned.
-            Number of predictions should be ``None`` for contextual bandits.
+        contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
+            The context for the expected rewards. Default value is None.
+            If contexts is not ``None`` for context-free bandits, the predicted expectations returned will be a
+            list of the same length as contexts.
 
         Returns
         -------
@@ -1201,26 +1197,24 @@ class MAB:
         ------
         TypeError:  Contexts is not given as ``None``, list, numpy array, pandas series or data frames.
 
-        ValueError: Predicting with contexts data when there is no contextual policy.
-        ValueError: Contextual policy when predicting with no contexts data.
+        ValueError: Prediction with context policy requires context data.
         """
 
         # Check that fit is called before
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
 
         # Validate arguments
-        self._validate_predict_args(contexts, num_predictions)
+        self._validate_predict_args(contexts)
 
         # Convert contexts to numpy array for efficiency
         contexts = self.__convert_context(contexts)
 
         # Return the arm with the best expectation
-        return self._imp.predict(contexts, num_predictions)
+        return self._imp.predict(contexts)
 
     def predict_expectations(self,
                              contexts: Union[None, List[Num], List[List[Num]],
-                                             np.ndarray, pd.Series, pd.DataFrame] = None,  # Contexts, optional
-                             num_predictions: int = None
+                                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
                              ) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         """Returns a dictionary of arms (key) to their expected rewards (value).
 
@@ -1230,11 +1224,8 @@ class MAB:
         ----------
         contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context for the expected rewards. Default value is None.
-            Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
-        num_predictions : int
-            The number of predictions to return for context-free bandits. Default value is None.
-            If None, a single prediction will be returned.
-            Number of predictions should be ``None`` for contextual bandits.
+            If contexts is not ``None`` for context-free bandits, the predicted expectations returned will be a
+            list of the same length as contexts.
 
         Returns
         -------
@@ -1244,21 +1235,20 @@ class MAB:
         ------
         TypeError:  Contexts is not given as ``None``, list, numpy array or pandas data frames.
 
-        ValueError: Predicting with contexts data when there is no contextual policy.
-        ValueError: Contextual policy when predicting with no contexts data.
+        ValueError: Prediction with context policy requires context data.
         """
 
         # Check that fit is called before
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
 
         # Validate arguments
-        self._validate_predict_args(contexts, num_predictions)
+        self._validate_predict_args(contexts)
 
         # Convert contexts to numpy array for efficiency
         contexts = self.__convert_context(contexts)
 
         # Return a dictionary from arms (key) to expectations (value)
-        return self._imp.predict_expectations(contexts, num_predictions)
+        return self._imp.predict_expectations(contexts)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
         """Warm-start untrained (cold) arms of the multi-armed bandit.
@@ -1382,19 +1372,18 @@ class MAB:
                         ValueError("Thompson Sampling requires binary rewards when binarizer function is not "
                                    "provided."))
 
-    def _validate_predict_args(self, contexts, num_predictions):
+    def _validate_predict_args(self, contexts):
         """"
         Validates argument types for predict and predict_expectation functions.
         """
 
         # Context policy and context data should match
         if self.is_contextual:  # don't use "if contexts" since it's n-dim array
-            check_true(num_predictions is None,
-                       ValueError("Prediction with context policy cannot specify number of predictions."))
             check_true(contexts is not None, ValueError("Prediction with context policy requires context data."))
             MAB._validate_context_type(contexts)
         else:
-            check_true(contexts is None, ValueError("Prediction with no context policy cannot handle context data."))
+            if contexts is not None:
+                MAB._validate_context_type(contexts)
 
     @staticmethod
     def _validate_context_type(contexts):

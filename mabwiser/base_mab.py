@@ -122,8 +122,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict(self, contexts: Optional[np.ndarray] = None,
-                num_predictions: Optional[int] = None) -> Union[Arm, List[Arm]]:
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
         """Abstract method.
 
         Returns the predicted arm.
@@ -131,8 +130,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None,
-                             num_predictions: Optional[int] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         """Abstract method.
 
         Returns a dictionary from arms (keys) to their expected rewards (values).

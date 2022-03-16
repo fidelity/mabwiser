@@ -514,3 +514,14 @@ class ThompsonTest(BaseTest):
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
         self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 3})
         self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 5})
+
+    def test_ts_contexts(self):
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.ThompsonSampling(),
+                                 contexts=[[]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [3, 2, 1, 2, 1, 2, 3, 3, 2, 1])

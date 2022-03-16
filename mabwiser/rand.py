@@ -20,23 +20,23 @@ class _Random(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         pass
 
-    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict(self, contexts: np.ndarray = None):
 
         # Return the arm with maximum expectation
-        expectations = self.predict_expectations(num_predictions=num_predictions)
-        if num_predictions is None or num_predictions == 1:
+        expectations = self.predict_expectations(contexts)
+        if isinstance(expectations, dict):
             return argmax(expectations)
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict_expectations(self, contexts: np.ndarray = None):
 
         # Return a random expectation (between 0 and 1) for each arm
         # size = 1 if num_predictions is None else num_predictions
-        num_predictions = 1 if num_predictions is None else num_predictions
-        random_values = self.rng.rand((num_predictions, len(self.arms)))
+        size = 1 if contexts is None else len(contexts)
+        random_values = self.rng.rand((size, len(self.arms)))
         expectations = [dict(zip(self.arms, exp)).copy() for exp in random_values]
-        if num_predictions == 1:
+        if size == 1:
             return expectations[0]
         else:
             return expectations

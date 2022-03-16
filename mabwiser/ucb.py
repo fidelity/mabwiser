@@ -46,22 +46,22 @@ class _UCB1(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards)
 
-    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict(self, contexts: np.ndarray = None):
 
         # Return the arm with maximum expectation
-        expectations = self.predict_expectations(num_predictions=num_predictions)
-        if num_predictions is None or num_predictions == 1:
+        expectations = self.predict_expectations(contexts)
+        if isinstance(expectations, dict):
             return argmax(expectations)
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict_expectations(self, contexts: np.ndarray = None):
 
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
-        if num_predictions is None or num_predictions == 1:
+        if contexts is None or len(contexts) == 1:
             return self.arm_to_expectation.copy()
         else:
-            return [self.arm_to_expectation.copy() for _ in range(num_predictions)]
+            return [self.arm_to_expectation.copy() for _ in range(len(contexts))]
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

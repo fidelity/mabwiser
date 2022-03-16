@@ -42,26 +42,26 @@ class _Softmax(BaseMAB):
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()
 
-    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict(self, contexts: np.ndarray = None):
 
         # Return the arm with maximum expectation
-        expectations = self.predict_expectations(num_predictions=num_predictions)
-        if num_predictions is None or num_predictions == 1:
+        expectations = self.predict_expectations(contexts)
+        if isinstance(expectations, dict):
             return argmax(expectations)
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict_expectations(self, contexts: np.ndarray = None):
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
         # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.
         # The Dirichlet distribution can be seen as a multivariate generalization of the Beta distribution.
         # Add a very small epsilon to ensure each of the expectations is positive.
-        num_predictions = 1 if num_predictions is None else num_predictions
+        size = 1 if contexts is None else len(contexts)
         alpha = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
-        dirichlet_random_values = self.rng.dirichlet(alpha, num_predictions)
+        dirichlet_random_values = self.rng.dirichlet(alpha, size)
         expectations = [dict(zip(self.arm_to_expectation.keys(), exp)).copy() for exp in dirichlet_random_values]
-        if num_predictions == 1:
+        if size == 1:
             return expectations[0]
         else:
             return expectations

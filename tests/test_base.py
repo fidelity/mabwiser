@@ -114,7 +114,7 @@ class BaseTest(unittest.TestCase):
         else:
 
             # Return: expectations(s) and the MAB instance
-            expectations = [mab.predict_expectations(contexts)for _ in range(num_run)]
+            expectations = [mab.predict_expectations(contexts) for _ in range(num_run)]
             return expectations[0] if num_run == 1 else expectations, mab
 
     @staticmethod

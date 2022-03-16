@@ -32,27 +32,27 @@ class _EpsilonGreedy(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict(self, contexts: np.ndarray = None):
 
         # Return the arm with maximum expectation
-        expectations = self.predict_expectations(num_predictions=num_predictions)
-        if num_predictions is None or num_predictions == 1:
+        expectations = self.predict_expectations(contexts)
+        if isinstance(expectations, dict):
             return argmax(expectations)
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
+    def predict_expectations(self, contexts: np.ndarray = None):
 
         # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
         # and the actual arm expectations otherwise
-        if num_predictions is None or num_predictions == 1:
+        if contexts is None or len(contexts) == 1:
             if self.rng.rand() < self.epsilon:
                 return dict((arm, self.rng.rand()) for arm in self.arms).copy()
             else:
                 return self.arm_to_expectation.copy()
         else:
-            probability = self.rng.rand(num_predictions)
-            random_values = self.rng.rand((num_predictions, len(self.arms)))
+            probability = self.rng.rand(len(contexts))
+            random_values = self.rng.rand((len(contexts), len(self.arms)))
             expectations = [dict(zip(self.arms, exp)).copy() if probability[index] < self.epsilon
                             else self.arm_to_expectation.copy() for index, exp in enumerate(random_values)]
             return expectations
