@@ -137,11 +137,11 @@ class _Linear(BaseMAB):
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
         # Return predict for the given context
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
 

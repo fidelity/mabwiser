@@ -77,16 +77,24 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         self.rng = None
 
     @abc.abstractmethod
-    def rand(self):
-        """ Return a single float in the range [0, 1)
+    def rand(self, size=None):
+        """ Return return values in range [0, 1) with a given shape.
+
+            Parameters
+            ----------
+            size : int or tuple of ints, optional
+                Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+                ``m * n * k`` samples are drawn.  Default is None, in which case a
+                single value is returned.
+
             Returns
             -------
-            out : Return a single float in the range [0, 1)
+            out : Array of random floats of shape size (unless size=None, in which case a single float is returned).
         """
         pass
 
     @abc.abstractmethod
-    def randint(self, low: int, high: int = None, size: int = None):
+    def randint(self, low: int, high: int = None, size=None):
         """ Return random integers from low (inclusive) to high (exclusive).
             Return random integers from the “discrete uniform” distribution
             in the “half-open” interval [low, high).
@@ -141,7 +149,7 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def beta(self, alpha: int, beta: int):
+    def beta(self, alpha: int, beta: int, size=None):
         """ Return a sample from a Beta distribution.
 
             Parameters
@@ -150,16 +158,21 @@ class _BaseRNG(metaclass=abc.ABCMeta):
                     Alpha, positive (>0).
             beta : float or array_like of floats
                     Beta, positive (>0).
+            size : int or tuple of ints, optional
+                    Output shape.
+                    If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn.
+                    If size is None (default), a single value is returned if a and b are both scalars.
+                    Otherwise, np.broadcast(a, b).size samples are drawn.
 
             Returns
             -------
-            out : scalar
-                Drawn sample from the parameterized beta distribution.
+            out : scalar or ndarray
+               Drawn samples from the parameterized beta distribution.
         """
         pass
 
     @abc.abstractmethod
-    def standard_normal(self, size):
+    def standard_normal(self, size: Union[int, Tuple[int]] = None):
         """ Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
             Parameters
@@ -225,8 +238,8 @@ class _NumpyRNG(_BaseRNG):
         super().__init__(seed)
         self.rng = np.random.default_rng(self.seed)
 
-    def rand(self):
-        return self.rng.random()
+    def rand(self, size=None):
+        return self.rng.random(size)
 
     def randint(self, low: int, high: int = None, size: int = None):
         return self.rng.integers(low=low, high=high, size=size)
@@ -234,10 +247,10 @@ class _NumpyRNG(_BaseRNG):
     def choice(self, a: Union[int, Iterable[int]], size: Union[int, Tuple[int]] = None, p: Iterable[float] = None):
         return self.rng.choice(a=a, size=size, p=p)
 
-    def beta(self, num_success: int, num_failure: int):
-        return self.rng.beta(num_success, num_failure)
+    def beta(self, num_success: int, num_failure: int, size=None):
+        return self.rng.beta(num_success, num_failure, size)
 
-    def standard_normal(self, size):
+    def standard_normal(self, size=None):
         return self.rng.standard_normal(size)
 
     def multivariate_normal(self, mean: Union[np.ndarray, List[float]],

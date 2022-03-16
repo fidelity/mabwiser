@@ -868,13 +868,13 @@ class MAB:
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinGreedy):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, 0, learning_policy.epsilon,
-                          learning_policy.l2_lambda, "ridge", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ridge", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinTS):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                          learning_policy.l2_lambda, "ts", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ts", learning_policy.arm_to_scaler)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                          learning_policy.l2_lambda, "ucb", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ucb", learning_policy.arm_to_scaler)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
 
@@ -1174,7 +1174,8 @@ class MAB:
 
     def predict(self,
                 contexts: Union[None, List[Num], List[List[Num]],
-                                np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
+                                np.ndarray, pd.Series, pd.DataFrame] = None,  # Contexts, optional
+                num_predictions: int = None
                 ) -> Union[Arm, List[Arm]]:
         """Returns the "best" arm (or arms list if multiple contexts are given) based on the expected reward.
 
@@ -1187,6 +1188,10 @@ class MAB:
         contexts : Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context under which each decision is made. Default value is None.
             Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
+        num_predictions : int
+            The number of predictions to return for context-free bandits. Default value is None.
+            If None, a single prediction will be returned.
+            Number of predictions should be ``None`` for contextual bandits.
 
         Returns
         -------
@@ -1204,17 +1209,18 @@ class MAB:
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
 
         # Validate arguments
-        self._validate_predict_args(contexts)
+        self._validate_predict_args(contexts, num_predictions)
 
         # Convert contexts to numpy array for efficiency
         contexts = self.__convert_context(contexts)
 
         # Return the arm with the best expectation
-        return self._imp.predict(contexts)
+        return self._imp.predict(contexts, num_predictions)
 
     def predict_expectations(self,
                              contexts: Union[None, List[Num], List[List[Num]],
-                                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
+                                             np.ndarray, pd.Series, pd.DataFrame] = None,  # Contexts, optional
+                             num_predictions: int = None
                              ) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         """Returns a dictionary of arms (key) to their expected rewards (value).
 
@@ -1225,6 +1231,10 @@ class MAB:
         contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context for the expected rewards. Default value is None.
             Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
+        num_predictions : int
+            The number of predictions to return for context-free bandits. Default value is None.
+            If None, a single prediction will be returned.
+            Number of predictions should be ``None`` for contextual bandits.
 
         Returns
         -------
@@ -1242,13 +1252,13 @@ class MAB:
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
 
         # Validate arguments
-        self._validate_predict_args(contexts)
+        self._validate_predict_args(contexts, num_predictions)
 
         # Convert contexts to numpy array for efficiency
         contexts = self.__convert_context(contexts)
 
         # Return a dictionary from arms (key) to expectations (value)
-        return self._imp.predict_expectations(contexts)
+        return self._imp.predict_expectations(contexts, num_predictions)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
         """Warm-start untrained (cold) arms of the multi-armed bandit.
@@ -1372,13 +1382,15 @@ class MAB:
                         ValueError("Thompson Sampling requires binary rewards when binarizer function is not "
                                    "provided."))
 
-    def _validate_predict_args(self, contexts):
+    def _validate_predict_args(self, contexts, num_predictions):
         """"
         Validates argument types for predict and predict_expectation functions.
         """
 
         # Context policy and context data should match
         if self.is_contextual:  # don't use "if contexts" since it's n-dim array
+            check_true(num_predictions is None,
+                       ValueError("Prediction with context policy cannot specify number of predictions."))
             check_true(contexts is not None, ValueError("Prediction with context policy requires context data."))
             MAB._validate_context_type(contexts)
         else:

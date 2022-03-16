@@ -20,15 +20,26 @@ class _Random(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         pass
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
 
-        # Return the first arm with maximum expectation
-        return argmax(self.predict_expectations())
+        # Return the arm with maximum expectation
+        expectations = self.predict_expectations(num_predictions=num_predictions)
+        if num_predictions is None or num_predictions == 1:
+            return argmax(expectations)
+        else:
+            return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
 
         # Return a random expectation (between 0 and 1) for each arm
-        return dict((arm, self.rng.rand()) for arm in self.arms).copy()
+        # size = 1 if num_predictions is None else num_predictions
+        num_predictions = 1 if num_predictions is None else num_predictions
+        random_values = self.rng.rand((num_predictions, len(self.arms)))
+        expectations = [dict(zip(self.arms, exp)).copy() for exp in random_values]
+        if num_predictions == 1:
+            return expectations[0]
+        else:
+            return expectations
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
         pass

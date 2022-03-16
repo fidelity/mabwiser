@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, List, NoReturn, Optional
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, _BaseRNG
 
 
 class _EpsilonGreedy(BaseMAB):
@@ -32,19 +32,30 @@ class _EpsilonGreedy(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
 
-        # Return the first arm with maximum expectation
-        return argmax(self.predict_expectations())
+        # Return the arm with maximum expectation
+        expectations = self.predict_expectations(num_predictions=num_predictions)
+        if num_predictions is None or num_predictions == 1:
+            return argmax(expectations)
+        else:
+            return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
 
         # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
         # and the actual arm expectations otherwise
-        if self.rng.rand() < self.epsilon:
-            return dict((arm, self.rng.rand()) for arm in self.arms).copy()
+        if num_predictions is None or num_predictions == 1:
+            if self.rng.rand() < self.epsilon:
+                return dict((arm, self.rng.rand()) for arm in self.arms).copy()
+            else:
+                return self.arm_to_expectation.copy()
         else:
-            return self.arm_to_expectation.copy()
+            probability = self.rng.rand(num_predictions)
+            random_values = self.rng.rand((num_predictions, len(self.arms)))
+            expectations = [dict(zip(self.arms, exp)).copy() if probability[index] < self.epsilon
+                            else self.arm_to_expectation.copy() for index, exp in enumerate(random_values)]
+            return expectations
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

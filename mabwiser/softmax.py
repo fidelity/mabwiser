@@ -42,19 +42,29 @@ class _Softmax(BaseMAB):
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
 
-        # Return the first arm with maximum expectation
-        return argmax(self.predict_expectations())
+        # Return the arm with maximum expectation
+        expectations = self.predict_expectations(num_predictions=num_predictions)
+        if num_predictions is None or num_predictions == 1:
+            return argmax(expectations)
+        else:
+            return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
         # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.
         # The Dirichlet distribution can be seen as a multivariate generalization of the Beta distribution.
         # Add a very small epsilon to ensure each of the expectations is positive.
-        expectations = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
-        return dict(zip(self.arm_to_expectation.keys(), self.rng.dirichlet(expectations))).copy()
+        num_predictions = 1 if num_predictions is None else num_predictions
+        alpha = [v + np.finfo(float).eps for v in self.arm_to_expectation.values()]
+        dirichlet_random_values = self.rng.dirichlet(alpha, num_predictions)
+        expectations = [dict(zip(self.arm_to_expectation.keys(), exp)).copy() for exp in dirichlet_random_values]
+        if num_predictions == 1:
+            return expectations[0]
+        else:
+            return expectations
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

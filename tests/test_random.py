@@ -73,7 +73,7 @@ class RandomTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                                  rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 learning_policy=LearningPolicy.Random(),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
@@ -86,7 +86,7 @@ class RandomTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                                  rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 learning_policy=LearningPolicy.Random(),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)

@@ -45,20 +45,29 @@ class _ThompsonSampling(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards)
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: np.ndarray = None, num_predictions: int = None):
 
-        # Return the arm with maximum expectation. If multiple max value exists, return the first one
-        return argmax(self.predict_expectations())
+        # Return the arm with maximum expectation
+        expectations = self.predict_expectations(num_predictions=num_predictions)
+        if num_predictions is None or num_predictions == 1:
+            return argmax(expectations)
+        else:
+            return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: np.ndarray = None, num_predictions: int = None):
 
         # Expectation of each arm is a random sample from beta distribution with  success and fail counters
-        for arm in self.arm_to_expectation:
-            self.arm_to_expectation[arm] = self.rng.beta(self.arm_to_success_count[arm],
-                                                         self.arm_to_fail_count[arm])
-
-        # Return a copy of expectations dictionary from arms (key) to expectations (values)
-        return self.arm_to_expectation.copy()
+        num_predictions = 1 if num_predictions is None else num_predictions
+        expectations = []
+        for _ in range(num_predictions):
+            for arm in self.arm_to_expectation:
+                self.arm_to_expectation[arm] = self.rng.beta(self.arm_to_success_count[arm],
+                                                             self.arm_to_fail_count[arm])
+            expectations.append(self.arm_to_expectation.copy())
+        if num_predictions == 1:
+            return expectations[0]
+        else:
+            return expectations
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
