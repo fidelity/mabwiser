@@ -1186,7 +1186,7 @@ class MAB:
         ----------
         contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context for the expected rewards. Default value is None.
-            If contexts is not ``None`` for context-free bandits, the predicted expectations returned will be a
+            If contexts is not ``None`` for context-free bandits, the predictions returned will be a
             list of the same length as contexts.
 
         Returns
