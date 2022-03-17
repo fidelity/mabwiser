@@ -86,12 +86,10 @@ class LearningPolicy(NamedTuple):
             The regularization strength.
             Integer or float. Cannot be negative.
             Default value is 1.0.
-        arm_to_scaler: Dict[Arm, Callable]
-            Standardize context features by arm.
-            Dictionary mapping each arm to a scaler object. It is assumed
-            that the scaler objects are already fit and will only be used
-            to transform context features.
-            Default value is None.
+        scale: bool
+            Whether to scale features to have zero mean and unit variance.
+            Uses StandardScaler in sklearn.preprocessing.
+            Default value is False.
 
         Example
         -------
@@ -107,15 +105,14 @@ class LearningPolicy(NamedTuple):
         """
         epsilon: Num = 0.1
         l2_lambda: Num = 1.0
-        arm_to_scaler: Dict[Arm, Callable] = None
+        scale: bool = False
 
         def _validate(self):
             check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
             check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
-            if self.arm_to_scaler is not None:
-                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+            check_true(isinstance(self.scale, bool), TypeError("Standardize must be True or False."))
 
     class LinTS(NamedTuple):
         """ LinTS Learning Policy
@@ -148,12 +145,10 @@ class LearningPolicy(NamedTuple):
             The regularization strength.
             Integer or float. Must be greater than zero.
             Default value is 1.0.
-        arm_to_scaler: Dict[Arm, Callable]
-            Standardize context features by arm.
-            Dictionary mapping each arm to a scaler object. It is assumed
-            that the scaler objects are already fit and will only be used
-            to transform context features.
-            Default value is None.
+        scale: bool
+            Whether to scale features to have zero mean and unit variance.
+            Uses StandardScaler in sklearn.preprocessing.
+            Default value is False.
 
         Example
         -------
@@ -169,15 +164,14 @@ class LearningPolicy(NamedTuple):
         """
         alpha: Num = 1.0
         l2_lambda: Num = 1.0
-        arm_to_scaler: Dict[Arm, Callable] = None
+        scale: bool = False
 
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 < self.alpha, ValueError("The value of alpha must be greater than zero."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 < self.l2_lambda, ValueError("The value of l2_lambda must be greater than zero."))
-            if self.arm_to_scaler is not None:
-                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+            check_true(isinstance(self.scale, bool), TypeError("Scale must be True or False."))
 
     class LinUCB(NamedTuple):
         """LinUCB Learning Policy.
@@ -208,12 +202,10 @@ class LearningPolicy(NamedTuple):
             The regularization strength.
             Integer or float. Cannot be negative.
             Default value is 1.0.
-        arm_to_scaler: Dict[Arm, Callable]
-            Standardize context features by arm.
-            Dictionary mapping each arm to a scaler object. It is assumed
-            that the scaler objects are already fit and will only be used
-            to transform context features.
-            Default value is None.
+        scale: bool
+            Whether to scale features to have zero mean and unit variance.
+            Uses StandardScaler in sklearn.preprocessing.
+            Default value is False.
 
         Example
         -------
@@ -229,15 +221,14 @@ class LearningPolicy(NamedTuple):
         """
         alpha: Num = 1.0
         l2_lambda: Num = 1.0
-        arm_to_scaler: Dict[Arm, Callable] = None
+        scale: bool = False
 
         def _validate(self):
             check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
             check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
             check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
             check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
-            if self.arm_to_scaler is not None:
-                check_true(isinstance(self.arm_to_scaler, dict), TypeError("Arm_to_scaler must be a dictionary"))
+            check_true(isinstance(self.scale, bool), TypeError("Scale must be True or False."))
 
     class Popularity(NamedTuple):
         """Randomized Popularity Learning Policy.
@@ -868,13 +859,13 @@ class MAB:
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinGreedy):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, 0, learning_policy.epsilon,
-                         learning_policy.l2_lambda, "ridge", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ridge", learning_policy.scale)
         elif isinstance(learning_policy, LearningPolicy.LinTS):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                         learning_policy.l2_lambda, "ts", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ts", learning_policy.scale)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                         learning_policy.l2_lambda, "ucb", learning_policy.arm_to_scaler)
+                         learning_policy.l2_lambda, "ucb", learning_policy.scale)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
 
@@ -936,15 +927,12 @@ class MAB:
             else:
                 return LearningPolicy.EpsilonGreedy(lp.epsilon)
         elif isinstance(lp, _Linear):
-            arm_to_scaler = dict()
-            for arm in lp.arms:
-                arm_to_scaler[arm] = lp.arm_to_model[arm].scaler
             if lp.regression == 'ridge':
-                return LearningPolicy.LinGreedy(lp.epsilon, lp.l2_lambda, arm_to_scaler)
+                return LearningPolicy.LinGreedy(lp.epsilon, lp.l2_lambda, lp.scale)
             elif lp.regression == 'ts':
-                return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, arm_to_scaler)
+                return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, lp.scale)
             elif lp.regression == 'ucb':
-                return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, arm_to_scaler)
+                return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, lp.scale)
             else:
                 check_true(False, ValueError("Undefined regression " + str(lp.regression)))
         elif isinstance(lp, _Random):
@@ -981,7 +969,7 @@ class MAB:
         else:
             return None
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """ Adds an _arm_ to the list of arms.
 
         Incorporates the arm into the learning and neighborhood policies with no training data.
@@ -992,8 +980,6 @@ class MAB:
             The new arm to be added.
         binarizer: Callable
             The new binarizer function for Thompson Sampling.
-        scaler: Callable
-            A scaler object from sklearn.preprocessing.
 
         Returns
         -------
@@ -1002,8 +988,6 @@ class MAB:
         Raises
         ------
         TypeError:  For ThompsonSampling, binarizer must be a callable function.
-        TypeError:  The standard scaler object must have a transform method.
-        TypeError:  The standard scaler object must be fit with calculated ``mean_`` and ``var_`` attributes.
 
         ValueError: A binarizer function was provided but the learning policy is not Thompson Sampling.
         ValueError: The arm already exists.
@@ -1020,17 +1004,11 @@ class MAB:
                                                       "success for a given arm decision. Specifically, the function "
                                                       "signature is binarize(arm: Arm, reward: Num) -> True/False "
                                                       "or 0/1"))
-
-        if scaler:
-            check_true(hasattr(scaler, 'transform'),
-                       TypeError("Scaler must be a scaler object from sklearn.preprocessing with a transform method"))
-            check_true(hasattr(scaler, 'mean_') and hasattr(scaler, 'var_'),
-                       TypeError("Scaler must be fit with calculated mean_ and var_ attributes"))
         check_false(arm in self.arms, ValueError("The arm is already in the list of arms."))
 
         self._validate_arm(arm)
         self.arms.append(arm)
-        self._imp.add_arm(arm, binarizer, scaler)
+        self._imp.add_arm(arm, binarizer)
 
     def remove_arm(self, arm: Arm) -> NoReturn:
         """Removes an _arm_ from the list of arms.

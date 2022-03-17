@@ -559,7 +559,7 @@ class LinUCBTest(BaseTest):
         exp, mab = self.predict(arms=arms,
                                 decisions=decisions,
                                 rewards=rewards,
-                                learning_policy=LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler),
+                                learning_policy=LearningPolicy.LinUCB(scale=True),
                                 context_history=context_history,
                                 contexts=contexts,
                                 seed=123456,
@@ -585,14 +585,6 @@ class LinUCBTest(BaseTest):
 
             for i in range(len(contexts)):
                 self.assertAlmostEqual(exp[i][arm], exp_check[i][arm])
-
-    @staticmethod
-    def test_add_arm_scaler():
-        scaler = StandardScaler()
-        scaler.fit(np.array([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]).astype('float64'))
-        arm_to_scaler = {0: deepcopy(scaler), 1: deepcopy(scaler)}
-        mab = MAB([0, 1], LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler))
-        mab.add_arm(2, scaler=deepcopy(scaler))
 
     def test_add_arm(self):
         arm, mab = self.predict(arms=[1, 2, 3],

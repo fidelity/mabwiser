@@ -7,6 +7,8 @@ March, 17, 2022 2.4.0
 major:
 - Implement vectorized functions for non-contextual policies to speed-up prediction for multiple decisions.
 - Change MAB predict and predict_expectations to allow empty contexts to be specified for non-contextual policies.
+- Update scaler use in Linear policies so that standard scaler can be fit directly instead of pre-trained scalers.
+- Change scaler argument from pre-trained `arm_to_scaler` input to a boolean scale flag.
 
 March, 8, 2022 2.3.0
 -------------------------------------------------------------------------------

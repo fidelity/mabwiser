@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
@@ -13,7 +14,7 @@ from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 class _RidgeRegression:
 
     def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, 
-                 scaler: Optional[Callable] = None):
+                 scaler: StandardScaler = None):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
         self.rng = rng                      # random number generator
@@ -38,7 +39,12 @@ class _RidgeRegression:
 
         # Scale
         if self.scaler is not None:
-            X = self.scaler.transform(X.astype('float64'))
+            X = X.astype('float64')
+            if not hasattr(self.scaler, 'scale_'):
+                self.scaler.fit(X)
+            else:
+                self.scaler.partial_fit(X)
+            X = self.scaler.transform(X)
 
         # X transpose
         Xt = X.T
@@ -106,22 +112,18 @@ class _Linear(BaseMAB):
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 alpha: Num, epsilon: Num, l2_lambda: Num, regression: str,
-                 arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
+                 alpha: Num, epsilon: Num, l2_lambda: Num, regression: str, scale: bool):
         super().__init__(rng, arms, n_jobs, backend)
         self.alpha = alpha
         self.epsilon = epsilon
         self.l2_lambda = l2_lambda
         self.regression = regression
-
-        # Create ridge regression model for each arm
+        self.scale = scale
         self.num_features = None
 
-        if arm_to_scaler is None:
-            arm_to_scaler = dict((arm, None) for arm in arms)
-
-        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, 
-                                                                       l2_lambda, arm_to_scaler[arm])) for arm in arms)
+        # Create regression model for each arm
+        scaler = StandardScaler() if self.scale else None
+        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scaler)) for arm in arms)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -149,9 +151,10 @@ class _Linear(BaseMAB):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
             self.arm_to_model[cold_arm] = deepcopy(self.arm_to_model[warm_arm])
 
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None):
 
         # Add to untrained_arms arms
+        scaler = StandardScaler() if self.scale else None
         self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, scaler)
 
         # If fit happened, initialize the new arm to defaults

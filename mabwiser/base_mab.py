@@ -86,14 +86,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
         self.trained_arms: List[Arm] = list()
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
         calls the ``_uptake_new_arm()`` function of the sub-class.
         """
         self.arm_to_expectation[arm] = 0
-        self._uptake_new_arm(arm, binarizer, scaler)
+        self._uptake_new_arm(arm, binarizer)
 
     def remove_arm(self, arm: Arm) -> NoReturn:
         """Removes arm from the bandit.
@@ -147,7 +147,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
