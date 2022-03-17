@@ -15,9 +15,7 @@ from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
-
 
 from mabwiser._version import __author__, __email__, __version__, __copyright__
 from mabwiser.approximate import _LSHNearest
@@ -292,8 +290,8 @@ class LearningPolicy(NamedTuple):
             P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
             { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
 
-        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine the degree of
-        exploration.
+        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine
+        the degree of exploration.
 
         Attributes
         ----------
@@ -530,7 +528,7 @@ class NeighborhoodPolicy(NamedTuple):
             Integer value. Must be greater than zero.
             Default value is 3.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+            The probabilities associated with each arm. Used to select random arm if prediction has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
@@ -557,7 +555,7 @@ class NeighborhoodPolicy(NamedTuple):
             check_true(self.n_dimensions > 0, ValueError("n_dimensions must be greater than zero."))
             check_true(isinstance(self.n_tables, int), TypeError("n_tables must be an integer"))
             check_true(self.n_tables > 0, ValueError("n_tables must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
                        TypeError("no_nhood_prob_of_arm must be None or List."))
             if isinstance(self.no_nhood_prob_of_arm, List):
                 check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
@@ -580,7 +578,7 @@ class NeighborhoodPolicy(NamedTuple):
             Accepts any of the metrics supported by scipy.spatial.distance.cdist.
             Default value is Euclidean distance.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+            The probabilities associated with each arm. Used to select random arm if context has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
@@ -607,7 +605,7 @@ class NeighborhoodPolicy(NamedTuple):
             check_true((self.metric in Constants.distance_metrics),
                        ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
             check_true(self.radius > 0, ValueError("Radius must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
                        TypeError("no_nhood_prob_of_arm must be None or List."))
             if isinstance(self.no_nhood_prob_of_arm, List):
                 check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
@@ -1164,9 +1162,10 @@ class MAB:
 
         Parameters
         ----------
-        contexts : Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
-            The context under which each decision is made. Default value is None.
-            Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
+        contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
+            The context for the expected rewards. Default value is None.
+            If contexts is not ``None`` for context-free bandits, the predictions returned will be a
+            list of the same length as contexts.
 
         Returns
         -------
@@ -1176,8 +1175,7 @@ class MAB:
         ------
         TypeError:  Contexts is not given as ``None``, list, numpy array, pandas series or data frames.
 
-        ValueError: Predicting with contexts data when there is no contextual policy.
-        ValueError: Contextual policy when predicting with no contexts data.
+        ValueError: Prediction with context policy requires context data.
         """
 
         # Check that fit is called before
@@ -1204,7 +1202,8 @@ class MAB:
         ----------
         contexts : Union[None, List[Num], List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context for the expected rewards. Default value is None.
-            Contexts should be ``None`` for context-free bandits and is required for contextual bandits.
+            If contexts is not ``None`` for context-free bandits, the predicted expectations returned will be a
+            list of the same length as contexts.
 
         Returns
         -------
@@ -1214,8 +1213,7 @@ class MAB:
         ------
         TypeError:  Contexts is not given as ``None``, list, numpy array or pandas data frames.
 
-        ValueError: Predicting with contexts data when there is no contextual policy.
-        ValueError: Contextual policy when predicting with no contexts data.
+        ValueError: Prediction with context policy requires context data.
         """
 
         # Check that fit is called before
@@ -1362,7 +1360,8 @@ class MAB:
             check_true(contexts is not None, ValueError("Prediction with context policy requires context data."))
             MAB._validate_context_type(contexts)
         else:
-            check_true(contexts is None, ValueError("Prediction with no context policy cannot handle context data."))
+            if contexts is not None:
+                MAB._validate_context_type(contexts)
 
     @staticmethod
     def _validate_context_type(contexts):
@@ -1466,7 +1465,9 @@ class MAB:
             else:  # For predictions, compare the shape to the stored context history
 
                 # We need to find out the number of features (to distinguish Series shape)
-                if isinstance(self.learning_policy, (LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB)):
+                if isinstance(self.learning_policy, (LearningPolicy.LinGreedy,
+                                                     LearningPolicy.LinTS,
+                                                     LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size

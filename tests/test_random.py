@@ -73,7 +73,7 @@ class RandomTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                                  rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 learning_policy=LearningPolicy.Random(),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
@@ -86,10 +86,31 @@ class RandomTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                                  rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.25),
+                                 learning_policy=LearningPolicy.Random(),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
         mab.remove_arm(3)
         self.assertTrue(3 not in mab.arms)
         self.assertTrue(3 not in mab._imp.arm_to_expectation)
+
+    def test_random_contexts(self):
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Random(),
+                                 contexts=[[]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [1, 1, 3, 1, 2, 2, 2, 2, 2, 2])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Random(),
+                                 contexts=[[1, 2, 3]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [1, 1, 3, 1, 2, 2, 2, 2, 2, 2])

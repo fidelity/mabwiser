@@ -298,3 +298,24 @@ class PopularityTest(BaseTest):
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})
+
+    def test_popularity_contexts(self):
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 contexts=[[]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [3, 2, 3, 3, 3, 2, 2, 3, 2, 3])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.Popularity(),
+                                 contexts=[[1, 2, 3]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [3, 2, 3, 3, 3, 2, 2, 3, 2, 3])

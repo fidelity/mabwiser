@@ -2,6 +2,12 @@
 MABWiser CHANGELOG
 =====================
 
+March, 17, 2022 2.4.0
+-------------------------------------------------------------------------------
+major:
+- Implement vectorized functions for non-contextual policies to speed-up prediction for multiple decisions.
+- Change MAB predict and predict_expectations to allow empty contexts to be specified for non-contextual policies.
+
 March, 8, 2022 2.3.0
 -------------------------------------------------------------------------------
 major:
