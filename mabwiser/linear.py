@@ -119,17 +119,10 @@ class _Linear(BaseMAB):
         self.l2_lambda = l2_lambda
         self.regression = regression
         self.scale = scale
-
-        # Create ridge regression model for each arm
         self.num_features = None
 
-        # Create scaler
-        if self.scale:
-            scaler = StandardScaler()
-        else:
-            scaler = None
-
-        # Create arm to model
+        # Create regression model for each arm
+        scaler = StandardScaler() if self.scale else None
         self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scaler)) for arm in arms)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
