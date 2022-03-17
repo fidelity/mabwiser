@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 
@@ -20,7 +20,7 @@ class _Random(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         pass
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -29,7 +29,7 @@ class _Random(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return a random expectation (between 0 and 1) for each arm.
         # If contexts is None or has length of 1 generate single arm to expectations,

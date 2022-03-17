@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List, Optional, NoReturn
+from typing import Dict, List, Optional, NoReturn, Union
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
@@ -31,7 +31,7 @@ class _Popularity(_EpsilonGreedy):
         # Make sure expectations sum up to 1 like probabilities
         self._normalize_expectations()
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -40,7 +40,7 @@ class _Popularity(_EpsilonGreedy):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
         # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.

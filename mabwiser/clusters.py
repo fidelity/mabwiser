@@ -84,11 +84,11 @@ class _Clusters(BaseMAB):
 
         self._fit_operation()
 
-    def predict(self, contexts: Optional[np.ndarray] = None):
+    def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict within the cluster
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None):
+    def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations within the cluster
         return self._parallel_predict(contexts, is_predict=False)
 

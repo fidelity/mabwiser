@@ -3,7 +3,7 @@
 
 import math
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 
@@ -46,7 +46,7 @@ class _UCB1(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -55,7 +55,7 @@ class _UCB1(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         if contexts is None or len(contexts) == 1:

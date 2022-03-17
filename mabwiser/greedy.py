@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import argmax, reset, Arm, _BaseRNG
+from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
 
 
 class _EpsilonGreedy(BaseMAB):
@@ -32,7 +32,7 @@ class _EpsilonGreedy(BaseMAB):
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -41,7 +41,7 @@ class _EpsilonGreedy(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
         # and the actual arm expectations otherwise.

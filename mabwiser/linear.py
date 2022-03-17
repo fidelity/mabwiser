@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 
@@ -137,11 +137,11 @@ class _Linear(BaseMAB):
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict for the given context
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
 

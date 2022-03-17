@@ -42,7 +42,7 @@ class _Softmax(BaseMAB):
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -51,7 +51,7 @@ class _Softmax(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
         # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.

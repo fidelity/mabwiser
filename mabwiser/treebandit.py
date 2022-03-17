@@ -59,11 +59,11 @@ class _TreeBandit(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
 
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         return self._parallel_predict(contexts, is_predict=False)
 

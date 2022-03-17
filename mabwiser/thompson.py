@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Dict, List, NoReturn, Optional, Callable
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
 
@@ -45,7 +45,7 @@ class _ThompsonSampling(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
         # Return the arm with maximum expectation
         expectations = self.predict_expectations(contexts)
@@ -54,7 +54,7 @@ class _ThompsonSampling(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Expectation of each arm is a random sample from beta distribution with success and fail counters.
         # If contexts is None or has length of 1 generate single arm to expectations,
