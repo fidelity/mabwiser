@@ -56,18 +56,19 @@ class _ThompsonSampling(BaseMAB):
 
     def predict_expectations(self, contexts: np.ndarray = None):
 
-        # Expectation of each arm is a random sample from beta distribution with  success and fail counters
+        # Expectation of each arm is a random sample from beta distribution with success and fail counters.
+        # If contexts is None or has length of 1 generate single arm to expectations,
+        # otherwise use vectorized functions to generate a list of arm to expectations with same length as contexts.
         size = 1 if contexts is None else len(contexts)
-        expectations = []
-        for _ in range(size):
-            for arm in self.arm_to_expectation:
-                self.arm_to_expectation[arm] = self.rng.beta(self.arm_to_success_count[arm],
-                                                             self.arm_to_fail_count[arm])
-            expectations.append(self.arm_to_expectation.copy())
+        arm_to_random_beta = dict()
+        for arm in self.arm_to_expectation:
+            arm_to_random_beta[arm] = self.rng.beta(self.arm_to_success_count[arm], self.arm_to_fail_count[arm], size)
+        arm_to_expectation = [{arm: arm_to_random_beta[arm][i] for arm in self.arms} for i in range(size)]
+        self.arm_to_expectation = arm_to_expectation[-1]
         if size == 1:
-            return expectations[0]
+            return arm_to_expectation[0]
         else:
-            return expectations
+            return arm_to_expectation
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

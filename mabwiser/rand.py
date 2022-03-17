@@ -31,8 +31,9 @@ class _Random(BaseMAB):
 
     def predict_expectations(self, contexts: np.ndarray = None):
 
-        # Return a random expectation (between 0 and 1) for each arm
-        # size = 1 if num_predictions is None else num_predictions
+        # Return a random expectation (between 0 and 1) for each arm.
+        # If contexts is None or has length of 1 generate single arm to expectations,
+        # otherwise use vectorized functions to generate a list of arm to expectations with same length as contexts.
         size = 1 if contexts is None else len(contexts)
         random_values = self.rng.rand((size, len(self.arms)))
         expectations = [dict(zip(self.arms, exp)).copy() for exp in random_values]

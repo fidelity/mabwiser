@@ -44,7 +44,9 @@ class _EpsilonGreedy(BaseMAB):
     def predict_expectations(self, contexts: np.ndarray = None):
 
         # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
-        # and the actual arm expectations otherwise
+        # and the actual arm expectations otherwise.
+        # If contexts is None or has length of 1 generate single arm to expectations,
+        # otherwise use vectorized functions to generate a list of arm to expectations with same length as contexts.
         if contexts is None or len(contexts) == 1:
             if self.rng.rand() < self.epsilon:
                 return dict((arm, self.rng.rand()) for arm in self.arms).copy()

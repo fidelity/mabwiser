@@ -394,3 +394,13 @@ class GreedyTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
         self.assertEqual(arms, [1, 1, 1, 1, 1, 1, 3, 1, 1, 1])
+
+        arms, mab = self.predict(arms=[1, 2, 3],
+                                 decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
+                                 rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.5),
+                                 contexts=[[1, 2, 3]] * 10,
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+        self.assertEqual(arms, [1, 1, 1, 1, 1, 1, 3, 1, 1, 1])
