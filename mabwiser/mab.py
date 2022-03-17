@@ -528,7 +528,7 @@ class NeighborhoodPolicy(NamedTuple):
             Integer value. Must be greater than zero.
             Default value is 3.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if prediction has no neighbors.
+            The probabilities associated with each arm. Used to select random arm if context has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
