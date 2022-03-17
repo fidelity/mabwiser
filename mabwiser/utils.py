@@ -172,7 +172,7 @@ class _BaseRNG(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def standard_normal(self, size: Union[int, Tuple[int]] = None):
+    def standard_normal(self, size=None):
         """ Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
             Parameters
