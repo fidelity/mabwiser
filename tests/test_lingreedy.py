@@ -592,7 +592,53 @@ class LinGreedyTest(BaseTest):
         self.assertEqual(len(arm), 3)
         self.assertEqual(arm, [[3, 2], [3, 3], [3, 3]])
 
-    def test_scaler(self):
+    def test_scaler_values(self):
+        exp, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinGreedy(scale=True),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+        self.assertEqual(mab._imp.arm_to_model[1].scaler.n_samples_seen_, 3)
+        self.assertEqual(mab._imp.arm_to_model[2].scaler.n_samples_seen_, 2)
+        self.assertEqual(mab._imp.arm_to_model[3].scaler.n_samples_seen_, 5)
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[1].scaler.mean_), [1/3, 2/3,  4/3, 4/3, 2.0])
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[2].scaler.mean_), [0.5, 2.5, 1.5, 2.0, 3.0])
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[3].scaler.mean_), [0.2, 1.2, 1.6, 1.6, 2.6])
+
+    def test_scaler_partial_fit(self):
+        exp, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinGreedy(scale=True),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=1,
+                                is_predict=False)
+        mab.partial_fit(decisions=[3, 3, 3, 2, 2, 1, 1, 1, 1, 1],
+                        rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                        contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                  [0, 2, 1, 0, 0]])
+        self.assertEqual(mab._imp.arm_to_model[1].scaler.n_samples_seen_, 8)
+        self.assertEqual(mab._imp.arm_to_model[2].scaler.n_samples_seen_, 4)
+        self.assertEqual(mab._imp.arm_to_model[3].scaler.n_samples_seen_, 8)
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[1].scaler.mean_), [0.25, 1.0, 1.5, 1.5, 2.375])
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[2].scaler.mean_), [0.5, 2.5, 1.5, 2.0, 3.0])
+        self.assertListAlmostEqual(list(mab._imp.arm_to_model[3].scaler.mean_), [0.25, 1.0, 1.5, 1.5, 2.375])
+
+    def test_scaler_predictions(self):
 
         arms = [1, 2, 3]
         context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
@@ -604,6 +650,7 @@ class LinGreedyTest(BaseTest):
         decisions = np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3])
         rewards = np.array([0, 0, 1, 0, 0, 0, 0, 1, 1, 1])
 
+
         arm_to_scaler = {}
         for arm in arms:
             scaler = StandardScaler()
@@ -614,7 +661,7 @@ class LinGreedyTest(BaseTest):
         exp, mab = self.predict(arms=arms,
                                 decisions=decisions,
                                 rewards=rewards,
-                                learning_policy=LearningPolicy.LinGreedy(arm_to_scaler=arm_to_scaler),
+                                learning_policy=LearningPolicy.LinGreedy(scale=True),
                                 context_history=context_history,
                                 contexts=contexts,
                                 seed=123456,

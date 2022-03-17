@@ -14,93 +14,72 @@ from tests.test_base import BaseTest
 class LinTSTest(BaseTest):
 
     def test_alpha0_0001(self):
-        scaler = StandardScaler()
-        context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                 [0, 2, 1, 0, 0]])
-        scaler.fit(context_history)
-
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
                                 rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                learning_policy=LearningPolicy.LinTS(alpha=0.0001,
-                                                                     arm_to_scaler={1: scaler, 2: scaler, 3: scaler}),
-                                context_history=context_history,
+                                learning_policy=LearningPolicy.LinTS(alpha=0.0001, scale=True),
+                                context_history=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                         [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                         [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                         [0, 2, 1, 0, 0]]),
                                 contexts=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]]),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 2], [3, 2], [3, 2]])
+        self.assertEqual(arm, [[2, 3], [2, 3], [3, 3]])
 
     def test_alpha0_0001_expectations(self):
-        scaler = StandardScaler()
-        context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                    [0, 2, 1, 0, 0]])
-        scaler.fit(context_history)
-
         exps, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
                                  rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                 learning_policy=LearningPolicy.LinTS(alpha=0.0001,
-                                                                      arm_to_scaler={1: scaler, 2: scaler, 3: scaler}),
-                                 context_history=context_history,
+                                 learning_policy=LearningPolicy.LinTS(alpha=0.0001, scale=True),
+                                 context_history=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                          [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                          [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                          [0, 2, 1, 0, 0]]),
                                  contexts=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]]),
                                  seed=123456,
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [-0.2852569197274552, 0.00016338898274687822, 0.5735155717025586])
-        self.assertListAlmostEqual(exps[1].values(), [-0.1487907884038659, -7.802191785859073e-05,
-                                                      -0.0008484936824155465])
+        self.assertListAlmostEqual(exps[0].values(),
+                                   [-0.23459369004297587, 0.0002702455674444537, 4.588547880979047e-05])
+        self.assertListAlmostEqual(exps[1].values(),
+                                   [-0.192811601170233, -2.3415795345448245e-05, 0.00016619626256880228])
 
     def test_alpha1(self):
-        scaler = StandardScaler()
-        context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                    [0, 2, 1, 0, 0]])
-        scaler.fit(context_history)
-
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.LinTS(alpha=1,
-                                                                     arm_to_scaler={1: scaler, 2: scaler, 3: scaler}),
-                                context_history=context_history,
+                                learning_policy=LearningPolicy.LinTS(alpha=1),
+                                context_history=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                         [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                         [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                         [0, 2, 1, 0, 0]]),
                                 contexts=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]]),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
-
         self.assertEqual(len(arm), 2)
         self.assertEqual(arm, [2, 3])
 
     def test_alpha1_expectations(self):
-        scaler = StandardScaler()
-        context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                    [0, 2, 1, 0, 0]])
-        scaler.fit(context_history)
-
         exps, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.LinTS(alpha=1,
-                                                                      arm_to_scaler={1: scaler, 2: scaler, 3: scaler}),
-                                 context_history=context_history,
+                                 learning_policy=LearningPolicy.LinTS(alpha=1),
+                                 context_history=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                           [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                           [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                           [0, 2, 1, 0, 0]]),
                                  contexts=np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]]),
                                  seed=123456,
                                  num_run=1,
                                  is_predict=False)
-
-        self.assertListAlmostEqual(exps[0].values(), [-0.6846042491588905, 1.8728586982060706, 0.39597711947956443])
-        self.assertListAlmostEqual(exps[1].values(), [-0.9156881567627143, -1.01000793116177, 1.6774048483779203])
+        self.assertListAlmostEqual(exps[0].values(), [-0.6029872358950072, 3.105765259323796, 1.0208598325762464])
+        self.assertListAlmostEqual(exps[1].values(), [0.572141413757231, 0.45473267178654997, 1.773376616755168])
 
     def test_np(self):
 
