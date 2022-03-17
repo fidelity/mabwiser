@@ -57,7 +57,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         If set to -2, all CPUs but one are used, and so on.
     backend: str, optional
         Specify a parallelization backend implementation supported in the joblib library. Supported options are:
-        - “loky” used by default, can induce some communication and memory overhead when exchanging input and output data with the worker Python processes.
+        - “loky” used by default, can induce some communication and memory overhead when exchanging input and output.
         - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
         - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
@@ -130,7 +130,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
         """Abstract method.
 
         Returns a dictionary from arms (keys) to their expected rewards (values).

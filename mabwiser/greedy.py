@@ -41,7 +41,8 @@ class _EpsilonGreedy(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
 
         # Return a random expectation (between 0 and 1) for each arm with epsilon probability,
         # and the actual arm expectations otherwise.

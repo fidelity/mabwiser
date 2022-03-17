@@ -29,7 +29,8 @@ class _Random(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
 
         # Return a random expectation (between 0 and 1) for each arm.
         # If contexts is None or has length of 1 generate single arm to expectations,

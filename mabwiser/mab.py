@@ -299,8 +299,8 @@ class LearningPolicy(NamedTuple):
             P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
             { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
 
-        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine the degree of
-        exploration.
+        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine
+        the degree of exploration.
 
         Attributes
         ----------
@@ -537,7 +537,7 @@ class NeighborhoodPolicy(NamedTuple):
             Integer value. Must be greater than zero.
             Default value is 3.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+            The probabilities associated with each arm. Used to select random arm if prediction has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
@@ -564,7 +564,7 @@ class NeighborhoodPolicy(NamedTuple):
             check_true(self.n_dimensions > 0, ValueError("n_dimensions must be greater than zero."))
             check_true(isinstance(self.n_tables, int), TypeError("n_tables must be an integer"))
             check_true(self.n_tables > 0, ValueError("n_tables must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
                        TypeError("no_nhood_prob_of_arm must be None or List."))
             if isinstance(self.no_nhood_prob_of_arm, List):
                 check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
@@ -587,7 +587,7 @@ class NeighborhoodPolicy(NamedTuple):
             Accepts any of the metrics supported by scipy.spatial.distance.cdist.
             Default value is Euclidean distance.
         no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if a prediction context has no neighbors.
+            The probabilities associated with each arm. Used to select random arm if context has no neighbors.
             If not given, a uniform random distribution over all arms is assumed.
             The probabilities should sum up to 1.
 
@@ -614,7 +614,7 @@ class NeighborhoodPolicy(NamedTuple):
             check_true((self.metric in Constants.distance_metrics),
                        ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
             check_true(self.radius > 0, ValueError("Radius must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm == None) or isinstance(self.no_nhood_prob_of_arm, List),
+            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
                        TypeError("no_nhood_prob_of_arm must be None or List."))
             if isinstance(self.no_nhood_prob_of_arm, List):
                 check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
@@ -1487,7 +1487,9 @@ class MAB:
             else:  # For predictions, compare the shape to the stored context history
 
                 # We need to find out the number of features (to distinguish Series shape)
-                if isinstance(self.learning_policy, (LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB)):
+                if isinstance(self.learning_policy, (LearningPolicy.LinGreedy,
+                                                     LearningPolicy.LinTS,
+                                                     LearningPolicy.LinUCB)):
                     first_arm = self.arms[0]
                     if isinstance(self._imp, _Linear):
                         num_features = self._imp.arm_to_model[first_arm].beta.size

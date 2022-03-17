@@ -55,7 +55,8 @@ class _UCB1(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
 
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         if contexts is None or len(contexts) == 1:

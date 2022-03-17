@@ -54,7 +54,8 @@ class _ThompsonSampling(BaseMAB):
         else:
             return [argmax(exp) for exp in expectations]
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
 
         # Expectation of each arm is a random sample from beta distribution with success and fail counters.
         # If contexts is None or has length of 1 generate single arm to expectations,
