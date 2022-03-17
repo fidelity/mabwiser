@@ -859,13 +859,13 @@ class MAB:
             lp = _UCB1(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha)
         elif isinstance(learning_policy, LearningPolicy.LinGreedy):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, 0, learning_policy.epsilon,
-                          learning_policy.l2_lambda, "ridge", learning_policy.scale)
+                         learning_policy.l2_lambda, "ridge", learning_policy.scale)
         elif isinstance(learning_policy, LearningPolicy.LinTS):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                          learning_policy.l2_lambda, "ts", learning_policy.scale)
+                         learning_policy.l2_lambda, "ts", learning_policy.scale)
         elif isinstance(learning_policy, LearningPolicy.LinUCB):
             lp = _Linear(self._rng, self.arms, self.n_jobs, self.backend, learning_policy.alpha, 0,
-                          learning_policy.l2_lambda, "ucb", learning_policy.scale)
+                         learning_policy.l2_lambda, "ucb", learning_policy.scale)
         else:
             check_true(False, ValueError("Undefined learning policy " + str(learning_policy)))
 
