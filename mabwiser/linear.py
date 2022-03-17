@@ -153,13 +153,8 @@ class _Linear(BaseMAB):
 
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None):
 
-        # Create scaler
-        if self.scale:
-            scaler = StandardScaler()
-        else:
-            scaler = None
-
         # Add to untrained_arms arms
+        scaler = StandardScaler() if self.scale else None
         self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, scaler)
 
         # If fit happened, initialize the new arm to defaults
