@@ -623,13 +623,9 @@ class InvalidTest(BaseTest):
                          is_predict=True,
                          n_jobs=0)
 
-    def test_invalid_add_arm_scaler(self):
-
-        scaler = StandardScaler()
-        arm_to_scaler = {0: deepcopy(scaler), 1: deepcopy(scaler)}
-        mab = MAB([0, 1], LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler))
+    def test_invalid_scale(self):
         with self.assertRaises(TypeError):
-            mab.add_arm(2, scaler=deepcopy(scaler))
+            mab = MAB([0, 1], LearningPolicy.LinUCB(scale=1))
 
     def test_convert_array_invalid(self):
         df = pd.DataFrame({'a': [1, 1, 1, 1, 1]})

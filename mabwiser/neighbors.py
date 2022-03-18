@@ -64,12 +64,12 @@ class _Neighbors(BaseMAB):
         self.contexts = np.concatenate((self.contexts, contexts))
         self.rewards = np.concatenate((self.rewards, rewards))
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
 
         # Return predict within the neighborhood
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
 
         # Return predict expectations within the neighborhood
         return self._parallel_predict(contexts, is_predict=False)

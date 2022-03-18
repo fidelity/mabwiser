@@ -17,7 +17,7 @@ class RidgeRegressionTest(BaseTest):
         rewards = np.array([3, 3, 1])
         rng = np.random.RandomState(seed=7)
 
-        ridge = _RidgeRegression(rng, l2_lambda=1.0, alpha=1.0, scaler = None)
+        ridge = _RidgeRegression(rng, l2_lambda=1.0, alpha=1.0, scale=False)
 
         ridge.init(context.shape[1])
         ridge.fit(context, rewards)
@@ -31,7 +31,7 @@ class RidgeRegressionTest(BaseTest):
         scaler = StandardScaler()
         scaler.fit(context.astype('float64'))
 
-        ridge = _RidgeRegression(rng, l2_lambda=1.0, alpha=1.0, scaler = scaler)
+        ridge = _RidgeRegression(rng, l2_lambda=1.0, alpha=1.0, scale=True)
 
         ridge.init(context.shape[1])
         ridge.fit(context, rewards)

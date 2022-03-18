@@ -7,7 +7,7 @@ This module defines the abstract base class for contextual multi-armed bandit al
 
 import abc
 from itertools import chain
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 import multiprocessing as mp
 
 from joblib import Parallel, delayed
@@ -57,7 +57,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         If set to -2, all CPUs but one are used, and so on.
     backend: str, optional
         Specify a parallelization backend implementation supported in the joblib library. Supported options are:
-        - “loky” used by default, can induce some communication and memory overhead when exchanging input and output data with the worker Python processes.
+        - “loky” used by default, can induce some communication and memory overhead when exchanging input and output.
         - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
         - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
@@ -86,14 +86,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
         self.trained_arms: List[Arm] = list()
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
         calls the ``_uptake_new_arm()`` function of the sub-class.
         """
         self.arm_to_expectation[arm] = 0
-        self._uptake_new_arm(arm, binarizer, scaler)
+        self._uptake_new_arm(arm, binarizer)
 
     def remove_arm(self, arm: Arm) -> NoReturn:
         """Removes arm from the bandit.
@@ -122,7 +122,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict(self, contexts: Optional[np.ndarray] = None) -> Arm:
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
         """Abstract method.
 
         Returns the predicted arm.
@@ -130,7 +130,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[Dict[Arm, Num],
+                                                                                   List[Dict[Arm, Num]]]:
         """Abstract method.
 
         Returns a dictionary from arms (keys) to their expected rewards (values).
@@ -146,7 +147,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.

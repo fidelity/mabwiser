@@ -2,11 +2,9 @@
 
 import os
 import pickle
-from copy import deepcopy
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
@@ -46,17 +44,11 @@ class MABTest(BaseTest):
         mab = MAB([0, 1], lp)
         self.assertEqual(lp.epsilon, mab.learning_policy.epsilon)
 
-        data = np.array([[1, 2, 3], [3, 2, 1]])
-        sc = StandardScaler()
-        sc.fit(data)
-        arm_to_scaler = {0: sc, 1: sc}
-
-        lp = LearningPolicy.LinUCB(alpha=2.0, l2_lambda=0.3, arm_to_scaler=arm_to_scaler)
+        lp = LearningPolicy.LinUCB(alpha=2.0, l2_lambda=0.3, scale=True)
         mab = MAB([0, 1], lp)
         self.assertEqual(lp.alpha, mab.learning_policy.alpha)
         self.assertEqual(lp.l2_lambda, mab.learning_policy.l2_lambda)
-        self.assertIs(sc, mab.learning_policy.arm_to_scaler[0])
-        self.assertIs(sc, mab.learning_policy.arm_to_scaler[1])
+        self.assertEqual(lp.scale, mab.learning_policy.scale)
 
         lp = LearningPolicy.Softmax(tau=0.5)
         mab = MAB([0, 1], lp)

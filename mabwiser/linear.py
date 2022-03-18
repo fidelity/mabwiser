@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, NoReturn, Optional, Union
 
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
@@ -12,19 +13,19 @@ from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
 class _RidgeRegression:
 
-    def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, 
-                 scaler: Optional[Callable] = None):
+    def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, scale: bool = False):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
         self.rng = rng                      # random number generator
         self.alpha = alpha                  # exploration parameter
         self.l2_lambda = l2_lambda          # regularization parameter
-        self.scaler = scaler                # standard scaler object
+        self.scale = scale                  # scale contexts
 
         self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
         self.A = None                       # (XtX + l2_lambda * I_d)
         self.A_inv = None                   # (XtX + l2_lambda * I_d)^-1
         self.Xty = None
+        self.scaler = None
 
     def init(self, num_features):
         # By default, assume that
@@ -33,12 +34,18 @@ class _RidgeRegression:
         self.A = self.l2_lambda * np.identity(num_features)
         self.A_inv = self.A.copy()
         self.beta = np.dot(self.A_inv, self.Xty)
+        self.scaler = StandardScaler() if self.scale else None
 
     def fit(self, X, y):
 
         # Scale
         if self.scaler is not None:
-            X = self.scaler.transform(X.astype('float64'))
+            X = X.astype('float64')
+            if not hasattr(self.scaler, 'scale_'):
+                self.scaler.fit(X)
+            else:
+                self.scaler.partial_fit(X)
+            X = self.scaler.transform(X)
 
         # X transpose
         Xt = X.T
@@ -63,6 +70,9 @@ class _RidgeRegression:
         return np.dot(x, self.beta)
 
     def _scale_predict_context(self, x):
+        if not hasattr(self.scaler, 'scale_'):
+            return x
+
         # Reshape 1D array to 2D
         x = x.reshape(1, -1)
 
@@ -106,22 +116,17 @@ class _Linear(BaseMAB):
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 alpha: Num, epsilon: Num, l2_lambda: Num, regression: str,
-                 arm_to_scaler: Optional[Dict[Arm, Callable]] = None):
+                 alpha: Num, epsilon: Num, l2_lambda: Num, regression: str, scale: bool):
         super().__init__(rng, arms, n_jobs, backend)
         self.alpha = alpha
         self.epsilon = epsilon
         self.l2_lambda = l2_lambda
         self.regression = regression
-
-        # Create ridge regression model for each arm
+        self.scale = scale
         self.num_features = None
 
-        if arm_to_scaler is None:
-            arm_to_scaler = dict((arm, None) for arm in arms)
-
-        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, 
-                                                                       l2_lambda, arm_to_scaler[arm])) for arm in arms)
+        # Create regression model for each arm
+        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scale)) for arm in arms)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -137,11 +142,11 @@ class _Linear(BaseMAB):
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None):
+    def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict for the given context
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None):
+    def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
 
@@ -149,10 +154,10 @@ class _Linear(BaseMAB):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
             self.arm_to_model[cold_arm] = deepcopy(self.arm_to_model[warm_arm])
 
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None):
 
         # Add to untrained_arms arms
-        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, scaler)
+        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, self.scale)
 
         # If fit happened, initialize the new arm to defaults
         is_fitted = self.num_features is not None

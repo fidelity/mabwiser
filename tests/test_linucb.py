@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest
 
 
@@ -559,7 +559,7 @@ class LinUCBTest(BaseTest):
         exp, mab = self.predict(arms=arms,
                                 decisions=decisions,
                                 rewards=rewards,
-                                learning_policy=LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler),
+                                learning_policy=LearningPolicy.LinUCB(scale=True),
                                 context_history=context_history,
                                 contexts=contexts,
                                 seed=123456,
@@ -586,13 +586,22 @@ class LinUCBTest(BaseTest):
             for i in range(len(contexts)):
                 self.assertAlmostEqual(exp[i][arm], exp_check[i][arm])
 
-    @staticmethod
-    def test_add_arm_scaler():
-        scaler = StandardScaler()
-        scaler.fit(np.array([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]).astype('float64'))
-        arm_to_scaler = {0: deepcopy(scaler), 1: deepcopy(scaler)}
-        mab = MAB([0, 1], LearningPolicy.LinUCB(arm_to_scaler=arm_to_scaler))
-        mab.add_arm(2, scaler=deepcopy(scaler))
+    def test_unused_arm_scale(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.LinUCB(scale=True),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+
+        self.assertEqual(arms, [4, 2])
 
     def test_add_arm(self):
         arm, mab = self.predict(arms=[1, 2, 3],
