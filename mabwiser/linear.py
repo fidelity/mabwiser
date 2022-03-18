@@ -13,19 +13,19 @@ from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
 class _RidgeRegression:
 
-    def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, 
-                 scaler: StandardScaler = None):
+    def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, scale: bool = False):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
         self.rng = rng                      # random number generator
         self.alpha = alpha                  # exploration parameter
         self.l2_lambda = l2_lambda          # regularization parameter
-        self.scaler = scaler                # standard scaler object
+        self.scale = scale                  # scale contexts
 
         self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
         self.A = None                       # (XtX + l2_lambda * I_d)
         self.A_inv = None                   # (XtX + l2_lambda * I_d)^-1
         self.Xty = None
+        self.scaler = None
 
     def init(self, num_features):
         # By default, assume that
@@ -34,6 +34,7 @@ class _RidgeRegression:
         self.A = self.l2_lambda * np.identity(num_features)
         self.A_inv = self.A.copy()
         self.beta = np.dot(self.A_inv, self.Xty)
+        self.scaler = StandardScaler() if self.scale else None
 
     def fit(self, X, y):
 
@@ -69,6 +70,9 @@ class _RidgeRegression:
         return np.dot(x, self.beta)
 
     def _scale_predict_context(self, x):
+        if not hasattr(self.scaler, 'scale_'):
+            return x
+
         # Reshape 1D array to 2D
         x = x.reshape(1, -1)
 
@@ -122,8 +126,7 @@ class _Linear(BaseMAB):
         self.num_features = None
 
         # Create regression model for each arm
-        scaler = StandardScaler() if self.scale else None
-        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scaler)) for arm in arms)
+        self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scale)) for arm in arms)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -154,8 +157,7 @@ class _Linear(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None):
 
         # Add to untrained_arms arms
-        scaler = StandardScaler() if self.scale else None
-        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, scaler)
+        self.arm_to_model[arm] = _Linear.factory.get(self.regression)(self.rng, self.alpha, self.l2_lambda, self.scale)
 
         # If fit happened, initialize the new arm to defaults
         is_fitted = self.num_features is not None

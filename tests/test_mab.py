@@ -2,11 +2,9 @@
 
 import os
 import pickle
-from copy import deepcopy
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from tests.test_base import BaseTest

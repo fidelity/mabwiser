@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from mabwiser.mab import LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import LearningPolicy
 from tests.test_base import BaseTest
 
 
@@ -329,6 +329,23 @@ class LinTSTest(BaseTest):
         self.assertEqual(len(arm), 4)
         self.assertEqual(arm, [[b, b], [b, b], [b, b], [b, b]])
 
+    def test_unused_arm_scale(self):
+
+        arms, mab = self.predict(arms=[1, 2, 3, 4],
+                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
+                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                                 learning_policy=LearningPolicy.LinTS(alpha=1, scale=True),
+                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                  [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                  [0, 2, 1, 0, 0]],
+                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                 seed=123456,
+                                 num_run=1,
+                                 is_predict=True)
+
+        self.assertEqual(arms, [4, 3])
+
     def test_unused_arm(self):
 
         exps, mab = self.predict(arms=[1, 2, 3, 4],
@@ -363,7 +380,6 @@ class LinTSTest(BaseTest):
                                  seed=123456,
                                  num_run=1,
                                  is_predict=True)
-
 
         self.assertEqual(arms, [4, 3])
 
