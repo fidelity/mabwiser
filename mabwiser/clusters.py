@@ -120,7 +120,6 @@ class _Clusters(BaseMAB):
         pass
 
     def _uptake_new_arm(self, arm: ArmConfig) -> None:
-
         # Update each learning policy
         for lp in self.lp_list:
             lp.add_arm(arm)
