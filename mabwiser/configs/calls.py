@@ -3,11 +3,11 @@
 from enum import Enum
 from typing import Tuple, Union
 
-from mabwiser.neighbors.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.configs.base import _EnumMeta
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _LinGreedy, _LinTS, _LinUCB
+from mabwiser.neighbors.approximate import _LSHNearest
 from mabwiser.neighbors.fixed import _KNearest, _Radius
 from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
@@ -37,7 +37,7 @@ class LPCall(Enum, metaclass=_EnumMeta):
         if isinstance(instance_name, (tuple, Tuple)):
             return any([cls._unit_isinstance(val, obj) for val in instance_name])
         else:
-            return cls._unit_isinstance(instance_name, obj)
+            return cls._unit_isinstance(obj, instance_name)
 
     @classmethod
     def _unit_isinstance(cls, obj: _C, instance_name: str):

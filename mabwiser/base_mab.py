@@ -16,8 +16,7 @@ from joblib import Parallel, delayed
 from mabwiser._version import __author__, __copyright__, __email__, __version__
 from mabwiser.configs.arm import ArmConfig
 from mabwiser.utilities.distance import get_distance_threshold, get_pairwise_distances
-from mabwiser.utilities.general import effective_jobs
-from mabwiser.utilities.general import argmin
+from mabwiser.utilities.general import argmin, effective_jobs
 from mabwiser.utilities.random import _BaseRNG
 
 __author__ = __author__

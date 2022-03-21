@@ -22,7 +22,7 @@ class _UCB1(BaseMAB):
         alpha: float,
         backend: Optional[str],
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.alpha = alpha
 
         self.total_count = 0
@@ -31,7 +31,10 @@ class _UCB1(BaseMAB):
         self.arm_to_mean = dict.fromkeys(self.arms, 0)
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Reset the sum, count, and expectations to zero
@@ -64,7 +67,9 @@ class _UCB1(BaseMAB):
         # Return the first arm with maximum expectation
         return argmax(self.predict_expectations())
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Dict[str, float]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Dict[str, float]:
 
         # Return a copy of expectations dictionary from arms (key) to expectations (values)
         return self.arm_to_expectation.copy()

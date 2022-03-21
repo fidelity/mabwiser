@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 import numpy as np
 
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.utilities.general import reset, argmax
+from mabwiser.utilities.general import argmax, reset
 from mabwiser.utilities.random import _BaseRNG
 
 
@@ -15,10 +15,15 @@ class _Popularity(_EpsilonGreedy):
         self, rng: _BaseRNG, arms: List[str], n_jobs: int, backend: Optional[str] = None
     ):
         # Init the parent greedy policy with zero epsilon
-        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, epsilon=0.0, backend=backend)
+        super().__init__(
+            rng=rng, arms=arms, n_jobs=n_jobs, epsilon=0.0, backend=backend
+        )
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Fit as usual greedy
@@ -28,7 +33,10 @@ class _Popularity(_EpsilonGreedy):
         self._normalize_expectations()
 
     def partial_fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Fit as usual greedy

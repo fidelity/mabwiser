@@ -40,7 +40,7 @@ class _TreeBandit(BaseMAB):
         tree_parameters: Dict,
         backend: Optional[str] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.lp = lp
         self.tree_parameters = tree_parameters
         self.tree_parameters["random_state"] = rng.seed
@@ -54,7 +54,10 @@ class _TreeBandit(BaseMAB):
         }
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Reset the decision tree and rewards of each arm
@@ -75,7 +78,10 @@ class _TreeBandit(BaseMAB):
         self._parallel_fit(decisions, rewards, contexts)
 
     def partial_fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # If TS and a binarizer function is given, binarize the rewards
@@ -91,7 +97,9 @@ class _TreeBandit(BaseMAB):
 
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Union[List, str]:
 
         return self._parallel_predict(contexts, is_predict=False)
 

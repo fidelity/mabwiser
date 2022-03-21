@@ -8,7 +8,7 @@ import numpy as np
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.configs.arm import ArmConfig
-from mabwiser.utilities.general import reset, argmax
+from mabwiser.utilities.general import argmax, reset
 from mabwiser.utilities.random import _BaseRNG
 
 
@@ -21,14 +21,17 @@ class _EpsilonGreedy(BaseMAB):
         epsilon: float,
         backend: Optional[str] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.epsilon = epsilon
 
         self.arm_to_sum = dict.fromkeys(self.arms, 0)
         self.arm_to_count = dict.fromkeys(self.arms, 0)
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Reset the sum, count, and expectations to zero
@@ -39,7 +42,10 @@ class _EpsilonGreedy(BaseMAB):
         self._parallel_fit(decisions, rewards, contexts)
 
     def partial_fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
         self._parallel_fit(decisions, rewards, contexts)
 

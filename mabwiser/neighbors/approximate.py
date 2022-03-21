@@ -148,14 +148,14 @@ class _LSHNearest(_ApproximateNeighbors):
         n_dimensions: int,
         n_tables: int,
         backend: Optional[str] = None,
-        no_nhood_prob_of_arm: Optional[List] = None
+        no_nhood_prob_of_arm: Optional[List] = None,
     ):
         super().__init__(
-            rng,
-            arms,
-            n_jobs,
-            backend,
-            lp,
+            rng=rng,
+            arms=arms,
+            n_jobs=n_jobs,
+            backend=backend,
+            lp=lp,
             metric="simhash",
             no_nhood_prob_of_arm=no_nhood_prob_of_arm,
         )

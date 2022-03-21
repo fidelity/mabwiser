@@ -43,7 +43,15 @@ class _Radius(_Neighbors):
         backend: Optional[str] = None,
         no_nhood_prob_of_arm: Optional[List] = None,
     ):
-        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend, lp=lp, metric=metric, no_nhood_prob_of_arm=no_nhood_prob_of_arm)
+        super().__init__(
+            rng=rng,
+            arms=arms,
+            n_jobs=n_jobs,
+            backend=backend,
+            lp=lp,
+            metric=metric,
+            no_nhood_prob_of_arm=no_nhood_prob_of_arm,
+        )
         self.radius = radius
 
     def _predict_contexts(
@@ -109,7 +117,9 @@ class _KNearest(_Neighbors):
         metric: DistanceMetrics,
         backend: Optional[str] = None,
     ):
-        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend, lp=lp, metric=metric, no_nhood_prob_of_arm=no_nhood_prob_of_arm)
+        super().__init__(
+            rng=rng, arms=arms, n_jobs=n_jobs, backend=backend, lp=lp, metric=metric
+        )
         self.k = k
 
     def _predict_contexts(

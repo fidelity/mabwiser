@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.configs.arm import ArmConfig
-from mabwiser.utilities.general import reset, argmax
+from mabwiser.utilities.general import argmax, reset
 from mabwiser.utilities.random import _BaseRNG
 
 
@@ -21,7 +21,7 @@ class _ThompsonSampling(BaseMAB):
         backend: Optional[str] = None,
         binarizer: Optional[Callable] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.binarizer = binarizer
 
         # Track whether the rewards have been binarized already by a context policy external
@@ -30,7 +30,10 @@ class _ThompsonSampling(BaseMAB):
         self.arm_to_fail_count = dict.fromkeys(self.arms, 1)
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # If rewards are non binary, convert them
@@ -105,7 +108,9 @@ class _ThompsonSampling(BaseMAB):
     ) -> None:
         pass
 
-    def _get_binary_rewards(self, decisions: np.ndarray, rewards: np.ndarray) -> np.ndarray:
+    def _get_binary_rewards(
+        self, decisions: np.ndarray, rewards: np.ndarray
+    ) -> np.ndarray:
         # If a binarizer function is given and binarization has not taken place already in a neighborhood policy
         if self.binarizer and not self.is_contextual_binarized:
             return np.fromiter(

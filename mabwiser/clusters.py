@@ -30,7 +30,7 @@ class _Clusters(BaseMAB):
         is_minibatch: bool,
         backend: Optional[str] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
 
         self.n_clusters = n_clusters
 
@@ -104,7 +104,9 @@ class _Clusters(BaseMAB):
         # Return predict within the cluster
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Union[List, str]:
         # Return predict expectations within the cluster
         return self._parallel_predict(contexts, is_predict=False)
 

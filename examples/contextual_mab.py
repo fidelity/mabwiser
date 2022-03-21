@@ -3,7 +3,11 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import MAB
+from mabwiser.configs.arm import ArmConfig, WarmStartConfig
+from mabwiser.configs.mab import MABConfig
+from mabwiser.configs.learning import UCB1
+from mabwiser.configs.neighborhood import Radius
 
 ######################################################################################
 #
@@ -18,199 +22,214 @@ from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 #
 ######################################################################################
 
-# Arms
-ads = [1, 2, 3, 4, 5]
+def main():
+    # Arms
+    ads = ["1", "2", "3", "4", "5"]
 
-# Historical data of ad decisions with corresponding revenues and context information
-train_df = pd.DataFrame({'ad': [1, 1, 1, 2, 4, 5, 3, 3, 2, 1, 4, 5, 3, 2, 5],
-                         'revenues': [10, 17, 22, 9, 4, 20, 7, 8, 20, 9, 50, 5, 7, 12, 10],
-                         'age': [22, 27, 39, 48, 21, 20, 19, 37, 52, 26, 18, 42, 55, 57, 38],
-                         'click_rate': [0.2, 0.6, 0.99, 0.68, 0.15, 0.23, 0.75, 0.17,
-                                        0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
-                         'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
-                        )
+    # Historical data of ad decisions with corresponding revenues and context information
+    train_df = pd.DataFrame({'ad': ["1", "1", "1", "2", "4", "5", "3", "3", "2", "1", "4", "5", "3", "2", "5"],
+                             'revenues': [10, 17, 22, 9, 4, 20, 7, 8, 20, 9, 50, 5, 7, 12, 10],
+                             'age': [22, 27, 39, 48, 21, 20, 19, 37, 52, 26, 18, 42, 55, 57, 38],
+                             'click_rate': [0.2, 0.6, 0.99, 0.68, 0.15, 0.23, 0.75, 0.17,
+                                            0.33, 0.65, 0.56, 0.22, 0.19, 0.11, 0.83],
+                             'subscriber': [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0]}
+                            )
 
-# Arm features for warm start
-arm_to_features = {1: [0, 1, 1], 2: [0, 0.5, 0.5], 3: [1, 1, 0.5], 4: [0.2, 1, 0], 5: [0, 1, 0.1], 6: [0, 0.5, 0.5]}
 
-# Test data to for new prediction
-test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
-test_df_revenue = pd.Series([7, 13])
+    # Arm features for warm start
+    arm_to_features = {"1": [0.0, 1.0, 1.0], "2": [0.0, 0.5, 0.5], "3": [1.0, 1.0, 0.5], "4": [0.2, 1.0, 0.0], "5": [0.0, 1.0, 0.1], "6": [0.0, 0.5, 0.5]}
 
-# Scale the training and test data
-scaler = StandardScaler()
-train = scaler.fit_transform(train_df[['age', 'click_rate', 'subscriber']].values.astype('float64'))
-test = scaler.transform(test_df.values.astype('float64'))
 
-########################################################
-# Radius Neighborhood Policy with UCB1 Learning Policy
-########################################################
+    # Test data to for new prediction
+    test_df = pd.DataFrame({'age': [37, 52], 'click_rate': [0.5, 0.6], 'subscriber': [0, 1]})
+    test_df_revenue = pd.Series([7, 13])
 
-# Radius contextual policy with radius equals to 5 and ucb1 learning with alpha 1.25
-radius = MAB(arms=ads,
-             learning_policy=LearningPolicy.UCB1(alpha=1.25),
-             neighborhood_policy=NeighborhoodPolicy.Radius(radius=5))
+    # Scale the training and test data
+    scaler = StandardScaler()
+    train = scaler.fit_transform(train_df[['age', 'click_rate', 'subscriber']].values.astype('float64'))
+    test = scaler.transform(test_df.values.astype('float64'))
 
-# Learn from previous ads shown and revenues generated
-radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    ########################################################
+    # Radius Neighborhood Policy with UCB1 Learning Policy
+    ########################################################
 
-# Predict the next best ad to show
-prediction = radius.predict(test)
+    # Radius contextual policy with radius equals to 5 and ucb1 learning with alpha 1.25
 
-# Expectation of each ad based on learning from past ad revenues
-expectations = radius.predict_expectations(test)
+    radius = MAB(
+        MABConfig(
+            arms=ads,
+            learning_policy=UCB1(alpha=1.25),
+            neighborhood_policy=Radius(radius=5.0)
+        )
+    )
 
-# Results
-print("Radius: ", prediction, " ", expectations)
-assert(prediction == [4, 4])
+    # Learn from previous ads shown and revenues generated
+    radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
 
-# Online update of model
-radius.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    # Predict the next best ad to show
+    prediction = radius.predict(test)
 
-# Updating of the model with new arm
-radius.add_arm(6)
+    # Expectation of each ad based on learning from past ad revenues
+    expectations = radius.predict_expectations(test)
 
-# Warm start new arm
-radius.warm_start(arm_to_features, distance_quantile=0.75)
+    # Results
+    print("Radius: ", prediction, " ", expectations)
+    assert(prediction == ["4", "4"])
 
-########################################################
-# KNearest Neighborhood Policy with UCB1 Learning Policy
-########################################################
+    # Online update of model
+    radius.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
 
-# KNearest context policy with k equals to 5 and ucb1 learning with alpha of 1.25
-knearest = MAB(arms=ads,
-               learning_policy=LearningPolicy.UCB1(alpha=1.25),
-               neighborhood_policy=NeighborhoodPolicy.KNearest(k=5))
+    # Updating of the model with new arm
+    radius.add_arm(ArmConfig(arm="6"))
 
-# Learn from previous ads shown and revenues generated
-knearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    # Warm start new arm
+    # Warm start new arm
+    radius.warm_start(warm_start_config=WarmStartConfig(
+        arm_to_features=arm_to_features, distance_quantile=0.75
+    ))
 
-# Predict the next best ad to show
-prediction = knearest.predict(test)
+    # ########################################################
+    # # KNearest Neighborhood Policy with UCB1 Learning Policy
+    # ########################################################
+    #
+    # # KNearest context policy with k equals to 5 and ucb1 learning with alpha of 1.25
+    # knearest = MAB(arms=ads,
+    #                learning_policy=LearningPolicy.UCB1(alpha=1.25),
+    #                neighborhood_policy=NeighborhoodPolicy.KNearest(k=5))
+    #
+    # # Learn from previous ads shown and revenues generated
+    # knearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    #
+    # # Predict the next best ad to show
+    # prediction = knearest.predict(test)
+    #
+    # # Expectation of each ad based on learning from past ad revenues
+    # expectations = knearest.predict_expectations(test)
+    #
+    # # Results
+    # print("KNearest: ", prediction, " ", expectations)
+    # assert(prediction == [5, 1])
+    #
+    # # Online update of model
+    # knearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    #
+    # # Updating of the model with new arm
+    # knearest.add_arm(6)
+    #
+    # ########################################################
+    # # KMeans Neighborhood Policy with UCB1 Learning Policy
+    # ########################################################
+    #
+    # # KMeans clustering context policy with 4 clusters and ucb1 learning with alpha of 1.25
+    # clusters = MAB(arms=ads,
+    #                learning_policy=LearningPolicy.UCB1(alpha=1.25),
+    #                neighborhood_policy=NeighborhoodPolicy.Clusters(n_clusters=4))
+    #
+    # # Learn from previous ads shown and revenues generated
+    # clusters.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    #
+    # # Predict the next best ad to show
+    # prediction = clusters.predict(test)
+    #
+    # # Expectation of each ad based on learning from past ad revenues
+    # expectations = clusters.predict_expectations(test)
+    #
+    # # Results
+    # print("KMeans: ", prediction, " ", expectations)
+    # assert(prediction == [5, 2])
+    #
+    # # Online update of model
+    # clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    #
+    # # Updating of the model with new arm
+    # clusters.add_arm(6)
+    #
+    # #################################################################
+    # # MiniBatchKMeans Neighborhood Policy with UCB1 Learning Policy
+    # #################################################################
+    #
+    # # MiniBatchKMeans clusters context policy with 4 clusters and ucb1 learning with alpha of 1.25
+    # clusters = MAB(arms=ads,
+    #                learning_policy=LearningPolicy.UCB1(alpha=1.25),
+    #                neighborhood_policy=NeighborhoodPolicy.Clusters(n_clusters=4, is_minibatch=True))
+    #
+    # # Learn from previous ads shown and revenues generated
+    # clusters.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    #
+    # # Predict the next best ad to show
+    # prediction = clusters.predict(test)
+    #
+    # # Expectation of each ad based on learning from past ad revenues
+    # expectations = clusters.predict_expectations(test)
+    #
+    # # Results
+    # print("MiniBatchKMeans: ", prediction, " ", expectations)
+    # assert(prediction == [5, 2])
+    #
+    # # Online update of model
+    # clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    #
+    # # Updating of the model with new arm
+    # clusters.add_arm(6)
+    #
+    # ###############################################################
+    # # LSH Approximate Neighborhood Policy with UCB1 Learning Policy
+    # ###############################################################
+    #
+    # # LSH Approximate Neareset Neighbors contextual policy with n_dimenions and n_tables equal to 5
+    # # and ucb1 learning with alpha 1.25
+    # lshnearest = MAB(arms=ads,
+    #                  learning_policy=LearningPolicy.UCB1(alpha=1.25),
+    #                  neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5, n_tables=5))
+    #
+    # # Learn from previous ads shown and revenues generated
+    # lshnearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    #
+    # # Predict the next best ad to show
+    # prediction = lshnearest.predict(test)
+    #
+    # # Expectation of each ad based on learning from past ad revenues
+    # expectations = lshnearest.predict_expectations(test)
+    #
+    # # Results
+    # print("LSH Nearest: ", prediction, " ", expectations)
+    # assert(prediction == [1, 4])
+    #
+    # # Online update of model
+    # lshnearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    #
+    # # Updating of the model with new arm
+    # lshnearest.add_arm(6)
+    #
+    # ####################################################################
+    # # TreeBandit Neighborhood Policy with Epsilon Greedy Learning Policy
+    # ####################################################################
+    #
+    # # TreeBandit contextual policy with DecisionTreeClassifier's default tree parameters
+    # # and ucb1 learning with alpha of 1.25
+    # treebandit = MAB(arms=ads,
+    #                  learning_policy=LearningPolicy.UCB1(alpha=1.25),
+    #                  neighborhood_policy=NeighborhoodPolicy.TreeBandit())
+    #
+    # # Learn from previous ads shown and revenues generated
+    # treebandit.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
+    #
+    # # Predict the next best ad to show
+    # prediction = treebandit.predict(test)
+    #
+    # # Expectation of each ad based on learning from past ad revenues
+    # expectations = treebandit.predict_expectations(test)
+    #
+    # # Results
+    # print("TreeBandit: ", prediction, " ", expectations)
+    # assert(prediction == [4, 4])
+    #
+    # # Online update of model
+    # treebandit.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
+    #
+    # # Updating of the model with new arm
+    # treebandit.add_arm(6)
 
-# Expectation of each ad based on learning from past ad revenues
-expectations = knearest.predict_expectations(test)
 
-# Results
-print("KNearest: ", prediction, " ", expectations)
-assert(prediction == [5, 1])
-
-# Online update of model
-knearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
-
-# Updating of the model with new arm
-knearest.add_arm(6)
-
-########################################################
-# KMeans Neighborhood Policy with UCB1 Learning Policy
-########################################################
-
-# KMeans clustering context policy with 4 clusters and ucb1 learning with alpha of 1.25
-clusters = MAB(arms=ads,
-               learning_policy=LearningPolicy.UCB1(alpha=1.25),
-               neighborhood_policy=NeighborhoodPolicy.Clusters(n_clusters=4))
-
-# Learn from previous ads shown and revenues generated
-clusters.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
-
-# Predict the next best ad to show
-prediction = clusters.predict(test)
-
-# Expectation of each ad based on learning from past ad revenues
-expectations = clusters.predict_expectations(test)
-
-# Results
-print("KMeans: ", prediction, " ", expectations)
-assert(prediction == [5, 2])
-
-# Online update of model
-clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
-
-# Updating of the model with new arm
-clusters.add_arm(6)
-
-#################################################################
-# MiniBatchKMeans Neighborhood Policy with UCB1 Learning Policy
-#################################################################
-
-# MiniBatchKMeans clusters context policy with 4 clusters and ucb1 learning with alpha of 1.25
-clusters = MAB(arms=ads,
-               learning_policy=LearningPolicy.UCB1(alpha=1.25),
-               neighborhood_policy=NeighborhoodPolicy.Clusters(n_clusters=4, is_minibatch=True))
-
-# Learn from previous ads shown and revenues generated
-clusters.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
-
-# Predict the next best ad to show
-prediction = clusters.predict(test)
-
-# Expectation of each ad based on learning from past ad revenues
-expectations = clusters.predict_expectations(test)
-
-# Results
-print("MiniBatchKMeans: ", prediction, " ", expectations)
-assert(prediction == [5, 2])
-
-# Online update of model
-clusters.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
-
-# Updating of the model with new arm
-clusters.add_arm(6)
-
-###############################################################
-# LSH Approximate Neighborhood Policy with UCB1 Learning Policy
-###############################################################
-
-# LSH Approximate Neareset Neighbors contextual policy with n_dimenions and n_tables equal to 5
-# and ucb1 learning with alpha 1.25
-lshnearest = MAB(arms=ads,
-                 learning_policy=LearningPolicy.UCB1(alpha=1.25),
-                 neighborhood_policy=NeighborhoodPolicy.LSHNearest(n_dimensions=5, n_tables=5))
-
-# Learn from previous ads shown and revenues generated
-lshnearest.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
-
-# Predict the next best ad to show
-prediction = lshnearest.predict(test)
-
-# Expectation of each ad based on learning from past ad revenues
-expectations = lshnearest.predict_expectations(test)
-
-# Results
-print("LSH Nearest: ", prediction, " ", expectations)
-assert(prediction == [1, 4])
-
-# Online update of model
-lshnearest.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
-
-# Updating of the model with new arm
-lshnearest.add_arm(6)
-
-####################################################################
-# TreeBandit Neighborhood Policy with Epsilon Greedy Learning Policy
-####################################################################
-
-# TreeBandit contextual policy with DecisionTreeClassifier's default tree parameters
-# and ucb1 learning with alpha of 1.25
-treebandit = MAB(arms=ads,
-                 learning_policy=LearningPolicy.UCB1(alpha=1.25),
-                 neighborhood_policy=NeighborhoodPolicy.TreeBandit())
-
-# Learn from previous ads shown and revenues generated
-treebandit.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
-
-# Predict the next best ad to show
-prediction = treebandit.predict(test)
-
-# Expectation of each ad based on learning from past ad revenues
-expectations = treebandit.predict_expectations(test)
-
-# Results
-print("TreeBandit: ", prediction, " ", expectations)
-assert(prediction == [4, 4])
-
-# Online update of model
-treebandit.partial_fit(decisions=prediction, rewards=test_df_revenue, contexts=test)
-
-# Updating of the model with new arm
-treebandit.add_arm(6)
+if __name__ == '__main__':
+    main()

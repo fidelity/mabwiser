@@ -5,11 +5,11 @@ import pandas as pd
 
 # from mabwiser.mab import MAB, LearningPolicy
 
-from mabwiser.new_mab import NewMAB as MAB
+from mabwiser.mab import MAB
 
 from mabwiser.configs.mab import MABConfig
 from mabwiser.configs.arm import ArmConfig, WarmStartConfig
-from mabwiser.configs.learning import EpsilonGreedy, Popularity
+from mabwiser.configs.learning import EpsilonGreedy, Popularity, Softmax, ThompsonSampling, UCB1
 
 
 ######################################################################################
@@ -99,132 +99,146 @@ def main():
 
     # Results
     print("Randomized Popularity: ", prediction, " ", expectations)
+    assert(prediction == "1")
+
+    ###################################
+    # Softmax Learning Policy
+    ###################################
+
+    # Softmax learning policy with tau set to 1
+    sfm = MAB(MABConfig(
+        arms=options,
+        learning_policy=Softmax(tau=1.0),
+        seed=123456
+    ))
+
+    sfm.fit(decisions=layouts, rewards=revenues)
+    prediction = sfm.predict()
+    expectations = sfm.predict_expectations()
+    print("Softmax: ", prediction, " ", expectations)
     assert(prediction == "2")
 
-    # ###################################
-    # # Softmax Learning Policy
-    # ###################################
-    #
-    # # Softmax learning policy with tau set to 1
-    # sfm = MAB(arms=options,
-    #           learning_policy=LearningPolicy.Softmax(tau=1),
-    #           seed=123456)
-    # sfm.fit(decisions=layouts, rewards=revenues)
-    # prediction = sfm.predict()
-    # expectations = sfm.predict_expectations()
-    # print("Softmax: ", prediction, " ", expectations)
-    # assert(prediction == 2)
-    #
-    # # Online updating of the model
-    # sfm.partial_fit(additional_layouts, additional_revenues)
-    #
-    # # Update the model with new arm
-    # sfm.add_arm(3)
-    #
-    # ###########################################################
-    # # Thompson Sampling with Binary Rewards Learning Policy
-    # ###########################################################
-    #
-    # # Thompson Sampling learning policy with binary rewards
-    # thompson = MAB(arms=options,
-    #                learning_policy=LearningPolicy.ThompsonSampling(),
-    #                seed=123456)
-    # thompson.fit(decisions=layouts, rewards=[1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1])
-    # prediction = thompson.predict()
-    # expectations = thompson.predict_expectations()
-    # print("Thompson Sampling (0/1): ", prediction, " ", expectations)
-    # assert(prediction == 1)
-    #
-    # # Online updating of the model
-    # thompson.partial_fit(additional_layouts, [0, 1, 0, 1])
-    #
-    # # Update the model with new arm
-    # thompson.add_arm(3)
-    #
-    # #############################################################
-    # # Thompson Sampling with Non-Binary Rewards Learning Policy
-    # #############################################################
-    #
-    # # Thompson Sampling learning policy with function for converting rewards to binary
-    # def binary_func(decision, reward):
-    #     decision_to_threshold = {1: 10, 2: 10}
-    #     return 1 if reward > decision_to_threshold[decision] else 0
-    #
-    #
-    # assert(callable(binary_func))
-    #
-    # thompson = MAB(arms=options,
-    #                learning_policy=LearningPolicy.ThompsonSampling(binarizer=binary_func),
-    #                seed=123456)
-    # thompson.fit(decisions=layouts, rewards=revenues)
-    # prediction = thompson.predict()
-    # expectations = thompson.predict_expectations()
-    # print("Thompson Sampling: ", prediction, " ", expectations)
-    # assert(prediction == 2)
-    #
-    # # Online updating of the model
-    # thompson.partial_fit(additional_layouts, additional_revenues)
-    #
-    # # Update the model with new arm
-    # def binary_func2(decision, reward):
-    #     decision_to_threshold = {1: 10, 2: 10, 3: 15}
-    #     return 1 if reward > decision_to_threshold[decision] else 0
-    #
-    # thompson.add_arm(3, binary_func2)
-    # assert(3 in thompson.arms)
-    #
-    # ##############################################
-    # # Upper Confidence Bound1 Learning Policy
-    # #############################################
-    #
-    # # UCB1 learning policy with alpha set to 1.25
-    # ucb = MAB(arms=options,
-    #           learning_policy=LearningPolicy.UCB1(alpha=1.25),
-    #           seed=123456)
-    # ucb.fit(decisions=layouts, rewards=revenues)
-    # prediction = ucb.predict()
-    # expectations = ucb.predict_expectations()
-    # print("UCB1: ", prediction, " ", expectations)
-    # assert(prediction == 2)
-    #
-    # # Online updating of the model
-    # ucb.partial_fit(additional_layouts, additional_revenues)
-    #
-    # # Update the model with new arm
-    # ucb.add_arm(3)
-    #
-    # ##############################################
-    # # Data Series as Input
-    # #############################################
-    #
-    # # Data Series as training input
-    # df = pd.DataFrame({'layouts': [1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1],
-    #                    'revenues': [10, 17, 22, 9, 4, 0, 7, 8, 20, 9, 50, 5, 7, 12, 10]})
-    #
-    # greedy = MAB(arms=options,
-    #              learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.15),
-    #              seed=123456)
-    # greedy.fit(decisions=df['layouts'], rewards=df['revenues'])
-    # prediction = greedy.predict()
-    # expectations = greedy.predict_expectations()
-    # print("Greedy (Data Series): ", prediction, " ", expectations)
-    # assert(prediction == 2)
-    #
-    # ##############################################
-    # # Numpy Arrays as Input
-    # #############################################
-    #
-    # # Numpy Array as training
-    # greedy = MAB(arms=options,
-    #              learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.15),
-    #              seed=123456)
-    # greedy.fit(decisions=np.array([1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1]),
-    #            rewards=np.array([10, 17, 22, 9, 4, 0, 7, 8, 20, 9, 50, 5, 7, 12, 10]))
-    # prediction = greedy.predict()
-    # expectations = greedy.predict_expectations()
-    # print("Greedy (Numpy Arrays): ", prediction, " ", expectations)
-    # assert(prediction == 2)
+    # Online updating of the model
+    sfm.partial_fit(additional_layouts, additional_revenues)
 
+    # Update the model with new arm
+    greedy.add_arm(ArmConfig(arm="3"))
+
+    ###########################################################
+    # Thompson Sampling with Binary Rewards Learning Policy
+    ###########################################################
+
+    # Thompson Sampling learning policy with binary rewards
+    thompson = MAB(MABConfig(
+        arms=options,
+        learning_policy=ThompsonSampling(),
+        seed=123456
+    ))
+    thompson.fit(decisions=layouts, rewards=[1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1])
+    prediction = thompson.predict()
+    expectations = thompson.predict_expectations()
+    print("Thompson Sampling (0/1): ", prediction, " ", expectations)
+    assert(prediction == "1")
+
+    # Online updating of the model
+    thompson.partial_fit(additional_layouts, [0, 1, 0, 1])
+
+    # Update the model with new arm
+    thompson.add_arm(ArmConfig(arm="3"))
+
+    #############################################################
+    # Thompson Sampling with Non-Binary Rewards Learning Policy
+    #############################################################
+
+    # Thompson Sampling learning policy with function for converting rewards to binary
+    def binary_func(decision, reward):
+        decision_to_threshold = {"1": 10, "2": 10}
+        return 1 if reward > decision_to_threshold[decision] else 0
+
+    assert(callable(binary_func))
+
+    thompson = MAB(MABConfig(
+        arms=options,
+        learning_policy=ThompsonSampling(binarizer=binary_func),
+        seed=123456
+    ))
+
+    thompson.fit(decisions=layouts, rewards=revenues)
+    prediction = thompson.predict()
+    expectations = thompson.predict_expectations()
+    print("Thompson Sampling: ", prediction, " ", expectations)
+    assert(prediction == "2")
+
+    # Online updating of the model
+    thompson.partial_fit(additional_layouts, additional_revenues)
+
+    # Update the model with new arm
+    def binary_func2(decision, reward):
+        decision_to_threshold = {"1": 10, "2": 10, "3": 15}
+        return 1 if reward > decision_to_threshold[decision] else 0
+
+    thompson.add_arm(ArmConfig(arm="3", binarizer=binary_func2))
+    assert("3" in thompson.arms)
+
+    ##############################################
+    # Upper Confidence Bound1 Learning Policy
+    #############################################
+
+    # UCB1 learning policy with alpha set to 1.25
+
+    ucb = MAB(MABConfig(
+        arms=options,
+        learning_policy=UCB1(alpha=1.25),
+        seed=123456
+    ))
+
+    ucb.fit(decisions=layouts, rewards=revenues)
+    prediction = ucb.predict()
+    expectations = ucb.predict_expectations()
+    print("UCB1: ", prediction, " ", expectations)
+    assert(prediction == "2")
+
+    # Online updating of the model
+    ucb.partial_fit(additional_layouts, additional_revenues)
+
+    # Update the model with new arm
+    ucb.add_arm(ArmConfig(arm="3"))
+
+    ##############################################
+    # Data Series as Input
+    #############################################
+
+    # Data Series as training input
+    df = pd.DataFrame({'layouts': ["1", "1", "1", "2", "1", "2", "2", "1", "2", "1", "2", "2", "1", "2", "1"],
+                       'revenues': [10.0, 17.0, 22.0, 9.0, 4.0, 0.0, 7.0, 8.0, 20.0, 9.0, 50.0, 5.0, 7.0, 12.0, 10.0]})
+
+    greedy = MAB(config=MABConfig(
+                        arms=options,
+                        learning_policy=EpsilonGreedy(epsilon=0.15)
+                    )
+    )
+    greedy.fit(decisions=df['layouts'], rewards=df['revenues'])
+    prediction = greedy.predict()
+    expectations = greedy.predict_expectations()
+    print("Greedy (Data Series): ", prediction, " ", expectations)
+    assert(prediction == "2")
+
+    ##############################################
+    # Numpy Arrays as Input
+    #############################################
+
+    # Numpy Array as training
+    greedy = MAB(config=MABConfig(
+        arms=options,
+        learning_policy=EpsilonGreedy(epsilon=0.15)
+    )
+    )
+    greedy.fit(decisions=np.array(["1", "1", "1", "2", "1", "2", "2", "1", "2", "1", "2", "2", "1", "2", "1"]),
+               rewards=np.array([10.0, 17.0, 22.0, 9.0, 4.0, 0.0, 7.0, 8.0, 20.0, 9.0, 50.0, 5.0, 7.0, 12.0, 10.0]))
+    prediction = greedy.predict()
+    expectations = greedy.predict_expectations()
+    print("Greedy (Numpy Arrays): ", prediction, " ", expectations)
+    assert(prediction == "2")
 
 
 if __name__ == '__main__':

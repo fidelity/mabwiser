@@ -43,7 +43,7 @@ class _Neighbors(BaseMAB, ABC):
         backend: Optional[str] = None,
         no_nhood_prob_of_arm: Optional[List] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.lp = lp
         self.metric = metric
         self.no_nhood_prob_of_arm = no_nhood_prob_of_arm

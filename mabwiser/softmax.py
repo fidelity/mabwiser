@@ -9,7 +9,7 @@ import numpy as np
 
 from mabwiser.base_mab import BaseMAB
 from mabwiser.configs.arm import ArmConfig
-from mabwiser.utilities.general import reset, argmax
+from mabwiser.utilities.general import argmax, reset
 from mabwiser.utilities.random import _BaseRNG
 
 
@@ -23,7 +23,7 @@ class _Softmax(BaseMAB):
         backend: Optional[str] = None,
     ):
 
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.tau = tau
 
         self.arm_to_sum = dict.fromkeys(self.arms, 0)
@@ -32,7 +32,10 @@ class _Softmax(BaseMAB):
         self.arm_to_exponent = dict.fromkeys(self.arms, 0)
 
     def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
 
         # Reset the sum, count, and expectations to zero
@@ -60,7 +63,9 @@ class _Softmax(BaseMAB):
         # Return the first arm with maximum expectation
         return argmax(self.predict_expectations())
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Dict[str, float]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Dict[str, float]:
 
         # Return a random value between 0 and 1 for each arm that is "proportional" to the
         # expectation of the arm and sums to 1 by sampling from a Dirichlet distribution.

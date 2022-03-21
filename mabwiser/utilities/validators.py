@@ -5,7 +5,7 @@
 This module provides various validators
 """
 
-from typing import Callable, List, Optional, Union, Tuple
+from typing import Callable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -41,9 +41,9 @@ def validate_2d(data: Union[np.ndarray, List, pd.DataFrame, pd.Series], var_name
         )
     else:
         raise TypeError(
-                f"Data named {var_name} should be given as 2D list, numpy array, pandas series or "
-                f"data frames."
-            )
+            f"Data named {var_name} should be given as 2D list, numpy array, pandas series or "
+            f"data frames."
+        )
 
 
 def check_false(expression: bool, exception: Exception) -> None:
@@ -83,15 +83,22 @@ def check_sklearn_scaler(scaler: Optional[Callable]):
 
 
 def check_in_arms(decisions: Union[List[str], np.ndarray, pd.Series], arms: List[str]):
-    if isinstance(decisions, (list, List,  np.ndarray)):
+    if isinstance(decisions, (list, List, np.ndarray)):
         tf_list = [v not in arms for v in decisions]
     else:
         tf_list = [v not in arms for v in decisions.values]
     if any(tf_list):
-        raise ValueError(f"Arm `{decisions[tf_list.index(True)]}` is not within the set of defined arms `{repr(arms)}`")
+        raise ValueError(
+            f"Arm `{decisions[tf_list.index(True)]}` is not within the set of defined arms `{repr(arms)}`"
+        )
 
 
-def check_fit_input(data: Union[Union[List[str], np.ndarray, pd.Series], Tuple[Union[List[str], np.ndarray, pd.Series], ...]]):
+def check_fit_input(
+    data: Union[
+        Union[List[str], np.ndarray, pd.Series],
+        Tuple[Union[List[str], np.ndarray, pd.Series], ...],
+    ]
+):
     if isinstance(data, (tuple, Tuple)):
         for v in data:
             _check_fit_input(v)
@@ -100,5 +107,9 @@ def check_fit_input(data: Union[Union[List[str], np.ndarray, pd.Series], Tuple[U
 
 
 def _check_fit_input(data: Union[List[str], np.ndarray, pd.Series]):
-    check_true(isinstance(data, (list, np.ndarray, pd.Series)),
-               TypeError("The decisions should be given as list, numpy array, or pandas series."))
+    check_true(
+        isinstance(data, (list, np.ndarray, pd.Series)),
+        TypeError(
+            "The decisions should be given as list, numpy array, or pandas series."
+        ),
+    )

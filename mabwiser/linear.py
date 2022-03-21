@@ -157,7 +157,7 @@ class _Linear(BaseMAB):
         backend: Optional[str] = None,
         arm_to_scaler: Optional[Dict[str, Callable]] = None,
     ):
-        super().__init__(rng, arms, n_jobs, backend)
+        super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.alpha = alpha
         self.epsilon = epsilon
         self.l2_lambda = l2_lambda
@@ -189,7 +189,10 @@ class _Linear(BaseMAB):
         self._parallel_fit(decisions, rewards, contexts)
 
     def partial_fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
     ) -> None:
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
@@ -198,7 +201,9 @@ class _Linear(BaseMAB):
         # Return predict for the given context
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Union[List, str]:
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
 
