@@ -2,26 +2,34 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
 
 from mabwiser.base_mab import BaseMAB
+from mabwiser.configs.arm import ArmConfig
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
+from mabwiser.utilities.general import reset
+from mabwiser.utilities.random import _BaseRNG, create_rng
 
 
 class _Clusters(BaseMAB):
-
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 n_clusters: Num, is_minibatch: bool):
+    def __init__(
+        self,
+        rng: _BaseRNG,
+        arms: List[str],
+        n_jobs: int,
+        lp: Union[_EpsilonGreedy, _Linear, _Random, _Softmax, _ThompsonSampling, _UCB1],
+        n_clusters: int,
+        is_minibatch: bool,
+        backend: Optional[str] = None,
+    ):
         super().__init__(rng, arms, n_jobs, backend)
 
         self.n_clusters = n_clusters
@@ -47,8 +55,12 @@ class _Clusters(BaseMAB):
         # When there are no neighbors, return nan expectations
         reset(self.arm_to_expectation, np.nan)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+    def fit(
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -66,8 +78,12 @@ class _Clusters(BaseMAB):
 
         self._fit_operation()
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+    def partial_fit(
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp_list[0], _ThompsonSampling) and self.lp_list[0].binarizer:
@@ -84,33 +100,35 @@ class _Clusters(BaseMAB):
 
         self._fit_operation()
 
-    def predict(self, contexts: Optional[np.ndarray] = None):
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
         # Return predict within the cluster
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None):
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
         # Return predict expectations within the cluster
         return self._parallel_predict(contexts, is_predict=False)
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+    def warm_start(
+        self, arm_to_features: Dict[str, List[float]], distance_quantile: float
+    ) -> None:
         for c in range(self.n_clusters):
             self.lp_list[c].warm_start(arm_to_features, distance_quantile)
 
-    def _copy_arms(self, cold_arm_to_warm_arm):
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[str, str]) -> None:
         pass
 
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
+    def _uptake_new_arm(self, arm: ArmConfig) -> None:
 
         # Update each learning policy
         for lp in self.lp_list:
-            lp.add_arm(arm, binarizer)
+            lp.add_arm(arm)
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: str) -> None:
         # Update each learning policy
         for lp in self.lp_list:
             lp.remove_arm(arm)
 
-    def _fit_operation(self):
+    def _fit_operation(self) -> None:
 
         # Train the clusters for the contexts
         self.kmeans.fit(self.contexts)
@@ -124,11 +142,22 @@ class _Clusters(BaseMAB):
             c_contexts = self.contexts[indices]
             self.lp_list[c].fit(c_decisions, c_rewards, c_contexts)
 
-    def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
+    def _fit_arm(
+        self,
+        arm: str,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ):
         pass
 
-    def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
-                          seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
+    def _predict_contexts(
+        self,
+        contexts: np.ndarray,
+        is_predict: bool,
+        seeds: Optional[np.ndarray] = None,
+        start_index: Optional[int] = None,
+    ) -> List:
 
         # Copy learning policy object
         lp_list = deepcopy(self.lp_list)

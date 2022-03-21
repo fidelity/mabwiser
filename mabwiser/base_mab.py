@@ -6,16 +6,19 @@ This module defines the abstract base class for contextual multi-armed bandit al
 """
 
 import abc
+from copy import deepcopy
 from itertools import chain
-from typing import Callable, Dict, List, NoReturn, Optional
-import multiprocessing as mp
+from typing import Dict, List, Optional, Tuple, Union
 
-from joblib import Parallel, delayed
-from scipy.spatial.distance import cdist
 import numpy as np
+from joblib import Parallel, delayed
 
-from mabwiser.utils import Arm, Num, _BaseRNG, argmin
-from mabwiser._version import __author__, __email__, __version__, __copyright__
+from mabwiser._version import __author__, __copyright__, __email__, __version__
+from mabwiser.configs.arm import ArmConfig
+from mabwiser.utilities.distance import get_distance_threshold, get_pairwise_distances
+from mabwiser.utilities.general import effective_jobs
+from mabwiser.utilities.general import argmin
+from mabwiser.utilities.random import _BaseRNG
 
 __author__ = __author__
 __email__ = __email__
@@ -72,38 +75,45 @@ class BaseMAB(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: str = None):
+    def __init__(
+        self, rng: _BaseRNG, arms: List[str], n_jobs: int, backend: Optional[str] = None
+    ):
         """Abstract method.
 
         Creates a multi-armed bandit policy with the given arms.
         """
         self.rng: _BaseRNG = rng
-        self.arms: List[Arm] = arms
+        self.arms: List[str] = deepcopy(arms)
         self.n_jobs: int = n_jobs
         self.backend: str = backend
 
-        self.arm_to_expectation: Dict[Arm, float] = dict.fromkeys(self.arms, 0)
-        self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
-        self.trained_arms: List[Arm] = list()
+        self.arm_to_expectation: Dict[str, float] = dict.fromkeys(self.arms, 0.0)
+        self.cold_arm_to_warm_arm: Dict[str, str] = dict()
+        self.trained_arms: List[str] = list()
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def add_arm(self, arm: ArmConfig) -> None:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
         calls the ``_uptake_new_arm()`` function of the sub-class.
         """
-        self.arm_to_expectation[arm] = 0
-        self._uptake_new_arm(arm, binarizer, scaler)
+        self.arms.append(arm.arm)
+        self.arm_to_expectation[arm.arm] = 0
+        self._uptake_new_arm(arm)
 
-    def remove_arm(self, arm: Arm) -> NoReturn:
-        """Removes arm from the bandit.
-        """
+    def remove_arm(self, arm: str) -> None:
+        """Removes arm from the bandit."""
+        self.arms.pop(self.arms.index(arm))
         self.arm_to_expectation.pop(arm)
         self._drop_existing_arm(arm)
 
     @abc.abstractmethod
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+    def fit(
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
         """Abstract method.
 
         Fits the multi-armed bandit to the given
@@ -112,8 +122,12 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+    def partial_fit(
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the given
@@ -122,7 +136,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict(self, contexts: Optional[np.ndarray] = None) -> Arm:
+    def predict(self, contexts: Optional[np.ndarray] = None) -> str:
         """Abstract method.
 
         Returns the predicted arm.
@@ -130,23 +144,29 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Dict[Arm, Num]:
+    def predict_expectations(
+        self, contexts: Optional[np.ndarray] = None
+    ) -> Dict[str, float]:
         """Abstract method.
 
         Returns a dictionary from arms (keys) to their expected rewards (values).
         """
         pass
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
-        self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
+    def warm_start(
+        self, arm_to_features: Dict[str, List[float]], distance_quantile: float
+    ) -> None:
+        self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(
+            arm_to_features, distance_quantile
+        )
         self._copy_arms(self.cold_arm_to_warm_arm)
 
     @abc.abstractmethod
-    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[str, str]) -> None:
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: ArmConfig) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
@@ -154,7 +174,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _drop_existing_arm(self, arm: Arm):
+    def _drop_existing_arm(self, arm: str) -> None:
         """Abstract method.
 
         Removes existing arm from multi-armed bandit.
@@ -162,8 +182,13 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray,
-                 contexts: Optional[np.ndarray] = None) -> NoReturn:
+    def _fit_arm(
+        self,
+        arm: str,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
         """Abstract method.
 
         Fit operation for individual arm.
@@ -171,25 +196,34 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
-                          seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
+    def _predict_contexts(
+        self,
+        contexts: np.ndarray,
+        is_predict: bool,
+        seeds: Optional[np.ndarray] = None,
+        start_index: Optional[int] = None,
+    ) -> List:
         """Abstract method.
 
         Predict operation for set of contexts.
         """
         pass
 
-    def _parallel_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                      contexts: Optional[np.ndarray] = None):
+    def _parallel_fit(
+        self,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ) -> None:
 
         # Compute effective number of jobs
-        n_jobs = self._effective_jobs(len(self.arms), self.n_jobs)
+        n_jobs = effective_jobs(len(self.arms), self.n_jobs)
 
         # Perform parallel fit
-        Parallel(n_jobs=n_jobs, require='sharedmem')(
-                          delayed(self._fit_arm)(
-                              arm, decisions, rewards, contexts)
-                          for arm in self.arms)
+        Parallel(n_jobs=n_jobs, require="sharedmem")(
+            delayed(self._fit_arm)(arm, decisions, rewards, contexts)
+            for arm in self.arms
+        )
 
         # Get list of arms in decisions
         # If decision is observed for cold arm, drop arm from cold arm dictionary
@@ -204,7 +238,9 @@ class BaseMAB(metaclass=abc.ABCMeta):
         else:
             self.trained_arms = np.unique(self.trained_arms + arms).tolist()
 
-    def _parallel_predict(self, contexts: np.ndarray, is_predict: bool):
+    def _parallel_predict(
+        self, contexts: np.ndarray, is_predict: bool
+    ) -> Union[List, str]:
 
         # Total number of contexts to predict
         n_contexts = len(contexts)
@@ -218,153 +254,42 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
         # Perform parallel predictions
         predictions = Parallel(n_jobs=n_jobs, backend=self.backend)(
-                          delayed(self._predict_contexts)(
-                              contexts[starts[i]:starts[i + 1]],
-                              is_predict,
-                              seeds[starts[i]:starts[i + 1]],
-                              starts[i])
-                          for i in range(n_jobs))
+            delayed(self._predict_contexts)(
+                contexts[starts[i] : starts[i + 1]],
+                is_predict,
+                seeds[starts[i] : starts[i + 1]],
+                starts[i],
+            )
+            for i in range(n_jobs)
+        )
 
         # Reduce
         predictions = list(chain.from_iterable(t for t in predictions))
 
         return predictions if len(predictions) > 1 else predictions[0]
 
-    def _partition_contexts(self, n_contexts: int):
+    def _partition_contexts(self, n_contexts: int) -> Tuple[int, List, List]:
 
         # Compute effective number of jobs
-        n_jobs = self._effective_jobs(n_contexts, self.n_jobs)
+        n_jobs = effective_jobs(n_contexts, self.n_jobs)
 
         # Partition contexts between jobs
         n_contexts_per_job = np.full(n_jobs, n_contexts // n_jobs, dtype=int)
-        n_contexts_per_job[:n_contexts % n_jobs] += 1
+        n_contexts_per_job[: n_contexts % n_jobs] += 1
         starts = np.cumsum(n_contexts_per_job)
 
         return n_jobs, n_contexts_per_job.tolist(), [0] + starts.tolist()
 
-    @staticmethod
-    def _effective_jobs(size: int, n_jobs: int):
-        if n_jobs < 0:
-            n_jobs = max(mp.cpu_count() + 1 + n_jobs, 1)
-        n_jobs = min(n_jobs, size)
-        return n_jobs
-
-    @staticmethod
-    def _get_arm_distances(from_arm: Arm, arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
-                           self_distance: int = 999999) -> Dict[Arm, Num]:
-        """
-        Calculates the distances of the given from_arm to all the arms.
-
-        Distances calculated based on the feature vectors given in arm_to_features using the given distance metric.
-        The distance of the arm to itself is set as the given self_distance.
-
-        Parameters
-        ---------
-        from_arm: Arm
-            Distances from this arm.
-        arm_to_features: Dict[Arm, list[Num]]
-            Features for each arm used to calculate distances.
-        metric: str
-            Distance metric to use.
-            Default value is 'cosine'.
-        self_distance: int
-            The value to set as the distance to itself.
-            Default value is 999999.
-
-        Returns
-        -------
-        Returns distance from given arm to arm v as arm_to_distance[v].
-        """
-
-        # Find the distance of given from_arm to all arms including self
-        arm_to_distance = {}
-        for to_arm in arm_to_features.keys():
-            if from_arm == to_arm:
-                arm_to_distance[to_arm] = self_distance
-            else:
-                arm_to_distance[to_arm] = cdist(np.asarray([arm_to_features[from_arm]]),
-                                                np.asarray([arm_to_features[to_arm]]),
-                                                metric=metric)[0][0]
-
-                # Cosine similarity can be nan when a feature vector is all-zeros
-                if np.isnan(arm_to_distance[to_arm]):
-                    arm_to_distance[to_arm] = self_distance
-
-        return arm_to_distance
-
-    @staticmethod
-    def _get_pairwise_distances(arm_to_features: Dict[Arm, List[Num]], metric: str = 'cosine',
-                                self_distance: int = 999999) -> Dict[Arm, Dict[Arm, Num]]:
-        """
-        Calculates the distances between each pair of arms.
-
-        Distances calculated based on the feature vectors given in arm_to_features using the given distance metric.
-        The distance of the arm to itself is set as the given self_distance.
-
-        Parameters
-        ---------
-        arm_to_features: Dict[Arm, list[Num]]
-            Features for each arm used to calculate distances.
-        metric: str
-            Distance metric to use.
-            Default value is 'cosine'.
-        self_distance: int
-            The value to set as the distance to itself.
-            Default value is 999999.
-
-        Returns
-        -------
-        Returns the distance between two arms u and v as distance_from_to[u][v].
-        """
-
-        # For every arm, calculate its distance to all arms including itself
-        distance_from_to = {}
-        for from_arm in arm_to_features.keys():
-            distance_from_to[from_arm] = BaseMAB._get_arm_distances(from_arm, arm_to_features, metric, self_distance)
-        return distance_from_to
-
-    @staticmethod
-    def _get_distance_threshold(distance_from_to: Dict[Arm, Dict[Arm, Num]], quantile: Num,
-                                self_distance: int = 999999) -> Num:
-        """
-        Calculates a threshold for doing warm-start conditioned on minimum pairwise distances of arms.
-
-        Parameters
-        ---------
-        distance_from_to: Dict[Arm, Dict[Arm, Num]]
-            Dictionary of pairwise distances from arms to arms.
-        quantile: Num
-            Quantile used to compute threshold.
-        self_distance: int
-            The distance of arm to itself.
-            Default value is 999999.
-
-        Returns
-        -------
-        A threshold on pairwise distance for doing warm-start.
-        """
-
-        closest_distances = []
-        for arm, arm_to_distance in distance_from_to.items():
-
-            # Get distances from one arm to others
-            distances = [distance for distance in arm_to_distance.values()]
-
-            # Get the distance to closest arm (if not equal to self_distance)
-            if min(distances) != self_distance:
-                closest_distances.append(min(distances))
-
-        # Calculate threshold distance based on quantile
-        threshold = np.quantile(closest_distances, q=quantile)
-
-        return threshold
-
-    def _get_cold_arm_to_warm_arm(self, arm_to_features, distance_quantile):
+    def _get_cold_arm_to_warm_arm(
+        self, arm_to_features: Dict[str, List[float]], distance_quantile: float
+    ) -> Dict:
 
         # Calculate from-to distances between all pairs of arms based on features
         # and then find minimum distance (threshold) required to warm start an untrained arm
-        distance_from_to = self._get_pairwise_distances(arm_to_features)
-        distance_threshold = self._get_distance_threshold(distance_from_to, quantile=distance_quantile)
+        distance_from_to = get_pairwise_distances(arm_to_features)
+        distance_threshold = get_distance_threshold(
+            distance_from_to, quantile=distance_quantile
+        )
 
         # Cold arms
         cold_arms = [arm for arm in self.arms if arm not in self.trained_arms]

@@ -1,5 +1,6 @@
-import setuptools
 import os
+
+import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -7,7 +8,7 @@ with open("README.md", "r") as fh:
 with open("requirements.txt") as fh:
     required = fh.read().splitlines()
 
-with open(os.path.join('mabwiser', '_version.py')) as fp:
+with open(os.path.join("mabwiser", "_version.py")) as fp:
     exec(fp.read())
 
 setuptools.setup(
@@ -18,7 +19,9 @@ setuptools.setup(
     version=__version__,
     author=__author__,
     url="https://github.com/fidelity/mabwiser",
-    packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    packages=setuptools.find_packages(
+        exclude=["*.tests", "*.tests.*", "tests.*", "tests"]
+    ),
     install_requires=required,
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
@@ -27,6 +30,6 @@ setuptools.setup(
     ],
     project_urls={
         "Documentation": "https://fidelity.github.io/mabwiser/",
-        "Source": "https://github.com/fidelity/mabwiser"
-    }
+        "Source": "https://github.com/fidelity/mabwiser",
+    },
 )

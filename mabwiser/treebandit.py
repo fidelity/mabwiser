@@ -4,12 +4,13 @@
 from collections import defaultdict
 from copy import deepcopy
 from functools import partial
-from typing import Union, Dict, List, NoReturn, Optional, Callable
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 
 from mabwiser.base_mab import BaseMAB
+from mabwiser.configs.arm import ArmConfig
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.popularity import _Popularity
@@ -17,27 +18,52 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import argmax, Arm, Num, _BaseRNG, create_rng
+from mabwiser.utilities.general import argmax
+from mabwiser.utilities.random import _BaseRNG, create_rng
 
 
 class _TreeBandit(BaseMAB):
-    def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
-                 lp: Union[_EpsilonGreedy, _Linear, _Popularity, _Random, _Softmax, _ThompsonSampling, _UCB1],
-                 tree_parameters: Dict):
+    def __init__(
+        self,
+        rng: _BaseRNG,
+        arms: List[str],
+        n_jobs: int,
+        lp: Union[
+            _EpsilonGreedy,
+            _Linear,
+            _Popularity,
+            _Random,
+            _Softmax,
+            _ThompsonSampling,
+            _UCB1,
+        ],
+        tree_parameters: Dict,
+        backend: Optional[str] = None,
+    ):
         super().__init__(rng, arms, n_jobs, backend)
         self.lp = lp
         self.tree_parameters = tree_parameters
         self.tree_parameters["random_state"] = rng.seed
 
         # Reset the decision tree and rewards of each arm
-        self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
-        self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
+        self.arm_to_tree = {
+            arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms
+        }
+        self.arm_to_leaf_to_rewards = {
+            arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms
+        }
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(
+        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+    ) -> None:
 
         # Reset the decision tree and rewards of each arm
-        self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
-        self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
+        self.arm_to_tree = {
+            arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms
+        }
+        self.arm_to_leaf_to_rewards = {
+            arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms
+        }
 
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
@@ -48,7 +74,9 @@ class _TreeBandit(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(
+        self, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None
+    ) -> None:
 
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
@@ -59,21 +87,31 @@ class _TreeBandit(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def predict(self, contexts: np.ndarray = None) -> Arm:
+    def predict(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
 
         return self._parallel_predict(contexts, is_predict=True)
 
-    def predict_expectations(self, contexts: np.ndarray = None) -> Dict[Arm, Num]:
+    def predict_expectations(self, contexts: Optional[np.ndarray] = None) -> Union[List, str]:
 
         return self._parallel_predict(contexts, is_predict=False)
 
-    def _copy_arms(self, cold_arm_to_warm_arm):
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[str, str]) -> None:
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
             self.arm_to_tree[cold_arm] = deepcopy(self.arm_to_tree[warm_arm])
-            self.arm_to_leaf_to_rewards[cold_arm] = deepcopy(self.arm_to_leaf_to_rewards[warm_arm])
-            self.arm_to_expectation[cold_arm] = deepcopy(self.arm_to_expectation[warm_arm])
+            self.arm_to_leaf_to_rewards[cold_arm] = deepcopy(
+                self.arm_to_leaf_to_rewards[warm_arm]
+            )
+            self.arm_to_expectation[cold_arm] = deepcopy(
+                self.arm_to_expectation[warm_arm]
+            )
 
-    def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
+    def _fit_arm(
+        self,
+        arm: str,
+        decisions: np.ndarray,
+        rewards: np.ndarray,
+        contexts: Optional[np.ndarray] = None,
+    ):
 
         # Create dataset for the given arm
         arm_contexts = contexts[decisions == arm]
@@ -103,11 +141,17 @@ class _TreeBandit(BaseMAB):
                 # Add rewards
                 # NB: No need to check if index key in arm_to_rewards dict
                 # thanks to defaultdict() construction
-                self.arm_to_leaf_to_rewards[arm][index] = np.append(self.arm_to_leaf_to_rewards[arm][index],
-                                                                    rewards_to_add)
+                self.arm_to_leaf_to_rewards[arm][index] = np.append(
+                    self.arm_to_leaf_to_rewards[arm][index], rewards_to_add
+                )
 
-    def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
-                          seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
+    def _predict_contexts(
+        self,
+        contexts: np.ndarray,
+        is_predict: bool,
+        seeds: Optional[np.ndarray] = None,
+        start_index: Optional[int] = None,
+    ) -> List:
 
         # Get local copy of arm_to_tree, arm_to_expectation, arm_to_rewards, and arms
         # to minimize communication overhead between arms (processes) using shared objects
@@ -146,7 +190,10 @@ class _TreeBandit(BaseMAB):
 
             if is_predict:
                 # Return a random arm with less than epsilon probability
-                if isinstance(self.lp, _EpsilonGreedy) and self.rng.rand() < self.lp.epsilon:
+                if (
+                    isinstance(self.lp, _EpsilonGreedy)
+                    and self.rng.rand() < self.lp.epsilon
+                ):
                     predictions[index] = self.arms[self.rng.randint(0, len(self.arms))]
                 else:
                     predictions[index] = argmax(arm_to_expectation)
@@ -156,25 +203,29 @@ class _TreeBandit(BaseMAB):
         # Return list of predictions
         return predictions
 
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
+    def _uptake_new_arm(self, arm: ArmConfig):
 
-        self.lp.add_arm(arm, binarizer)
-        self.arm_to_tree[arm] = DecisionTreeRegressor(**self.tree_parameters)
-        self.arm_to_leaf_to_rewards[arm] = defaultdict(partial(np.ndarray, 0))
+        self.lp.add_arm(arm)
+        self.arm_to_tree[arm.arm] = DecisionTreeRegressor(**self.tree_parameters)
+        self.arm_to_leaf_to_rewards[arm.arm] = defaultdict(partial(np.ndarray, 0))
 
-    def _drop_existing_arm(self, arm: Arm):
+    def _drop_existing_arm(self, arm: str):
         self.lp.remove_arm(arm)
         self.arm_to_tree.pop(arm)
         self.arm_to_leaf_to_rewards.pop(arm)
 
-    def _create_leaf_lp(self, arm: Arm):
+    def _create_leaf_lp(self, arm: str):
 
         # Create a new learning policy object for each leaf
         # This avoids sharing the same object between different arms and leaves.
         if isinstance(self.lp, _EpsilonGreedy):
-            leaf_lp = _EpsilonGreedy(self.rng, [arm], self.n_jobs, self.backend, self.lp.epsilon)
+            leaf_lp = _EpsilonGreedy(
+                self.rng, [arm], self.n_jobs, self.backend, self.lp.epsilon
+            )
         elif isinstance(self.lp, _ThompsonSampling):
-            leaf_lp = _ThompsonSampling(self.rng, [arm], self.n_jobs, self.backend, self.lp.binarizer)
+            leaf_lp = _ThompsonSampling(
+                self.rng, [arm], self.n_jobs, self.backend, self.lp.binarizer
+            )
         elif isinstance(self.lp, _UCB1):
             leaf_lp = _UCB1(self.rng, [arm], self.n_jobs, self.backend, self.lp.alpha)
         else:
