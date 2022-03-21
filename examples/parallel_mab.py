@@ -5,7 +5,9 @@ from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-from mabwiser.mab import MAB, LearningPolicy
+from mabwiser.mab import MAB
+from mabwiser.configs.mab import MABConfig
+from mabwiser.configs.learning import LinUCB
 
 ######################################################################################
 #
@@ -24,7 +26,7 @@ from mabwiser.mab import MAB, LearningPolicy
 seed = 111
 
 # Arms
-arms = list(np.arange(100))
+arms = [str(v) for v in list(np.arange(100))]
 
 # Historical on user contexts and rewards (i.e. whether a user clicked
 # on the recommended playlist or not)
@@ -48,16 +50,20 @@ for arm in arms:
     # Fit standard scaler
     scaler = StandardScaler()
     scaler.fit(contexts[indices])
-    arm_to_scaler[arm] = scaler
+    arm_to_scaler[arm] = scaler.transform
 
 ########################################################
 # LinUCB Learning Policy
 ########################################################
 
 # LinUCB learning policy with alpha 1.25 and n_jobs = -1 (maximum available cores)
-linucb = MAB(arms=arms,
-             learning_policy=LearningPolicy.LinUCB(alpha=1.25, arm_to_scaler=arm_to_scaler),
-             n_jobs=-1)
+
+linucb = MAB(MABConfig(
+    arms=arms,
+    learning_policy=LinUCB(alpha=1.25, arm_to_scaler=arm_to_scaler),
+    n_jobs=-1
+))
+
 
 # Learn from playlists shown and observed click rewards for each arm
 linucb.fit(decisions=decisions_train, rewards=rewards_train, contexts=contexts_train)

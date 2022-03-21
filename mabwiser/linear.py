@@ -16,8 +16,8 @@ class _RidgeRegression(ABC):
     def __init__(
         self,
         rng: _BaseRNG,
-        alpha: float = 1.0,
-        l2_lambda: float = 1.0,
+        alpha: float,
+        l2_lambda: float,
         scaler: Optional[Callable] = None,
     ):
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
@@ -43,7 +43,7 @@ class _RidgeRegression(ABC):
 
         # Scale
         if self.scaler is not None:
-            x = self.scaler.transform(x.astype("float64"))
+            x = self.scaler(x.astype("float64"))
 
         # X transpose
         xt = x.T
@@ -67,15 +67,15 @@ class _RidgeRegression(ABC):
         x = x.reshape(1, -1)
 
         # Transform and return to previous shape. Convert to float64 to suppress any type warnings.
-        return self.scaler.transform(x.astype("float64")).reshape(-1)
+        return self.scaler(x.astype("float64")).reshape(-1)
 
 
 class _LinGreedyBase(_RidgeRegression):
     def __init__(
         self,
         rng: _BaseRNG,
-        alpha: float = 1.0,
-        l2_lambda: float = 1.0,
+        alpha: float,
+        l2_lambda: float,
         scaler: Optional[Callable] = None,
     ):
         super(_LinGreedyBase, self).__init__(
@@ -95,8 +95,8 @@ class _LinTSBase(_RidgeRegression):
     def __init__(
         self,
         rng: _BaseRNG,
-        alpha: float = 1.0,
-        l2_lambda: float = 1.0,
+        alpha: float,
+        l2_lambda: float,
         scaler: Optional[Callable] = None,
     ):
         super(_LinTSBase, self).__init__(
@@ -123,8 +123,8 @@ class _LinUCBBase(_RidgeRegression):
     def __init__(
         self,
         rng: _BaseRNG,
-        alpha: float = 1.0,
-        l2_lambda: float = 1.0,
+        alpha: float,
+        l2_lambda: float,
         scaler: Optional[Callable] = None,
     ):
         super(_LinUCBBase, self).__init__(
@@ -299,9 +299,9 @@ class _LinGreedy(_Linear):
         rng: _BaseRNG,
         arms: List[str],
         n_jobs: int,
-        alpha: float,
         epsilon: float,
         l2_lambda: float,
+        alpha: float = 0.0,
         backend: Optional[str] = None,
         arm_to_scaler: Optional[Dict[str, Callable]] = None,
     ):

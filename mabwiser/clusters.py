@@ -44,7 +44,7 @@ class _Clusters(BaseMAB):
         self.lp_list = [deepcopy(lp) for _ in range(self.n_clusters)]
         for c in range(self.n_clusters):
             self.lp_list[c].rng = rng
-            self.lp_list[c].arms = arms
+            self.lp_list[c].arms = deepcopy(arms)
 
         self.decisions = None
         self.rewards = None

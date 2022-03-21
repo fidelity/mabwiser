@@ -12,10 +12,6 @@ from sklearn.tree import DecisionTreeRegressor
 from mabwiser.base_mab import BaseMAB
 from mabwiser.configs.arm import ArmConfig
 from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.linear import _Linear
-from mabwiser.popularity import _Popularity
-from mabwiser.rand import _Random
-from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
 from mabwiser.utilities.general import argmax
@@ -30,19 +26,15 @@ class _TreeBandit(BaseMAB):
         n_jobs: int,
         lp: Union[
             _EpsilonGreedy,
-            _Linear,
-            _Popularity,
-            _Random,
-            _Softmax,
             _ThompsonSampling,
             _UCB1,
         ],
-        tree_parameters: Dict,
         backend: Optional[str] = None,
+        **kwargs
     ):
         super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.lp = lp
-        self.tree_parameters = tree_parameters
+        self.tree_parameters = kwargs
         self.tree_parameters["random_state"] = rng.seed
 
         # Reset the decision tree and rewards of each arm
@@ -223,19 +215,19 @@ class _TreeBandit(BaseMAB):
         self.arm_to_leaf_to_rewards.pop(arm)
 
     def _create_leaf_lp(self, arm: str):
-
         # Create a new learning policy object for each leaf
         # This avoids sharing the same object between different arms and leaves.
+
         if isinstance(self.lp, _EpsilonGreedy):
             leaf_lp = _EpsilonGreedy(
-                self.rng, [arm], self.n_jobs, self.backend, self.lp.epsilon
+                rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, epsilon=self.lp.epsilon
             )
         elif isinstance(self.lp, _ThompsonSampling):
             leaf_lp = _ThompsonSampling(
-                self.rng, [arm], self.n_jobs, self.backend, self.lp.binarizer
+                rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, binarizer=self.lp.binarizer
             )
         elif isinstance(self.lp, _UCB1):
-            leaf_lp = _UCB1(self.rng, [arm], self.n_jobs, self.backend, self.lp.alpha)
+            leaf_lp = _UCB1(rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, alpha=self.lp.alpha)
         else:
             raise ValueError("Incompatible leaf lp for TreeBandit: ", self.lp)
 

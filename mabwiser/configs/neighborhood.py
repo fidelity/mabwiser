@@ -218,8 +218,10 @@ class Radius:
 
 
 class _DTCCriterion(Enum):
-    gini = "gini"
-    entropy = "entropy"
+    squared_error = "squared_error"
+    friedman_mse = "friedman_mse"
+    absolute_error = "absolute_error"
+    poisson = "poisson"
 
 
 class _DTCSplitter(Enum):
@@ -269,22 +271,22 @@ class TreeBandit:
 
     """
 
-    criterion: Optional[_DTCCriterion] = None
-    splitter: Optional[_DTCSplitter] = None
+    criterion: Optional[_DTCCriterion] = _DTCCriterion.squared_error
+    splitter: Optional[_DTCSplitter] = _DTCSplitter.best
     max_depth: Optional[int] = None
-    min_samples_split: Optional[int] = None
-    min_samples_leaf: Optional[int] = None
-    min_weight_fraction_leaf: Optional[float] = None
+    min_samples_split: int = 2
+    min_samples_leaf: int = 1
+    min_weight_fraction_leaf: float = 0.0
     max_features: Optional[int] = None
     random_state: Optional[int] = None
     max_leaf_nodes: Optional[int] = None
-    min_impurity_decrease: Optional[float] = None
-    class_weight: Optional[Dict[str, float]]
-    ccp_alpha: Optional[float] = None
+    min_impurity_decrease: float = 0.0
+    ccp_alpha: float = 0.0
 
     def __post_hook__(self):
         try:
-            ge(self.ccp_alpha, bound=0.0)
+            if self.ccp_alpha is not None:
+                ge(self.ccp_alpha, bound=0.0)
         except Exception as e:
             raise ValueError(
                 f"`{self.__class__.__name__}` could not be instantiated -- spock message: {e}"

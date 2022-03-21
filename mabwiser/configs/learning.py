@@ -203,12 +203,14 @@ class LinTS:
     """
 
     alpha: float = 1.0
+    epsilon: float = 0.0
     l2_lambda: float = 1.0
     arm_to_scaler: Optional[Dict[str, Callable]] = None
 
     def __post_hook__(self):
         try:
             gt(self.alpha, bound=0.0)
+            ge(self.epsilon, bound=0.0)
             gt(self.l2_lambda, bound=0.0)
         except Exception as e:
             raise ValueError(
@@ -267,12 +269,14 @@ class LinUCB:
     """
 
     alpha: float = 1.0
+    epsilon: float = 0.0
     l2_lambda: float = 1.0
     arm_to_scaler: Optional[Dict[str, Callable]] = None
 
     def __post_hook__(self):
         try:
             ge(self.alpha, bound=0.0)
+            ge(self.epsilon, bound=0.0)
             ge(self.l2_lambda, bound=0.0)
         except Exception as e:
             raise ValueError(
