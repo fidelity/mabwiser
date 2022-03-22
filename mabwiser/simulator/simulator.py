@@ -476,7 +476,7 @@ class Simulator:
         #####################################
         # Scale the Data
         #####################################
-        if self.scaler is not None:
+        if self.scaler is not None and self.contexts is not None:
             self.logger.info("\n")
             train_contexts, test_contexts = self._run_scaler(
                 train_contexts, test_contexts

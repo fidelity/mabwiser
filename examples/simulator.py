@@ -12,7 +12,7 @@ from time import time
 
 size = 1000
 
-decisions = [str(random.randint(0, 2)) for _ in range(size)]
+decisions = [str(random.randint(0, 1)) for _ in range(size)]
 rewards = [float(random.randint(0, 1000)) for _ in range(size)]
 contexts = [[random.random() for _ in range(50)] for _ in range(size)]
 
