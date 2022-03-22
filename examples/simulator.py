@@ -245,8 +245,23 @@ sim.plot('avg', False)
 ####################################
 
 start = time()
-sim = Simulator(hyper_parameter_tuning, decisions, rewards, contexts,
-                scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=10, seed=123456)
+
+sim = Simulator(
+    bandits=hyper_parameter_tuning,
+    decisions=decisions,
+    rewards=rewards,
+    contexts=contexts,
+    scaler=StandardScaler(),
+    config=SimulatorConfig(
+        test_size=0.5,
+        is_ordered=False,
+        batch_size=10,
+        seed=123456,
+        evaluator=DefaultEvaluator.evaluator
+    )
+)
+
+
 sim.run()
 end = time()
 
@@ -271,8 +286,23 @@ sim.plot('avg', True)
 ####################################
 
 start = time()
-sim = Simulator(contextual_mabs, decisions, rewards, contexts,
-                scaler=StandardScaler(), test_size=0.5, is_ordered=False, batch_size=0, seed=123456, is_quick=True)
+
+sim = Simulator(
+    bandits=contextual_mabs,
+    decisions=decisions,
+    rewards=rewards,
+    contexts=contexts,
+    scaler=StandardScaler(),
+    config=SimulatorConfig(
+        test_size=0.5,
+        is_ordered=False,
+        batch_size=0,
+        seed=123456,
+        is_quick=True,
+        evaluator=DefaultEvaluator.evaluator
+    )
+)
+
 sim.run()
 end = time()
 
