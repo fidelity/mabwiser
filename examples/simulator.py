@@ -174,7 +174,7 @@ sim = Simulator(
     config=SimulatorConfig(
         test_size=0.5,
         is_ordered=False,
-        batch_size=0,
+        batch_size=100,
         seed=123456,
         evaluator=DefaultEvaluator.evaluator
     )
