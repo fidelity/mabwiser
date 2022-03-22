@@ -22,6 +22,7 @@ from mabwiser.utilities.validators import (
     check_false,
     check_fit_input,
     check_in_arms,
+    check_len,
     check_true,
     validate_2d,
 )
@@ -231,7 +232,9 @@ class MAB:
     def _validate_init(self) -> None:
         if NPCall.isinstance(self.implementor, "TreeBandit"):
             check_true(
-                LPCall.isinstance(self.lp, ("EpsilonGreedy", "UCB1", "ThompsonSampling")),
+                LPCall.isinstance(
+                    self.lp, ("EpsilonGreedy", "UCB1", "ThompsonSampling")
+                ),
                 ValueError(
                     f"Tree-Bandit is not compatible with the learning policy `{self.lp_name}`"
                 ),
@@ -262,17 +265,8 @@ class MAB:
                     "Fitting contexts data requires context policy or parametric learning policy."
                 ),
             )
-            check_true(
-                (len(decisions) == len(contexts))
-                or (len(decisions) == 1 and isinstance(contexts, pd.Series)),
-                ValueError(
-                    "Decisions and contexts should be same length: len(decision) = "
-                    + str(len(decisions))
-                    + " vs. len(contexts) = "
-                    + str(len(contexts))
-                ),
-            )
-
+            # Make sure lengths of decisions and contexts match
+            check_len(decisions, contexts, "decisions", "contexts")
         else:
             check_false(
                 self.is_contextual,
@@ -283,13 +277,8 @@ class MAB:
 
         # Check that the decisions are actually within the arms
         check_in_arms(decisions, self.arms)
-
         # Length check for decisions and rewards
-        check_true(
-            len(decisions) == len(rewards),
-            ValueError("Decisions and rewards should be same length."),
-        )
-
+        check_len(decisions, rewards, "decisions", "rewards")
         # Thompson Sampling: works with binary rewards or requires function to convert non-binary rewards
         if (
             LPCall.isinstance(self.lp, "ThompsonSampling")
@@ -484,14 +473,11 @@ class MAB:
 
         # Check that fit is called before
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
-
         # Validate arguments
         self._validate_predict_args(contexts)
-
         # Convert contexts to numpy array for efficiency
         if contexts is not None:
             contexts = convert_context(lp=self.lp, imp=self._imp, contexts=contexts)
-
         # Return the arm with the best expectation
         return self._imp.predict(contexts)
 
@@ -560,13 +546,10 @@ class MAB:
 
         # Check that fit is called before
         check_true(self._is_initial_fit, Exception("Call fit before prediction"))
-
         # Validate arguments
         self._validate_predict_args(contexts)
-
         # Convert contexts to numpy array for efficiency
         if contexts is not None:
             contexts = convert_context(lp=self.lp, imp=self._imp, contexts=contexts)
-
         # Return a dictionary from arms (key) to expectations (value)
         return self._imp.predict_expectations(contexts)

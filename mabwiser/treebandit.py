@@ -30,7 +30,7 @@ class _TreeBandit(BaseMAB):
             _UCB1,
         ],
         backend: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(rng=rng, arms=arms, n_jobs=n_jobs, backend=backend)
         self.lp = lp
@@ -220,14 +220,28 @@ class _TreeBandit(BaseMAB):
 
         if isinstance(self.lp, _EpsilonGreedy):
             leaf_lp = _EpsilonGreedy(
-                rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, epsilon=self.lp.epsilon
+                rng=self.rng,
+                arms=[arm],
+                n_jobs=self.n_jobs,
+                backend=self.backend,
+                epsilon=self.lp.epsilon,
             )
         elif isinstance(self.lp, _ThompsonSampling):
             leaf_lp = _ThompsonSampling(
-                rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, binarizer=self.lp.binarizer
+                rng=self.rng,
+                arms=[arm],
+                n_jobs=self.n_jobs,
+                backend=self.backend,
+                binarizer=self.lp.binarizer,
             )
         elif isinstance(self.lp, _UCB1):
-            leaf_lp = _UCB1(rng=self.rng, arms=[arm], n_jobs=self.n_jobs, backend=self.backend, alpha=self.lp.alpha)
+            leaf_lp = _UCB1(
+                rng=self.rng,
+                arms=[arm],
+                n_jobs=self.n_jobs,
+                backend=self.backend,
+                alpha=self.lp.alpha,
+            )
         else:
             raise ValueError("Incompatible leaf lp for TreeBandit: ", self.lp)
 

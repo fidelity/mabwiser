@@ -11,7 +11,9 @@ import numpy as np
 import pandas as pd
 
 
-def validate_2d(data: Union[np.ndarray, List, pd.DataFrame, pd.Series], var_name: str):
+def validate_2d(
+    data: Union[np.ndarray, List, pd.DataFrame, pd.Series], var_name: str
+) -> None:
     """
     Validates that  data is 2D
     """
@@ -46,6 +48,23 @@ def validate_2d(data: Union[np.ndarray, List, pd.DataFrame, pd.Series], var_name
         )
 
 
+def check_len(
+    v1: Union[List[str], np.ndarray, pd.Series],
+    v2: Union[List[List[float]], List[str], np.ndarray, pd.Series, pd.DataFrame],
+    v1_name: str = "",
+    v2_name: str = "",
+) -> None:
+    """
+    Checks that lengths of two variables matches
+    """
+    check_true(
+        len(v1) == len(v2) or (len(v1) == 1 and isinstance(v2, pd.Series)),
+        ValueError(
+            f"{v1_name} and {v2_name} should be same length: len {str(len(v1))} != len {str(len(v2))}"
+        ),
+    )
+
+
 def check_false(expression: bool, exception: Exception) -> None:
     """
     Checks that given expression is false, otherwise raises the given exception.
@@ -62,7 +81,7 @@ def check_true(expression: bool, exception: Exception) -> None:
         raise exception
 
 
-def check_sum_to_unity(list_floats: List[float]):
+def check_sum_to_unity(list_floats: List[float]) -> None:
     if isinstance(list_floats, (list, List)):
         if np.isclose(sum(list_floats), 1.0):
             raise ValueError(
@@ -70,7 +89,7 @@ def check_sum_to_unity(list_floats: List[float]):
             )
 
 
-def check_sklearn_scaler(scaler: Optional[Callable]):
+def check_sklearn_scaler(scaler: Optional[Callable]) -> None:
     if scaler is not None:
         if not hasattr(scaler, "transform"):
             raise TypeError(
@@ -82,7 +101,9 @@ def check_sklearn_scaler(scaler: Optional[Callable]):
             )
 
 
-def check_in_arms(decisions: Union[List[str], np.ndarray, pd.Series], arms: List[str]):
+def check_in_arms(
+    decisions: Union[List[str], np.ndarray, pd.Series], arms: List[str]
+) -> None:
     if isinstance(decisions, (list, List, np.ndarray)):
         tf_list = [v not in arms for v in decisions]
     else:
@@ -98,7 +119,7 @@ def check_fit_input(
         Union[List[str], np.ndarray, pd.Series],
         Tuple[Union[List[str], np.ndarray, pd.Series], ...],
     ]
-):
+) -> None:
     if isinstance(data, (tuple, Tuple)):
         for v in data:
             _check_fit_input(v)
@@ -106,7 +127,7 @@ def check_fit_input(
         _check_fit_input(data)
 
 
-def _check_fit_input(data: Union[List[str], np.ndarray, pd.Series]):
+def _check_fit_input(data: Union[List[str], np.ndarray, pd.Series]) -> None:
     check_true(
         isinstance(data, (list, np.ndarray, pd.Series)),
         TypeError(

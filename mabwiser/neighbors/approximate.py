@@ -19,6 +19,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
+from mabwiser.utilities.general import get_context_hash
 from mabwiser.utilities.random import _BaseRNG, create_rng
 
 
@@ -188,7 +189,7 @@ class _LSHNearest(_ApproximateNeighbors):
 
             # Get hashes in parallel
             hash_values = Parallel(n_jobs=n_jobs, backend=self.backend)(
-                delayed(self.get_context_hash)(
+                delayed(get_context_hash)(
                     contexts[starts[i] : starts[i + 1]], self.table_to_plane[k]
                 )
                 for i in range(n_jobs)
@@ -217,20 +218,7 @@ class _LSHNearest(_ApproximateNeighbors):
 
         # Get list of neighbors from each hash table based on the hash values of the new context
         for k in self.table_to_plane.keys():
-            hash_value = self.get_context_hash(row_2d, self.table_to_plane[k])
+            hash_value = get_context_hash(row_2d, self.table_to_plane[k])
             indices += self.table_to_hash_to_index[k][hash_value[0]]
 
         return indices
-
-    @staticmethod
-    def get_context_hash(contexts, plane):
-        # Project rows onto plane and get signs
-        projection_signs = 1 * (np.dot(contexts, plane) > 0)
-
-        # Get base 2 value of projection signs
-        # Another approach is to convert to strings ('01000', '00101', '11111', etc)
-        hash_values = np.zeros(contexts.shape[0])
-        for i in range(plane.shape[1]):
-            hash_values = hash_values + (projection_signs[:, i] * 2**i)
-
-        return hash_values

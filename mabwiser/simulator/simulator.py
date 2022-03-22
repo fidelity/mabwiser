@@ -5,607 +5,43 @@
 This module provides a simulation utility for comparing algorithms and hyper-parameter tuning.
 """
 
-import abc
 import logging
 import math
-from collections import defaultdict
-from copy import deepcopy
-from itertools import chain
-from typing import List, NoReturn, Optional, Union
+from typing import List, Optional, Union, Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from joblib import Parallel, delayed
-from scipy.spatial.distance import cdist
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
 from mabwiser._version import __author__, __copyright__, __email__, __version__
-from mabwiser.approximate import _LSHNearest
 from mabwiser.base_mab import BaseMAB
-from mabwiser.greedy import _EpsilonGreedy
-from mabwiser.linear import _Linear
+from mabwiser.configs.mab import SimulatorConfig
 from mabwiser.mab import MAB
-from mabwiser.neighbors import _KNearest, _Neighbors, _Radius
-from mabwiser.popularity import _Popularity
-from mabwiser.rand import _Random
-from mabwiser.softmax import _Softmax
-from mabwiser.thompson import _ThompsonSampling
-from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Constants, Num, _BaseRNG, check_true, create_rng
+from mabwiser.utilities.converters import convert_array, convert_matrix
+from mabwiser.utilities.validators import (
+    check_false,
+    check_fit_input,
+    check_len,
+    check_in_arms,
+    check_true,
+    validate_2d,
+)
+from mabwiser.neighbors.base import _Neighbors
+from mabwiser.neighbors.fixed import _Radius, _KNearest
+from mabwiser.neighbors.approximate import _LSHNearest
+from mabwiser.simulator.mab import _NeighborsSimulator, _LSHSimulator, _RadiusSimulator, _KNearestSimulator
+
+from mabwiser.utilities.general import effective_jobs
+
+
 
 __author__ = __author__
 __email__ = __email__
 __version__ = __version__
 __copyright__ = __copyright__
-
-
-def default_evaluator(
-    arms: List[Arm],
-    decisions: np.ndarray,
-    rewards: np.ndarray,
-    predictions: List[Arm],
-    arm_to_stats: dict,
-    stat: str,
-    start_index: int,
-    nn: bool = False,
-) -> dict:
-    """Default evaluation function.
-
-    Calculates predicted rewards for the test batch based on predicted arms.
-    When the predicted arm is the same as the historic decision, the historic reward is used.
-    When the predicted arm is different, the mean, min or max reward from the training data is used.
-    If using Radius or KNearest neighborhood policy, the statistics from the neighborhood are used
-    instead of the entire training set.
-
-    The simulator supports custom evaluation functions,
-    but they must have this signature to work with the simulation pipeline.
-
-    Parameters
-    ----------
-    arms: list
-        The list of arms.
-    decisions: np.ndarray
-        The historic decisions for the batch being evaluated.
-    rewards: np.ndarray
-        The historic rewards for the batch being evaluated.
-    predictions: list
-        The predictions for the batch being evaluated.
-    arm_to_stats: dict
-        The dictionary of descriptive statistics for each arm to use in evaluation.
-    stat: str
-        Which metric from arm_to_stats to use. Takes the values 'min', 'max', 'mean'.
-    start_index: int
-        The index of the first row in the batch.
-        For offline simulations it is 0.
-        For _online simulations it is batch size * batch number.
-        Used to select the correct index from arm_to_stats if there are separate entries for each row in the test set.
-    nn: bool
-        Whether the results are from one of the simulator custom nearest neighbors implementations.
-
-    Returns
-    -------
-    An arm_to_stats dictionary for the predictions in the batch.
-    Dictionary has the format {arm {'count', 'sum', 'min', 'max', 'mean', 'std'}}
-    """
-    # If decision and prediction matches each other, use the observed reward
-    # If decision and prediction are different, use the given stat (e.g., mean) for the arm as the reward
-
-    arm_to_rewards = dict((arm, []) for arm in arms)
-    if nn:
-        arm_to_stats, neighborhood_stats = arm_to_stats
-    for index, predicted_arm in enumerate(predictions):
-
-        if predicted_arm == decisions[index]:
-            arm_to_rewards[predicted_arm].append(rewards[index])
-        elif nn:
-            nn_index = index + start_index
-            row_neighborhood_stats = neighborhood_stats[nn_index]
-            if row_neighborhood_stats and row_neighborhood_stats[predicted_arm]:
-                arm_to_rewards[predicted_arm].append(
-                    row_neighborhood_stats[predicted_arm][stat]
-                )
-            else:
-                arm_to_rewards[predicted_arm].append(arm_to_stats[predicted_arm][stat])
-
-        else:
-            arm_to_rewards[predicted_arm].append(arm_to_stats[predicted_arm][stat])
-
-    # Calculate stats based on the rewards from predicted arms
-    arm_to_stats_prediction = {}
-    for arm in arms:
-        arm_to_rewards[arm] = np.array(arm_to_rewards[arm])
-        if len(arm_to_rewards[arm]) > 0:
-            arm_to_stats_prediction[arm] = {
-                "count": arm_to_rewards[arm].size,
-                "sum": arm_to_rewards[arm].sum(),
-                "min": arm_to_rewards[arm].min(),
-                "max": arm_to_rewards[arm].max(),
-                "mean": arm_to_rewards[arm].mean(),
-                "std": arm_to_rewards[arm].std(),
-            }
-        else:
-            arm_to_stats_prediction[arm] = {
-                "count": 0,
-                "sum": math.nan,
-                "min": math.nan,
-                "max": math.nan,
-                "mean": math.nan,
-                "std": math.nan,
-            }
-
-    return arm_to_stats_prediction
-
-
-class _NeighborsSimulator(_Neighbors):
-    def __init__(
-        self,
-        rng: _BaseRNG,
-        arms: List[Arm],
-        n_jobs: int,
-        backend: Optional[str],
-        lp: Union[
-            _EpsilonGreedy,
-            _Linear,
-            _Popularity,
-            _Random,
-            _Softmax,
-            _ThompsonSampling,
-            _UCB1,
-        ],
-        metric: str,
-        is_quick: bool,
-        no_nhood_prob_of_arm: Optional[List] = None,
-    ):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric, no_nhood_prob_of_arm)
-
-        self.is_quick = is_quick
-        self.neighborhood_arm_to_stat = []
-        self.raw_rewards = None
-        self.row_arm_to_expectation = []
-        self.distances = None
-        self.is_contextual = True
-        self.neighborhood_sizes = []
-
-    def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None
-    ):
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.raw_rewards = rewards.copy()
-
-        super().fit(decisions, rewards, contexts)
-
-    def partial_fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None
-    ):
-        if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
-            self.raw_rewards = np.concatenate((self.raw_rewards, rewards.copy()))
-
-        super().partial_fit(decisions, rewards, contexts)
-
-    def predict(self, contexts: Optional[np.ndarray] = None):
-        return self._predict_operation(contexts, is_predict=True)
-
-    def predict_expectations(self, contexts: np.ndarray = None):
-        return self._predict_operation(contexts, is_predict=False)
-
-    def calculate_distances(self, contexts: np.ndarray):
-
-        # Partition contexts by job
-        n_jobs, n_contexts, starts = self._partition_contexts(len(contexts))
-
-        # Calculate distances in parallel
-        distances = Parallel(n_jobs=n_jobs, backend=self.backend)(
-            delayed(self._calculate_distances_of_batch)(
-                contexts[starts[i] : starts[i + 1]]
-            )
-            for i in range(n_jobs)
-        )
-
-        # Reduce
-        self.distances = list(chain.from_iterable(t for t in distances))
-
-        return self.distances
-
-    def set_distances(self, distances):
-        self.distances = distances
-
-    def _calculate_distances_of_batch(self, contexts: np.ndarray):
-        distances = [None] * len(contexts)
-        for index, row in enumerate(contexts):
-            # Calculate the distances from the historical contexts
-            # Row is 1D so convert it to 2D array for cdist using newaxis
-            # Finally, reshape to flatten the output distances list
-            row_2d = row[np.newaxis, :]
-            distances[index] = cdist(self.contexts, row_2d, metric=self.metric).reshape(
-                -1
-            )
-        return distances
-
-    def _predict_operation(self, contexts, is_predict):
-        # Return predict within the neighborhood
-        out = self._parallel_predict(contexts, is_predict=is_predict)
-
-        if isinstance(out[0], list):
-            df = pd.DataFrame(
-                out, columns=["prediction", "expectations", "size", "stats"]
-            )
-
-            if is_predict:
-                self.row_arm_to_expectation = (
-                    self.row_arm_to_expectation + df["expectations"].tolist()
-                )
-            else:
-                self.row_arm_to_expectation = (
-                    self.row_arm_to_expectation + df["prediction"].tolist()
-                )
-            if not self.is_quick:
-                self.neighborhood_sizes = self.neighborhood_sizes + df["size"].tolist()
-                self.neighborhood_arm_to_stat = (
-                    self.neighborhood_arm_to_stat + df["stats"].tolist()
-                )
-
-            return df["prediction"].tolist()
-
-        # Single row prediction
-        else:
-            prediction, expectation, size, stats = out
-            if is_predict:
-                self.row_arm_to_expectation = self.row_arm_to_expectation + [
-                    expectation
-                ]
-            else:
-                self.row_arm_to_expectation = self.row_arm_to_expectation + [prediction]
-            if not self.is_quick:
-                self.neighborhood_sizes = self.neighborhood_sizes + [size]
-                self.neighborhood_arm_to_stat = self.neighborhood_arm_to_stat + [stats]
-            return prediction
-
-    def _get_nhood_predictions(self, lp, row_2d, indices, is_predict):
-
-        nn_decisions = self.decisions[indices]
-        nn_rewards = self.rewards[indices]
-
-        if isinstance(lp, _ThompsonSampling) and self.lp.binarizer:
-            nn_raw_rewards = self.raw_rewards[indices]
-
-        arm_to_stat = {}
-        if not self.is_quick:
-            for arm in self.arms:
-                if isinstance(lp, _ThompsonSampling) and self.lp.binarizer:
-                    arm_rewards = nn_raw_rewards[nn_decisions == arm]
-                else:
-                    arm_rewards = nn_rewards[nn_decisions == arm]
-
-                if len(arm_rewards > 0):
-                    arm_to_stat[arm] = Simulator.get_stats(arm_rewards)
-                else:
-                    arm_to_stat[arm] = {}
-
-        # Fit the decisions and rewards of the neighbors
-        lp.fit(nn_decisions, nn_rewards, self.contexts[indices])
-
-        # Predict based on the neighbors
-        if is_predict:
-            prediction = lp.predict(row_2d)
-            if isinstance(lp, _ThompsonSampling):
-                arm_to_expectation = lp.arm_to_expectation.copy()
-            else:
-                arm_to_expectation = lp.predict_expectations(row_2d)
-
-            return prediction, arm_to_expectation, arm_to_stat
-        else:
-            prediction = lp.predict_expectations(row_2d)
-
-            return prediction, {}, arm_to_stat
-
-
-class _RadiusSimulator(_NeighborsSimulator):
-    def __init__(
-        self,
-        rng: _BaseRNG,
-        arms: List[Arm],
-        n_jobs: int,
-        backend: Optional[str],
-        lp: Union[
-            _EpsilonGreedy,
-            _Linear,
-            _Popularity,
-            _Random,
-            _Softmax,
-            _ThompsonSampling,
-            _UCB1,
-        ],
-        radius: Num,
-        metric: str,
-        is_quick: bool,
-        no_nhood_prob_of_arm: Optional[List] = None,
-    ):
-        super().__init__(
-            rng, arms, n_jobs, backend, lp, metric, is_quick, no_nhood_prob_of_arm
-        )
-        self.radius = radius
-
-    def _predict_contexts(
-        self,
-        contexts: np.ndarray,
-        is_predict: bool,
-        seeds: Optional[np.ndarray] = None,
-        start_index: Optional[int] = None,
-    ) -> List:
-
-        # Copy learning policy object
-        lp = deepcopy(self.lp)
-
-        # Create an empty list of predictions
-        predictions = [None] * len(contexts)
-
-        # For each row in the given contexts
-        for index, row in enumerate(contexts):
-
-            # Get random generator
-            lp.rng = create_rng(seeds[index])
-
-            # Calculate the distances from the historical contexts
-            # Row is 1D so convert it to 2D array for cdist using newaxis
-            # Finally, reshape to flatten the output distances list
-            row_2d = row[np.newaxis, :]
-            distances_to_row = self.distances[start_index + index]
-
-            # Find the neighbor indices within the radius
-            # np.where with a condition returns a tuple where the first element is an array of indices
-            indices = np.where(distances_to_row <= self.radius)
-
-            # If neighbors exist
-            if indices[0].size > 0:
-
-                prediction, exp, stats = self._get_nhood_predictions(
-                    lp, row_2d, indices, is_predict
-                )
-                predictions[index] = [prediction, exp, len(indices[0]), stats]
-
-            else:  # When there are no neighbors
-
-                # Random arm (or nan expectations)
-                prediction = self._get_no_nhood_predictions(lp, is_predict)
-                predictions[index] = [prediction, {}, 0, {}]
-
-        # Return the list of predictions
-        return predictions
-
-
-class _KNearestSimulator(_NeighborsSimulator):
-    def __init__(
-        self,
-        rng: _BaseRNG,
-        arms: List[Arm],
-        n_jobs: int,
-        backend: Optional[str],
-        lp: Union[
-            _EpsilonGreedy,
-            _Linear,
-            _Popularity,
-            _Random,
-            _Softmax,
-            _ThompsonSampling,
-            _UCB1,
-        ],
-        k: int,
-        metric: str,
-        is_quick: bool,
-    ):
-        super().__init__(rng, arms, n_jobs, backend, lp, metric, is_quick)
-        self.k = k
-
-    def _predict_contexts(
-        self,
-        contexts: np.ndarray,
-        is_predict: bool,
-        seeds: Optional[np.ndarray] = None,
-        start_index: Optional[int] = None,
-    ) -> List:
-
-        # Copy Learning Policy object and set random state
-        lp = deepcopy(self.lp)
-
-        # Create an empty list of predictions
-        predictions = [None] * len(contexts)
-
-        # For each row in the given contexts
-        for index, row in enumerate(contexts):
-
-            # Get random generator
-            lp.rng = create_rng(seed=seeds[index])
-
-            # Calculate the distances from the historical contexts
-            # Row is 1D so convert it to 2D array for cdist using newaxis
-            # Finally, reshape to flatten the output distances list
-            row_2d = row[np.newaxis, :]
-            distances_to_row = self.distances[start_index + index]
-
-            # Find the k nearest neighbor indices
-            indices = np.argpartition(distances_to_row, self.k - 1)[: self.k]
-
-            prediction, exp, stats = self._get_nhood_predictions(
-                lp, row_2d, indices, is_predict
-            )
-            predictions[index] = [prediction, exp, self.k, stats]
-
-        # Return the list of predictions
-        return predictions
-
-
-class _ApproximateSimulator(_NeighborsSimulator, metaclass=abc.ABCMeta):
-    def fit(
-        self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None
-    ) -> None:
-        super().fit(decisions, rewards, contexts)
-
-        # Initialize planes
-        self._initialize(contexts.shape[1])
-
-        # Fit hashes for each training context
-        self._fit_operation(contexts, context_start=0)
-
-    def partial_fit(
-        self,
-        decisions: np.ndarray,
-        rewards: np.ndarray,
-        contexts: Optional[np.ndarray] = None,
-    ) -> None:
-        start = len(self.contexts)
-
-        super().partial_fit(decisions, rewards, contexts)
-
-        # Fit hashes for each training context
-        self._fit_operation(contexts, context_start=start)
-
-    def _predict_contexts(
-        self,
-        contexts: np.ndarray,
-        is_predict: bool,
-        seeds: Optional[np.ndarray] = None,
-        start_index: Optional[int] = None,
-    ) -> List:
-        # Copy learning policy object
-        lp = deepcopy(self.lp)
-
-        # Create an empty list of predictions
-        predictions = [None] * len(contexts)
-
-        # For each row in the given contexts
-        for index, row in enumerate(contexts):
-
-            # Get random generator
-            lp.rng = create_rng(seed=seeds[index])
-
-            # Prepare for hashing
-            row_2d = row[np.newaxis, :]
-            indices = self._get_neighbors(row_2d)
-
-            # Drop duplicates from list of neighbors
-            indices = list(set(indices))
-
-            # If neighbors exist
-            if len(indices) > 0:
-
-                prediction, exp, stats = self._get_nhood_predictions(
-                    lp, row_2d, indices, is_predict
-                )
-                predictions[index] = [prediction, exp, len(indices), stats]
-
-            else:  # When there are no neighbors
-
-                # Random arm (or nan expectations)
-                prediction = self._get_no_nhood_predictions(lp, is_predict)
-                predictions[index] = [prediction, {}, 0, {}]
-
-        return predictions
-
-    @abc.abstractmethod
-    def _get_neighbors(self, row_2d):
-        """Abstract method to be implemented by child classes."""
-        pass
-
-    @abc.abstractmethod
-    def _initialize(self, dimensions):
-        """Abstract method to be implemented by child classes."""
-        pass
-
-    @abc.abstractmethod
-    def _fit_operation(self, contexts, context_start):
-        """Abstract method to be implemented by child classes."""
-        pass
-
-
-class _LSHSimulator(_ApproximateSimulator):
-    def __init__(
-        self,
-        rng: _BaseRNG,
-        arms: List[Arm],
-        n_jobs: int,
-        backend: Optional[str],
-        lp: Union[
-            _EpsilonGreedy,
-            _Linear,
-            _Popularity,
-            _Random,
-            _Softmax,
-            _ThompsonSampling,
-            _UCB1,
-        ],
-        n_dimensions: int,
-        n_tables: int,
-        is_quick: bool,
-        no_nhood_prob_of_arm: Optional[List] = None,
-    ):
-        super().__init__(
-            rng, arms, n_jobs, backend, lp, "simhash", is_quick, no_nhood_prob_of_arm
-        )
-
-        # Properties for hash tables
-        self.n_dimensions = n_dimensions
-        self.n_tables = n_tables
-        self.buckets = 2**n_dimensions
-
-        # Initialize dictionaries for planes and hash table
-        self.table_to_hash_to_index = {
-            k: defaultdict(list) for k in range(self.n_tables)
-        }
-        self.table_to_plane = {i: [] for i in range(self.n_tables)}
-
-    def _add_neighbors(self, hash_values, k, h, context_start):
-        if context_start > 0:
-            neighbors = np.where(hash_values == h)[0] + context_start
-        else:
-            neighbors = np.where(hash_values == h)[0]
-        self.table_to_hash_to_index[k][h] += list(neighbors)
-
-    def _fit_operation(self, contexts, context_start):
-        # Get hashes for each hash table for each training context
-        for k in self.table_to_plane.keys():
-
-            n_contexts = len(contexts)
-
-            # Partition contexts by job
-            n_jobs, n_contexts, starts = self._partition_contexts(n_contexts)
-
-            # Get hashes in parallel
-            hash_values = Parallel(n_jobs=n_jobs, backend=self.backend)(
-                delayed(_LSHNearest.get_context_hash)(
-                    contexts[starts[i] : starts[i + 1]], self.table_to_plane[k]
-                )
-                for i in range(n_jobs)
-            )
-
-            # Reduce
-            hash_values = list(chain.from_iterable(t for t in hash_values))
-
-            # Get list of unique hashes - list is sparse, there should be collisions
-            hash_keys = np.unique(hash_values)
-
-            # For each hash, get the indices of contexts with that hash
-            Parallel(n_jobs=n_jobs, require="sharedmem")(
-                delayed(self._add_neighbors)(hash_values, k, h, context_start)
-                for h in hash_keys
-            )
-
-    def _initialize(self, n_rows):
-        self.table_to_plane = {
-            i: self.rng.standard_normal(size=(n_rows, self.n_dimensions))
-            for i in self.table_to_plane.keys()
-        }
-
-    def _get_neighbors(self, row_2d):
-        indices = list()
-
-        # Get list of neighbors from each hash table based on the hash values of the new context
-        for k in self.table_to_plane.keys():
-            hash_value = _LSHNearest.get_context_hash(row_2d, self.table_to_plane[k])
-            indices += self.table_to_hash_to_index[k][hash_value[0]]
-        return indices
 
 
 class Simulator:
@@ -707,22 +143,14 @@ class Simulator:
 
     def __init__(
         self,
-        bandits: List[tuple],  # List of tuples of names and bandits
-        decisions: Union[List[Arm], np.ndarray, pd.Series],  # Decisions that are made
-        rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
-        contexts: Union[
-            None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame
-        ] = None,  # Contexts, optional
-        scaler: callable = None,  # Scaler for contexts
-        test_size: float = 0.3,  # Fraction to use for test batch
-        is_ordered: bool = False,  # Whether to use chronological order
-        batch_size: int = 0,  # Batch size for online learning
-        evaluator: callable = default_evaluator,  # Evaluator function
-        seed: int = Constants.default_seed,  # Random seed
-        is_quick: bool = False,  # Quick run flag
-        log_file: str = None,  # Log file name
-        log_format: str = "%(asctime)s %(levelname)s %(message)s",
-    ):  # Log file format
+        bandits: List[tuple],
+        decisions: Union[List[str], np.ndarray, pd.Series],
+        rewards: Union[List[float], np.ndarray, pd.Series],
+        config: SimulatorConfig,
+        contexts: Optional[
+            Union[List[List[float]], np.ndarray, pd.Series, pd.DataFrame]
+        ] = None,
+    ):
         """Simulator
 
         Creates a simulator object with a collection of bandits, the history of decisions, rewards, and contexts, and
@@ -739,31 +167,8 @@ class Simulator:
             The rewards that are received corresponding to the decisions.
         contexts : Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame]
             The context under which each decision is made. Default value is None.
-        scaler: scaler
-            One of the scalers from sklearn.preprocessing. Optional.
-        test_size: float
-            The fraction of data to use in the test set. Must be in the range (0, 1).
-        is_ordered: bool
-            Whether to divide the data randomly or to use the order given.
-            When set to True, the test data will be the final n rows of the data set where n is determined by the split.
-            When set to False, sklearn's train_test_split will be used.
-        batch_size: int
-            The batch size to test before partial fitting during _online learning.
-            Cannot exceed the size of the test set.
-            When batch size is 0, the simulation will be offline.
-        evaluator: callable
-            Function for scoring the predictions.
-            Must have the function signature function(arm_to_stats_train: dictionary, predictions: list,
-            decisions: np.ndarray, rewards: np.ndarray, stat: str, start_index: int, nn: bool).
-        seed: num
-            The seed for simulation
-        is_quick: bool
-            Flag to omit neighborhood statistics.
-            Default value is False.
-        log_file: str
-            The logfile to store debug output. Optional.
-        log_format: str
-            The logger format used
+        config: SimulatorConfig
+            Spock configuration object for the Simulator class
 
         Raises
         ------
@@ -786,35 +191,22 @@ class Simulator:
             bandits=bandits,
             decisions=decisions,
             rewards=rewards,
-            contexts=contexts,
-            test_size=test_size,
-            ordered=is_ordered,
-            batch_size=batch_size,
-            evaluation=evaluator,
-            is_quick=is_quick,
+            contexts=contexts
         )
 
         # Convert decisions, rewards and contexts to numpy arrays
-        decisions = MAB._convert_array(decisions)
-        rewards = MAB._convert_array(rewards)
-        contexts = MAB._convert_matrix(contexts)
+        decisions = convert_array(decisions)
+        rewards = convert_array(rewards)
+        contexts = convert_matrix(contexts)
 
         # Save the simulation parameters
         self.bandits = bandits
         self.decisions = decisions
         self.rewards = rewards
         self.contexts = contexts
-        self.scaler = scaler
-        self.test_size = test_size
-        self.is_ordered = is_ordered
-        self.batch_size = batch_size
-        self.evaluator = evaluator
-        self.seed = seed
-        self.is_quick = is_quick
-        self.log_file = log_file
-        self.log_format = log_format
+        self.config = config
 
-        self._online = batch_size > 0
+        self._online = self.config.batch_size > 0
         self._chunk_size = 100
 
         # logger object
@@ -824,17 +216,17 @@ class Simulator:
         # create console handler and set level to info
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
-        formatter = logging.Formatter(self.log_format)
+        formatter = logging.Formatter(self.config.log_format)
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)
 
         # create error file handler and set level to debug
-        if self.log_file is not None:
+        if self.config.log_file is not None:
             handler = logging.FileHandler(
-                self.log_file, "w", encoding=None, delay="true"
+                self.config.log_file, "w", encoding=None, delay=True
             )
             handler.setLevel(logging.DEBUG)
-            formatter = logging.Formatter(self.log_format)
+            formatter = logging.Formatter(self.config.log_format)
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
 
@@ -844,7 +236,7 @@ class Simulator:
 
         # Get the number of effective jobs for each bandit
         n_jobs_list = [
-            BaseMAB._effective_jobs(math.ceil((len(decisions) * test_size)), mab.n_jobs)
+            effective_jobs(math.ceil((len(decisions) * self.config.test_size)), mab.n_jobs)
             for mab_name, mab in self.bandits
         ]
         # set max n_jobs
@@ -869,18 +261,18 @@ class Simulator:
         # Log parameters
         self.logger.info("Simulation Parameters")
         self.logger.info("\t bandits: " + str(self.bandits))
-        self.logger.info("\t scaler: " + str(self.scaler))
-        self.logger.info("\t test_size: " + str(self.test_size))
-        self.logger.info("\t is_ordered: " + str(self.is_ordered))
-        self.logger.info("\t batch_size: " + str(self.batch_size))
-        self.logger.info("\t evaluator: " + str(self.evaluator))
-        self.logger.info("\t seed: " + str(self.seed))
-        self.logger.info("\t is_quick: " + str(self.is_quick))
-        self.logger.info("\t log_file: " + str(self.log_file))
-        self.logger.info("\t format: " + self.log_format)
+        self.logger.info("\t scaler: " + str(self.config.scaler))
+        self.logger.info("\t test_size: " + str(self.config.test_size))
+        self.logger.info("\t is_ordered: " + str(self.config.is_ordered))
+        self.logger.info("\t batch_size: " + str(self.config.batch_size))
+        self.logger.info("\t evaluator: " + str(self.config.evaluator))
+        self.logger.info("\t seed: " + str(self.config.seed))
+        self.logger.info("\t is_quick: " + str(self.config.is_quick))
+        self.logger.info("\t log_file: " + str(self.config.log_file))
+        self.logger.info("\t format: " + self.config.log_format)
 
     # Public Methods
-    def get_arm_stats(self, decisions: np.ndarray, rewards: np.ndarray) -> dict:
+    def get_arm_stats(self, decisions: np.ndarray, rewards: np.ndarray) -> Dict:
         """
         Calculates descriptive statistics for each arm in the provided data set.
 
@@ -963,7 +355,7 @@ class Simulator:
         else:
             stats = self.bandit_to_arm_to_stats_max
 
-        if self.batch_size > 0:
+        if self.config.batch_size > 0:
             cu_sums = {}
             labels = {}
             mabs = []
@@ -1015,7 +407,7 @@ class Simulator:
                         cs += item
                         cu_sums[mab_name].append(cs)
 
-            x = [i * self.batch_size for i in labels[mabs[0]]]
+            x = [i * self.config.batch_size for i in labels[mabs[0]]]
             for mab in mabs:
                 sns.lineplot(x=x, y=cu_sums[mab], label=mab)
             plt.xlabel("Test Rows Predicted")
@@ -1088,7 +480,7 @@ class Simulator:
         #####################################
         # Scale the Data
         #####################################
-        if self.scaler is not None:
+        if self.config.scaler is not None:
             self.logger.info("\n")
             train_contexts, test_contexts = self._run_scaler(
                 train_contexts, test_contexts
@@ -1132,8 +524,8 @@ class Simulator:
         self.logger.info(
             str(name) + " batch " + str(i) + " confusion matrix: " + str(cfm)
         )
-        if nn and not self.is_quick:
-            self.bandit_to_arm_to_stats_min[name][i] = self.evaluator(
+        if nn and not self.config.is_quick:
+            self.bandit_to_arm_to_stats_min[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1147,7 +539,7 @@ class Simulator:
                 nn,
             )
 
-            self.bandit_to_arm_to_stats_avg[name][i] = self.evaluator(
+            self.bandit_to_arm_to_stats_avg[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1161,7 +553,7 @@ class Simulator:
                 nn,
             )
 
-            self.bandit_to_arm_to_stats_max[name][i] = self.evaluator(
+            self.bandit_to_arm_to_stats_max[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1175,7 +567,7 @@ class Simulator:
                 nn,
             )
         else:
-            self.bandit_to_arm_to_stats_min[name][i] = self.evaluator(
+            self.bandit_to_arm_to_stats_min[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1186,7 +578,7 @@ class Simulator:
                 False,
             )
 
-            self.bandit_to_arm_to_stats_avg[name][i] = self.evaluator(
+            self.bandit_to_arm_to_stats_avg[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1197,7 +589,7 @@ class Simulator:
                 False,
             )
 
-            self.bandit_to_arm_to_stats_max[name][i] = self.evaluator(
+            self.bandit_to_arm_to_stats_max[name][i] = self.config.evaluator(
                 self.arms,
                 decisions,
                 rewards,
@@ -1281,7 +673,7 @@ class Simulator:
                     self.bandit_to_predictions[name] + predictions
                 )
 
-                if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
+                if isinstance(mab, _NeighborsSimulator) and not self.config.is_quick:
                     self.bandit_to_arm_to_stats_neighborhoods[
                         name
                     ] = mab.neighborhood_arm_to_stat.copy()
@@ -1305,8 +697,8 @@ class Simulator:
                 + str(self.bandit_to_confusion_matrices[name])
             )
 
-            if nn and not self.is_quick:
-                self.bandit_to_arm_to_stats_min[name] = self.evaluator(
+            if nn and not self.config.is_quick:
+                self.bandit_to_arm_to_stats_min[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1320,7 +712,7 @@ class Simulator:
                     nn=nn,
                 )
 
-                self.bandit_to_arm_to_stats_avg[name] = self.evaluator(
+                self.bandit_to_arm_to_stats_avg[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1334,7 +726,7 @@ class Simulator:
                     nn=nn,
                 )
 
-                self.bandit_to_arm_to_stats_max[name] = self.evaluator(
+                self.bandit_to_arm_to_stats_max[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1348,7 +740,7 @@ class Simulator:
                     nn=nn,
                 )
             else:
-                self.bandit_to_arm_to_stats_min[name] = self.evaluator(
+                self.bandit_to_arm_to_stats_min[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1359,7 +751,7 @@ class Simulator:
                     nn=False,
                 )
 
-                self.bandit_to_arm_to_stats_avg[name] = self.evaluator(
+                self.bandit_to_arm_to_stats_avg[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1370,7 +762,7 @@ class Simulator:
                     nn=False,
                 )
 
-                self.bandit_to_arm_to_stats_max[name] = self.evaluator(
+                self.bandit_to_arm_to_stats_max[name] = self.config.evaluator(
                     self.arms,
                     test_decisions,
                     test_rewards,
@@ -1422,7 +814,7 @@ class Simulator:
                 nn,
             )
 
-            if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
+            if isinstance(mab, _NeighborsSimulator) and not self.config.is_quick:
                 self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
                 self.bandit_to_arm_to_stats_neighborhoods[
                     name
@@ -1444,11 +836,11 @@ class Simulator:
 
         # Divide the test data into batches
         start = 0
-        for i in range(0, int(math.ceil(len(test_decisions) / self.batch_size))):
+        for i in range(0, int(math.ceil(len(test_decisions) / self.config.batch_size))):
             self.logger.info("Starting batch " + str(i))
 
             # Stop at the next batch_size interval or the end of the test data
-            stop = min(start + self.batch_size, len(test_decisions) + 1)
+            stop = min(start + self.config.batch_size, len(test_decisions) + 1)
 
             batch_contexts = (
                 test_contexts[start:stop] if test_contexts is not None else None
@@ -1461,9 +853,9 @@ class Simulator:
             chunk_start = 0
 
             # Divide the batch into chunks
-            for j in range(0, int(math.ceil(self.batch_size / self._chunk_size))):
+            for j in range(0, int(math.ceil(self.config.batch_size / self._chunk_size))):
                 distances = None
-                chunk_stop = min(chunk_start + self._chunk_size, self.batch_size)
+                chunk_stop = min(chunk_start + self._chunk_size, self.config.batch_size)
                 chunk_contexts = (
                     batch_contexts[chunk_start:chunk_stop]
                     if batch_contexts is not None
@@ -1499,7 +891,7 @@ class Simulator:
                             else:
                                 expectations = mab.predict_expectations(chunk_contexts)
 
-                        if self.batch_size == 1:
+                        if self.config.batch_size == 1:
                             predictions = [predictions]
 
                     else:
@@ -1533,12 +925,12 @@ class Simulator:
 
                 if (
                     isinstance(mab, (_RadiusSimulator, _LSHSimulator))
-                    and not self.is_quick
+                    and not self.config.is_quick
                 ):
                     self.bandit_to_neighborhood_size[
                         name
                     ] = mab.neighborhood_sizes.copy()
-                if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
+                if isinstance(mab, _NeighborsSimulator) and not self.config.is_quick:
                     self.bandit_to_arm_to_stats_neighborhoods[
                         name
                     ] = mab.neighborhood_arm_to_stat.copy()
@@ -1582,8 +974,8 @@ class Simulator:
 
         self.logger.info("Train/Test Scale")
 
-        train_contexts = self.scaler.fit_transform(train_contexts)
-        test_contexts = self.scaler.transform(test_contexts)
+        train_contexts = self.config.scaler.fit_transform(train_contexts)
+        test_contexts = self.config.scaler.transform(test_contexts)
         return train_contexts, test_contexts
 
     def _run_train_test_split(self):
@@ -1598,8 +990,8 @@ class Simulator:
             The train and test decisions, rewards and contexts
         """
 
-        if self.is_ordered:
-            train_size = int(len(self.decisions) * (1 - self.test_size))
+        if self.config.is_ordered:
+            train_size = int(len(self.decisions) * (1 - self.config.test_size))
             train_decisions = self.decisions[:train_size]
             train_rewards = self.rewards[:train_size]
             train_contexts = (
@@ -1760,7 +1152,7 @@ class Simulator:
                     imp.lp,
                     imp.radius,
                     imp.metric,
-                    is_quick=self.is_quick,
+                    is_quick=self.config.is_quick,
                     no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm,
                 )
 
@@ -1773,7 +1165,7 @@ class Simulator:
                     imp.lp,
                     imp.k,
                     imp.metric,
-                    is_quick=self.is_quick,
+                    is_quick=self.config.is_quick,
                 )
             elif isinstance(imp, _LSHNearest):
                 mab = _LSHSimulator(
@@ -1784,7 +1176,7 @@ class Simulator:
                     imp.lp,
                     imp.n_dimensions,
                     imp.n_tables,
-                    is_quick=self.is_quick,
+                    is_quick=self.config.is_quick,
                     no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm,
                 )
 
@@ -1828,10 +1220,7 @@ class Simulator:
         rewards,
         contexts,
         test_size,
-        ordered,
         batch_size,
-        evaluation,
-        is_quick,
     ):
         """
         Validates the simulation parameters.
@@ -1851,75 +1240,17 @@ class Simulator:
             )
 
         # Type check for decisions
-        check_true(
-            isinstance(decisions, (list, np.ndarray, pd.Series)),
-            TypeError(
-                "The decisions should be given as list, numpy array, or pandas series."
-            ),
-        )
-
-        # Type check for rewards
-        check_true(
-            isinstance(rewards, (list, np.ndarray, pd.Series)),
-            TypeError(
-                "The rewards should be given as list, numpy array, or pandas series."
-            ),
-        )
-
+        check_fit_input((decisions, rewards))
         # Type check for contexts --don't use "if contexts" since it's n-dim array
         if contexts is not None:
-            if isinstance(contexts, np.ndarray):
-                check_true(
-                    contexts.ndim == 2,
-                    TypeError(
-                        "The contexts should be given as 2D list, numpy array, or pandas series or "
-                        "data frames."
-                    ),
-                )
-            elif isinstance(contexts, list):
-                check_true(
-                    np.array(contexts).ndim == 2,
-                    TypeError(
-                        "The contexts should be given as 2D list, numpy array, or pandas series or "
-                        "data frames."
-                    ),
-                )
-            else:
-                check_true(
-                    isinstance(contexts, (pd.Series, pd.DataFrame)),
-                    TypeError(
-                        "The contexts should be given as 2D list, numpy array, or pandas series or "
-                        "data frames."
-                    ),
-                )
-
+            validate_2d(contexts, "contexts")
+            # Make sure lengths of decisions and contexts match
+            check_len(decisions, contexts, "decisions", "contexts")
         # Length check for decisions and rewards
-        check_true(
-            len(decisions) == len(rewards),
-            ValueError("Decisions and rewards should be same length."),
-        )
-
-        check_true(
-            isinstance(test_size, float), TypeError("Test size must be a float.")
-        )
-        check_true(
-            0.0 < test_size < 1.0,
-            ValueError("Test size must be greater than zero and less than one."),
-        )
-        check_true(isinstance(ordered, bool), TypeError("Ordered must be a boolean."))
-        check_true(
-            isinstance(batch_size, int), TypeError("Batch size must be an integer.")
-        )
+        check_len(decisions, rewards, "decisions", "rewards")
+        # Verify the batch size is less than the total test set
         if batch_size > 0:
             check_true(
                 batch_size <= (math.ceil(len(decisions) * test_size)),
                 ValueError("Batch size cannot be larger than " "the test set."),
             )
-
-        check_true(
-            callable(evaluation), TypeError("Evaluation method must be a function.")
-        )
-
-        check_true(
-            isinstance(is_quick, bool), TypeError("Quick run flag must be a boolean.")
-        )
