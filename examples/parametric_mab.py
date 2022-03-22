@@ -112,7 +112,7 @@ assert(prediction == ["1", "2"])
 # KNearest context policy with k equals to 4 and LinUCB learning with alpha of 1.25
 knearest = MAB(config=MABConfig(
     arms=ads,
-    learning_policy=LinUCB(alpha=1.0),
+    learning_policy=LinUCB(alpha=1.25),
     neighborhood_policy=KNearest(k=4),
     seed=123456
 ))

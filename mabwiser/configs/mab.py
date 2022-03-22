@@ -33,7 +33,6 @@ class SimulatorConfig:
     """Configuration for the Simulator class
 
     Attributes:
-        scaler: One of the scalers from sklearn.preprocessing. Optional.
         test_size: The fraction of data to use in the test set. Must be in the range (0, 1).
         is_ordered: Whether to divide the data randomly or to use the order given. When set to True, the test data will
             be the final n rows of the data set where n is determined by the split. When set to False, sklearn's
@@ -48,14 +47,13 @@ class SimulatorConfig:
         log_file: The logfile to store debug output. Optional.
         log_format: The logger format used
     """
-    scaler: Optional[Callable] = None
     test_size: float = 0.3
     is_ordered: bool = False
     batch_size: int = 0
     evaluator: Callable
     seed: int = 123456
     is_quick: bool = False
-    log_file: str = None
+    log_file: Optional[str] = None
     log_format: str = "%(asctime)s %(levelname)s %(message)s"
 
     def __post_hook__(self):

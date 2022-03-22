@@ -35,6 +35,7 @@ from mabwiser.neighbors.approximate import _LSHNearest
 from mabwiser.simulator.mab import _NeighborsSimulator, _LSHSimulator, _RadiusSimulator, _KNearestSimulator
 
 from mabwiser.utilities.general import effective_jobs
+from mabwiser.utilities.types import _T
 
 
 
@@ -79,17 +80,6 @@ class Simulator:
         A scaler object from sklearn.preprocessing.
     test_size: float
         The size of the test set
-    is_ordered: bool
-        Whether to use a chronological division for the train-test split.
-        If false, uses sklearn's train_test_split.
-    batch_size: int
-        The size of each batch for online learning.
-    evaluator: callable
-        The function for evaluating the bandits. Values are stored in bandit_to_arm_to_stats_avg.
-        Must have the function signature function(arms_to_stats_train: dictionary, predictions: list,
-        decisions: np.ndarray, rewards: np.ndarray, metric: str).
-    is_quick: bool
-        Flag to skip neighborhood statistics.
     logger: Logger
         The logger object.
     arms: list
@@ -147,6 +137,7 @@ class Simulator:
         decisions: Union[List[str], np.ndarray, pd.Series],
         rewards: Union[List[float], np.ndarray, pd.Series],
         config: SimulatorConfig,
+        scaler: _T,
         contexts: Optional[
             Union[List[List[float]], np.ndarray, pd.Series, pd.DataFrame]
         ] = None,
@@ -186,25 +177,30 @@ class Simulator:
         ValueError  The test_size size must be greater than 0 and less than 1.
         ValueError  The batch size cannot exceed the size of the test set.
         """
+        # Set the config first
+        self.config = config
 
         self._validate_args(
             bandits=bandits,
             decisions=decisions,
             rewards=rewards,
-            contexts=contexts
+            contexts=contexts,
+            batch_size=self.config.batch_size,
+            test_size=self.config.test_size
         )
 
         # Convert decisions, rewards and contexts to numpy arrays
         decisions = convert_array(decisions)
         rewards = convert_array(rewards)
-        contexts = convert_matrix(contexts)
+        contexts = convert_matrix(contexts) if contexts is not None else contexts
 
         # Save the simulation parameters
         self.bandits = bandits
         self.decisions = decisions
         self.rewards = rewards
         self.contexts = contexts
-        self.config = config
+
+        self.scaler = scaler
 
         self._online = self.config.batch_size > 0
         self._chunk_size = 100
@@ -236,7 +232,7 @@ class Simulator:
 
         # Get the number of effective jobs for each bandit
         n_jobs_list = [
-            effective_jobs(math.ceil((len(decisions) * self.config.test_size)), mab.n_jobs)
+            effective_jobs(math.ceil((len(decisions) * self.config.test_size)), mab.config.n_jobs)
             for mab_name, mab in self.bandits
         ]
         # set max n_jobs
@@ -261,7 +257,7 @@ class Simulator:
         # Log parameters
         self.logger.info("Simulation Parameters")
         self.logger.info("\t bandits: " + str(self.bandits))
-        self.logger.info("\t scaler: " + str(self.config.scaler))
+        self.logger.info("\t scaler: " + str(self.scaler))
         self.logger.info("\t test_size: " + str(self.config.test_size))
         self.logger.info("\t is_ordered: " + str(self.config.is_ordered))
         self.logger.info("\t batch_size: " + str(self.config.batch_size))
@@ -480,7 +476,7 @@ class Simulator:
         #####################################
         # Scale the Data
         #####################################
-        if self.config.scaler is not None:
+        if self.scaler is not None:
             self.logger.info("\n")
             train_contexts, test_contexts = self._run_scaler(
                 train_contexts, test_contexts
@@ -683,7 +679,7 @@ class Simulator:
 
             if not mab.is_contextual:
                 self.bandit_to_expectations[name] = mab._imp.arm_to_expectation.copy()
-            if isinstance(mab, _NeighborsSimulator) and not self.is_quick:
+            if isinstance(mab, _NeighborsSimulator) and not self.config.is_quick:
                 self.bandit_to_neighborhood_size[name] = mab.neighborhood_sizes.copy()
 
             # Evaluate the predictions
@@ -954,7 +950,7 @@ class Simulator:
                 self.logger.info(name + " updated")
 
             # Update start value for next batch
-            start += self.batch_size
+            start += self.config.batch_size
 
     def _run_scaler(self, train_contexts, test_contexts):
         """
@@ -974,8 +970,8 @@ class Simulator:
 
         self.logger.info("Train/Test Scale")
 
-        train_contexts = self.config.scaler.fit_transform(train_contexts)
-        test_contexts = self.config.scaler.transform(test_contexts)
+        train_contexts = self.scaler.fit_transform(train_contexts)
+        test_contexts = self.scaler.transform(test_contexts)
         return train_contexts, test_contexts
 
     def _run_train_test_split(self):
@@ -1022,8 +1018,8 @@ class Simulator:
                     indices,
                     self.decisions,
                     self.rewards,
-                    test_size=self.test_size,
-                    random_state=self.seed,
+                    test_size=self.config.test_size,
+                    random_state=self.config.seed,
                 )
             else:
 
@@ -1041,8 +1037,8 @@ class Simulator:
                     self.decisions,
                     self.rewards,
                     self.contexts,
-                    test_size=self.test_size,
-                    random_state=self.seed,
+                    test_size=self.config.test_size,
+                    random_state=self.config.seed,
                 )
             self.test_indices = test_indices
 
@@ -1145,37 +1141,37 @@ class Simulator:
                 imp = mab
             if isinstance(imp, _Radius):
                 mab = _RadiusSimulator(
-                    imp.rng,
-                    imp.arms,
-                    imp.n_jobs,
-                    imp.backend,
-                    imp.lp,
-                    imp.radius,
-                    imp.metric,
+                    rng=imp.rng,
+                    arms=imp.arms,
+                    n_jobs=imp.n_jobs,
+                    backend=imp.backend,
+                    lp=imp.lp,
+                    radius=imp.radius,
+                    metric=imp.metric,
                     is_quick=self.config.is_quick,
-                    no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm,
+                    no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm
                 )
 
             elif isinstance(imp, _KNearest):
                 mab = _KNearestSimulator(
-                    imp.rng,
-                    imp.arms,
-                    imp.n_jobs,
-                    imp.backend,
-                    imp.lp,
-                    imp.k,
-                    imp.metric,
-                    is_quick=self.config.is_quick,
+                    rng=imp.rng,
+                    arms=imp.arms,
+                    n_jobs=imp.n_jobs,
+                    backend=imp.backend,
+                    lp=imp.lp,
+                    k=imp.k,
+                    metric=imp.metric,
+                    is_quick=self.config.is_quick
                 )
             elif isinstance(imp, _LSHNearest):
                 mab = _LSHSimulator(
-                    imp.rng,
-                    imp.arms,
-                    imp.n_jobs,
-                    imp.backend,
-                    imp.lp,
-                    imp.n_dimensions,
-                    imp.n_tables,
+                    rng=imp.rng,
+                    arms=imp.arms,
+                    n_jobs=imp.n_jobs,
+                    backend=imp.backend,
+                    lp=imp.lp,
+                    n_dimensions=imp.n_dimensions,
+                    n_tables=imp.n_tables,
                     is_quick=self.config.is_quick,
                     no_nhood_prob_of_arm=imp.no_nhood_prob_of_arm,
                 )
