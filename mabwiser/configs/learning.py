@@ -138,7 +138,7 @@ class LinGreedy:
 
     epsilon: float = 0.1
     l2_lambda: float = 1.0
-    arm_to_scaler: Optional[Dict[str, Callable]] = None
+    scale: bool = False
 
     def __post_hook__(self):
         try:
@@ -205,7 +205,7 @@ class LinTS:
     alpha: float = 1.0
     epsilon: float = 0.0
     l2_lambda: float = 1.0
-    arm_to_scaler: Optional[Dict[str, Callable]] = None
+    scale: bool = False
 
     def __post_hook__(self):
         try:
@@ -271,7 +271,7 @@ class LinUCB:
     alpha: float = 1.0
     epsilon: float = 0.0
     l2_lambda: float = 1.0
-    arm_to_scaler: Optional[Dict[str, Callable]] = None
+    scale: bool = False
 
     def __post_hook__(self):
         try:
