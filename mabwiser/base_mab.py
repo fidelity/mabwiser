@@ -86,7 +86,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
         self.trained_arms: List[Arm] = list()
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
@@ -95,7 +95,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.arm_to_expectation[arm] = 0
         self._uptake_new_arm(arm, binarizer)
 
-    def remove_arm(self, arm: Arm) -> NoReturn:
+    def remove_arm(self, arm: Arm) -> None:
         """Removes arm from the bandit.
         """
         self.arm_to_expectation.pop(arm)
@@ -103,7 +103,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+            contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fits the multi-armed bandit to the given
@@ -113,7 +113,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the given
@@ -138,16 +138,16 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         pass
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
         self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
         self._copy_arms(self.cold_arm_to_warm_arm)
 
     @abc.abstractmethod
-    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> None:
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
@@ -164,7 +164,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray,
-                 contexts: Optional[np.ndarray] = None) -> NoReturn:
+                 contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fit operation for individual arm.

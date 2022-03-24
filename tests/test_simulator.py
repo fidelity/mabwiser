@@ -13,6 +13,7 @@ from mabwiser.base_mab import BaseMAB
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
 from mabwiser.simulator import Simulator, _NeighborsSimulator, _RadiusSimulator, _KNearestSimulator, default_evaluator
 from mabwiser.greedy import _EpsilonGreedy
+from mabwiser.configs.validators import is_compatible
 
 logging.disable(logging.CRITICAL)
 
@@ -39,7 +40,7 @@ class TestSimulator(unittest.TestCase):
 
         # Case for TreeBandit lp/np compatibility
         treebandit_compat = isinstance(np, NeighborhoodPolicy.TreeBandit) \
-                            and np._is_compatible(lp)
+                            and is_compatible(lp)
 
         return treebandit_compat
 
@@ -806,7 +807,7 @@ class TestSimulator(unittest.TestCase):
 
         sim = Simulator(bandits=[("example1", MAB([0, 1], LearningPolicy.Softmax())),
                                  ("example2", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.KNearest())),
-                                 ("example3", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(1)))],
+                                 ("example3", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=1.0)))],
                         decisions=decisions,
                         rewards=rewards,
                         contexts=contexts,
@@ -822,7 +823,7 @@ class TestSimulator(unittest.TestCase):
 
         sim = Simulator(bandits=[("example1", MAB([0, 1], LearningPolicy.Softmax())),
                                  ("example2", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.KNearest())),
-                                 ("example3", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(1)))],
+                                 ("example3", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=1.0)))],
                         decisions=decisions,
                         rewards=rewards,
                         contexts=contexts,
@@ -1005,7 +1006,7 @@ class TestSimulator(unittest.TestCase):
         rewards = np.array([rng.randint(0, 100) for _ in range(10)])
         contexts = np.array([[rng.rand() for _ in range(20)] for _ in range(10)])
 
-        sim = Simulator(bandits=[("example", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(1)))],
+        sim = Simulator(bandits=[("example", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=1.0)))],
                         decisions=decisions,
                         rewards=rewards,
                         contexts=contexts,
@@ -1019,7 +1020,7 @@ class TestSimulator(unittest.TestCase):
         decisions = np.array([rng.randint(0, 2) for _ in range(10)])
         rewards = np.array([rng.randint(0, 100) for _ in range(10)])
         contexts = np.array([[rng.rand() for _ in range(20)] for _ in range(10)])
-        sim = Simulator(bandits=[("example", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(1.5)))],
+        sim = Simulator(bandits=[("example", MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=1.5)))],
                         decisions=decisions,
                         rewards=rewards,
                         contexts=contexts,
@@ -1173,8 +1174,8 @@ class TestSimulator(unittest.TestCase):
             else:
                 return reward >= 220
 
-        bandits = [('0', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize), NeighborhoodPolicy.Radius())),
-                   ('1', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize), NeighborhoodPolicy.KNearest()))]
+        bandits = [('0', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize), NeighborhoodPolicy.Radius())),
+                   ('1', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize), NeighborhoodPolicy.KNearest()))]
 
         sim = Simulator(bandits=bandits,
                         decisions=[rng.randint(0, 2) for _ in range(20)],
@@ -1224,7 +1225,7 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_predict_expectations(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=2,
+        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=2.0,
                                metric='euclidean', is_quick=True)
         nn2 = _KNearestSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), k=3,
                                  metric='euclidean', is_quick=True)
@@ -1250,7 +1251,7 @@ class TestSimulator(unittest.TestCase):
 
     def test_neighbors_simulator_expectations_no_neighbors(self):
         rng = np.random.RandomState(seed=9)
-        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=1,
+        nn1 = _RadiusSimulator(rng, [0, 1], 1, None, _EpsilonGreedy(rng, [0, 1], 1, .05), radius=1.0,
                                metric='euclidean', is_quick=True)
         decisions = np.array([rng.randint(0, 2) for _ in range(10)])
         rewards = np.array([rng.randint(0, 100) for _ in range(10)])
@@ -1278,8 +1279,8 @@ class TestSimulator(unittest.TestCase):
 
         lp = _EpsilonGreedy(rng, [0, 1], 1, .05)
 
-        bandit = [('example', MAB([0, 1], LearningPolicy.EpsilonGreedy(0),
-                                  NeighborhoodPolicy.Radius(radius=1, no_nhood_prob_of_arm=empty_nbhd)))]
+        bandit = [('example', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0),
+                                  NeighborhoodPolicy.Radius(radius=1.0, no_nhood_prob_of_arm=empty_nbhd)))]
 
         sim = Simulator(bandits=bandit,
                         decisions=[rng.randint(0, 2) for _ in range(20)],

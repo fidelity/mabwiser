@@ -27,27 +27,27 @@ def binarize(decision, reward):
         return reward >= 220
 
 n_jobs=2
-contextual_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                   ('UCB1', MAB([0, 1], LearningPolicy.UCB1(1), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                   ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize),
-                                            NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                   ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=.15),
-                                         NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                   ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs))]
+contextual_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                   ('UCB1', MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                   ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize),
+                                            NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                   ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.15),
+                                         NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                   ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs))]
 
 context_free_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), n_jobs=n_jobs)),
-                     ('UCB1', MAB([0, 1], LearningPolicy.UCB1(1), n_jobs=n_jobs)),
-                     ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize), n_jobs=n_jobs)),
-                     ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=.15), n_jobs=n_jobs)),
+                     ('UCB1', MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), n_jobs=n_jobs)),
+                     ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize), n_jobs=n_jobs)),
+                     ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.15), n_jobs=n_jobs)),
                      ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), n_jobs=n_jobs))]
 
-mixed = [('RandomRadius', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
+mixed = [('RandomRadius', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
           ('Random', MAB([0, 1], LearningPolicy.Random(), n_jobs=n_jobs))]
 
 hyper_parameter_tuning = []
 for radius in range(6, 10):
     hyper_parameter_tuning.append(('Radius'+str(radius),
-                                  MAB([0, 1], LearningPolicy.UCB1(1), NeighborhoodPolicy.Radius(radius),
+                                  MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), NeighborhoodPolicy.Radius(radius=float(radius)),
                                       n_jobs=n_jobs)))
 
 ####################################

@@ -21,11 +21,11 @@ class InvalidTest(BaseTest):
 
     def test_invalid_arm_not_list(self):
         with self.assertRaises(TypeError):
-            MAB(1, LearningPolicy.EpsilonGreedy(epsilon=0))
+            MAB(1, LearningPolicy.EpsilonGreedy(epsilon=0.0))
 
     def test_invalid_learning_policy(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], NeighborhoodPolicy.Radius(radius=12))
+            MAB([0, 1], NeighborhoodPolicy.Radius(radius=12.0))
 
     def test_incomplete_learning_policy_implementation(self):
         class TestMAB(BaseMAB):
@@ -77,11 +77,11 @@ class InvalidTest(BaseTest):
 
     def test_invalid_epsilon_value(self):
         with self.assertRaises(ValueError):
-            MAB(['a', 'b'], LearningPolicy.EpsilonGreedy(epsilon=2))
+            MAB(['a', 'b'], LearningPolicy.EpsilonGreedy(epsilon=2.0))
         with self.assertRaises(ValueError):
-            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=-1))
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=-1.0))
         with self.assertRaises(ValueError):
-            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=2))
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(epsilon=2.0))
 
     def test_invalid_rewards_to_binary_type(self):
         thresholds = {1: 1, 'b': 1}
@@ -93,8 +93,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinUCB(alpha=-1),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinUCB(alpha=-1.0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -105,8 +105,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinTS(alpha=0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinTS(alpha=0.0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -119,7 +119,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinUCB(alpha=None),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -131,7 +131,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinTS(alpha=None),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -143,8 +143,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinUCB(alpha=1, l2_lambda=-1),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinUCB(alpha=1.0, l2_lambda=-1.0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -155,8 +155,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinTS(alpha=1, l2_lambda=0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinTS(alpha=1.0, l2_lambda=0.0),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -169,7 +169,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.LinGreedy(l2_lambda=None),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -180,8 +180,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinUCB(alpha=1, l2_lambda=None),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinUCB(alpha=1.0, l2_lambda=None),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -192,8 +192,8 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
-                         learning_policy=LearningPolicy.LinTS(alpha=1, l2_lambda=None),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         learning_policy=LearningPolicy.LinTS(alpha=1.0, l2_lambda=None),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -206,7 +206,7 @@ class InvalidTest(BaseTest):
 
     def test_invalid_ucb_alpha_value(self):
         with self.assertRaises(ValueError):
-            MAB(['a', 'b'], LearningPolicy.UCB1(alpha=-2))
+            MAB(['a', 'b'], LearningPolicy.UCB1(alpha=-2.0))
 
     def test_invalid_tau_type(self):
         with self.assertRaises(TypeError):
@@ -214,83 +214,83 @@ class InvalidTest(BaseTest):
 
     def test_invalid_tau_value(self):
         with self.assertRaises(ValueError):
-            MAB(['a', 'b'], LearningPolicy.Softmax(tau=0))
+            MAB(['a', 'b'], LearningPolicy.Softmax(tau=0.0))
 
     def test_invalid_lp_arg(self):
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.UCB1(epsilon=2))
+            MAB(['a', 'b'], LearningPolicy.UCB1(epsilon=2.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.EpsilonGreedy(alpha=2))
+            MAB(['a', 'b'], LearningPolicy.EpsilonGreedy(alpha=2.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.ThompsonSampling(alpha=2))
+            MAB(['a', 'b'], LearningPolicy.ThompsonSampling(alpha=2.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.Softmax(alpha=2))
+            MAB(['a', 'b'], LearningPolicy.Softmax(alpha=2.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.LinGreedy(alpha=1))
+            MAB(['a', 'b'], LearningPolicy.LinGreedy(alpha=1.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.LinUCB(tau=1))
+            MAB(['a', 'b'], LearningPolicy.LinUCB(tau=1.0))
 
         with self.assertRaises(TypeError):
-            MAB(['a', 'b'], LearningPolicy.LinTS(epsilon=1))
+            MAB(['a', 'b'], LearningPolicy.LinTS(epsilon=1.0))
 
     def test_invalid_context_policy(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), LearningPolicy.EpsilonGreedy(epsilon=0))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), LearningPolicy.EpsilonGreedy(epsilon=0.0))
 
     def test_invalid_n_tables_type(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0),
                 NeighborhoodPolicy.LSHNearest(n_tables='string'))
 
     def test_invalid_n_tables_value(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0),
                 NeighborhoodPolicy.LSHNearest(n_tables=0))
 
     def test_invalid_n_dimensions_type(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0),
                 NeighborhoodPolicy.LSHNearest(n_dimensions='string'))
 
     def test_invalid_n_dimensions_value(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0),
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0),
                 NeighborhoodPolicy.LSHNearest(n_dimensions=0))
 
     def test_invalid_radius_no_nhood_type_ann(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.LSHNearest(no_nhood_prob_of_arm={}))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.LSHNearest(no_nhood_prob_of_arm={}))
 
     def test_invalid_radius_no_nhood_sum_ann(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(no_nhood_prob_of_arm=[0, 0]))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(no_nhood_prob_of_arm=[0.0, 0.0]))
 
     def test_invalid_metric(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(metric='linear'))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(metric='linear'))
 
     def test_invalid_radius(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=-1))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=-1.0))
 
     def test_invalid_radius_no_nhood_type(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=1,
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=1.0,
                                                                                            no_nhood_prob_of_arm={}))
 
     def test_invalid_radius_no_nhood_sum(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(radius=1,
-                                                                                           no_nhood_prob_of_arm=[0, 0]))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=1.0,
+                                                                                           no_nhood_prob_of_arm=[0.0, 0.0]))
 
     def test_invalid_k(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.KNearest(k=0))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.KNearest(k=0))
 
     def test_too_large_k(self):
         with self.assertRaises(ValueError):
@@ -298,7 +298,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(4),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=4),
                          context_history=[[1, 1], [0, 0], [0, 0]],
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -307,15 +307,15 @@ class InvalidTest(BaseTest):
 
     def test_invalid_minibatch(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Clusters(minibatch=0))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Clusters(minibatch=0))
 
     def test_invalid_clusters_type(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Clusters(n_clusters=None))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Clusters(n_clusters=None))
 
     def test_invalid_clusters_num(self):
         with self.assertRaises(ValueError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Clusters(n_clusters=1))
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Clusters(n_clusters=1))
 
     def test_invalid_treebandit_lp_linucb(self):
         with self.assertRaises(ValueError):
@@ -335,7 +335,7 @@ class InvalidTest(BaseTest):
 
     def test_invalid_seed(self):
         with self.assertRaises(TypeError):
-            MAB([0, 1], LearningPolicy.EpsilonGreedy(0), seed=[0, 1])
+            MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.0), seed=[0, 1])
 
     def test_predict_with_no_fit(self):
         for lp in InvalidTest.lps:
@@ -426,7 +426,7 @@ class InvalidTest(BaseTest):
     def test_invalid_decisions_rewards_length(self):
         decisions = [1, 1, 2, 2, 2, 3, 3]
         rewards = [0, 0, 0, 0, 0, 0, 1, 1, 1]
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(ValueError):
             mab.fit(decisions, rewards)
 
@@ -434,7 +434,7 @@ class InvalidTest(BaseTest):
         decisions = [1, 1, 1]
         rewards = [0, 0, 0]
         context_history = [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(2))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=2.0))
         with self.assertRaises(ValueError):
             mab.fit(decisions, rewards, context_history)
 
@@ -442,49 +442,49 @@ class InvalidTest(BaseTest):
         decisions = [1, 1, 1]
         rewards = [0, 0, 0]
         context_history = {1: [1, 1, 1], 2: [1, 1, 1], 3: [1, 1, 1], 4: [1, 1, 1]}
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(2))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=2.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards, context_history)
 
     def test_rewards_null_list(self):
         decisions = [1, 1, 1, 2, 2, 2, 3, 3, 3]
         rewards = [0, 0, 0, 0, 0, 0, 1, 1, None]
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
     def test_rewards_null_array(self):
         decisions = np.asarray([1, 1, 1, 2, 2, 2, 3, 3, 3])
         rewards = np.asarray([0, 0, 0, 0, 0, 0, 1, 1, None])
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
     def test_rewards_nan_array(self):
         decisions = np.asarray([1, 1, 1, 2, 2, 2, 3, 3, 3])
         rewards = np.asarray([0, 0, 0, 0, 0, 0, 1, 1, np.nan])
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
     def test_rewards_null_df(self):
         history = pd.DataFrame({'decision': [1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 'reward': [0, 0, 0, 0, 0, 0, 1, 1, None]})
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(history['decision'], history['reward'])
 
     def test_rewards_inf_array(self):
         decisions = np.asarray([1, 1, 1, 2, 2, 2, 3, 3, 3])
         rewards = np.asarray([0, 0, 0, 0, 0, 0, 1, 1, np.inf])
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
     def test_rewards_inf_df(self):
         history = pd.DataFrame({'decision': [1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 'reward': [0, 0, 0, 0, 0, 0, 1, 1, np.inf]})
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(history['decision'], history['reward'])
 
@@ -492,14 +492,14 @@ class InvalidTest(BaseTest):
         decisions = [1, 1, 1]
         rewards = [0, 0, 0]
         context_history = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards, context_history)
 
     def test_invalid_no_context_history(self):
         decisions = [1, 1, 1]
         rewards = [0, 0, 0]
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Radius(2))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.Radius(radius=2.0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
@@ -509,7 +509,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=[[1, 1], [0, 0], [0, 0]],
                          contexts=[1, 1],
                          seed=123456,
@@ -522,7 +522,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=[[1, 1], [0, 0], [0, 0]],
                          contexts=np.array([1, 1]),
                          seed=123456,
@@ -535,7 +535,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=[1, 1, 1],
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -548,7 +548,7 @@ class InvalidTest(BaseTest):
                          decisions=[1, 1, 1],
                          rewards=[0, 0, 0],
                          learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
-                         neighborhood_policy=NeighborhoodPolicy.KNearest(2),
+                         neighborhood_policy=NeighborhoodPolicy.KNearest(k=2),
                          context_history=np.array([1, 1, 1]),
                          contexts=np.array([[1, 1]]),
                          seed=123456,
@@ -556,7 +556,7 @@ class InvalidTest(BaseTest):
                          is_predict=True)
 
     def test_invalid_add_arm(self):
-        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
+        mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0.0))
         with self.assertRaises(ValueError):
             mab.add_arm(None)
         with self.assertRaises(ValueError):
@@ -617,7 +617,7 @@ class InvalidTest(BaseTest):
             self.predict(arms=[1, 2, 3],
                          decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                          rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                         learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                         learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                          seed=123456,
                          num_run=4,
                          is_predict=True,

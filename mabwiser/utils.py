@@ -45,7 +45,7 @@ def argmin(dictionary: Dict) -> Arm:
     return min(dictionary, key=dictionary.get)
 
 
-def check_false(expression: bool, exception: Exception) -> NoReturn:
+def check_false(expression: bool, exception: Exception) -> None:
     """
     Checks that given expression is false, otherwise raises the given exception.
     """
@@ -53,7 +53,7 @@ def check_false(expression: bool, exception: Exception) -> NoReturn:
         raise exception
 
 
-def check_true(expression: bool, exception: Exception) -> NoReturn:
+def check_true(expression: bool, exception: Exception) -> None:
     """
     Checks that given expression is true, otherwise raises the given exception.
     """
@@ -61,7 +61,7 @@ def check_true(expression: bool, exception: Exception) -> NoReturn:
         raise exception
 
 
-def reset(dictionary: Dict, value) -> NoReturn:
+def reset(dictionary: Dict, value) -> None:
     """
     Maps every key to the given value.
     """

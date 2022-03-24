@@ -18,7 +18,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=0),
+                                learning_policy=LearningPolicy.UCB1(alpha=0.0),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
@@ -31,7 +31,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
                                 rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=0),
+                                learning_policy=LearningPolicy.UCB1(alpha=0.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
@@ -43,7 +43,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
@@ -56,7 +56,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=False)
@@ -67,7 +67,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=np.asarray([1, 1, 1, 2, 2, 3, 3, 3, 3, 3]),
                                 rewards=np.asarray([0, 0, 1, 0, 0, 0, 0, 1, 1, 1]),
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
@@ -82,7 +82,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=df['decisions'],
                                 rewards=df['rewards'],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
@@ -97,7 +97,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=df['decisions'],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=3,
                                 is_predict=True)
@@ -149,7 +149,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 4],
                                 decisions=[1, 1, 4, 4, 2, 2, 1, 1, 4, 2, 1, 4, 1, 2, 4],
                                 rewards=[7, 9, 10, 20, 2, 5, 8, 15, 17, 11, 0, 5, 2, 9, 3],
-                                learning_policy=LearningPolicy.UCB1(alpha=2),
+                                learning_policy=LearningPolicy.UCB1(alpha=2.0),
                                 seed=23,
                                 num_run=4,
                                 is_predict=True)
@@ -162,7 +162,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=['one', 'two', 'three'],
                                 decisions=['one', 'one', 'one', 'three', 'two', 'two', 'three', 'one', 'three', 'two'],
                                 rewards=[1, 0, 1, 0, 1, 0, 1, 1, 1, 0],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=23,
                                 num_run=4,
                                 is_predict=True)
@@ -237,7 +237,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[a, b, c],
                                 decisions=[a, b, c, a, b, c, a, b, c, a, b, b],
                                 rewards=[7, 12, 1, -10, 5, 1, 2, 9, 3, 3, 6, 7],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=7,
                                 num_run=4,
                                 is_predict=True)
@@ -250,7 +250,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -262,7 +262,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -301,7 +301,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.UCB1(alpha=1),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -346,7 +346,7 @@ class UCBTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 2, 1, 1, 2],
                                 rewards=[10, 4, 3, 5, 6],
-                                learning_policy=LearningPolicy.UCB1(1.0),
+                                learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -379,7 +379,7 @@ class UCBTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],
                                  rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.UCB1(1.0),
+                                 learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
@@ -395,7 +395,7 @@ class UCBTest(BaseTest):
         _, mab = self.predict(arms=[1, 2, 3],
                               decisions=[1, 1, 1, 2, 2, 2, 1, 1, 1],
                               rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
-                              learning_policy=LearningPolicy.UCB1(1.0),
+                              learning_policy=LearningPolicy.UCB1(alpha=1.0),
                               seed=7,
                               num_run=1,
                               is_predict=False)

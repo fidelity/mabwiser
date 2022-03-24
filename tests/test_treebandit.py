@@ -13,7 +13,7 @@ class TreeBanditTest(BaseTest):
         decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
         rewards = [20, 17, 25, 9]
         contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-        mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+        mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.TreeBandit())
         mab.fit(decisions, rewards, contexts)
         result = mab.predict([[3, 2, 0, 1]])
         self.assertEqual(result, 'Arm2')
@@ -37,18 +37,13 @@ class TreeBanditTest(BaseTest):
         self.assertIsNone(mab._imp.arm_to_tree[arm].__dict__["max_leaf_nodes"])
 
     def test_tree_parameters(self):
-
-        tree_parameters = {
-            # "criterion": "entropy",
-            "max_depth": 4,
-            "min_samples_split": 2,
-            "max_leaf_nodes": 10}
-
         arm, mab = self.predict(arms=['Arm1', 'Arm2'],
                                 decisions=['Arm1', 'Arm1', 'Arm2', 'Arm1'],
                                 rewards=[20, 17, 25, 9],
                                 learning_policy=LearningPolicy.UCB1(),
-                                neighborhood_policy=NeighborhoodPolicy.TreeBandit(tree_parameters=tree_parameters),
+                                neighborhood_policy=NeighborhoodPolicy.TreeBandit(
+                                    max_depth=4, min_samples_split=2, max_leaf_nodes=10
+                                ),
                                 context_history=[[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]],
                                 contexts=[[2, 3, 1, 0]],
                                 seed=123456,
@@ -64,7 +59,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -80,7 +75,7 @@ class TreeBanditTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                 rewards=[2, 1, 1, 0, 0, 0, 4, 1, 1, 1],
-                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                 neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                 context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                  [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -131,7 +126,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.UCB1(alpha=1),
+                                 learning_policy=LearningPolicy.UCB1(alpha=1.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -148,7 +143,7 @@ class TreeBanditTest(BaseTest):
         exps, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
                                  rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -166,7 +161,7 @@ class TreeBanditTest(BaseTest):
         exps, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
                                  rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                 learning_policy=LearningPolicy.UCB1(alpha=0),
+                                 learning_policy=LearningPolicy.UCB1(alpha=0.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -184,7 +179,7 @@ class TreeBanditTest(BaseTest):
         arm, mab = self.predict(arms=['Arm1', 'Arm2'],
                                 decisions=['Arm1', 'Arm1', 'Arm2', 'Arm1'],
                                 rewards=[20, 17, 25, 9],
-                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                 neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                 context_history=[[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]],
                                 contexts=[[2, 3, 1, 0]],
@@ -218,7 +213,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 7, 0, 1, 9, 0, 2, 6, 11],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -267,7 +262,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 7, 0, 1, 9, 0, 2, 6, 11],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -310,7 +305,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
@@ -333,7 +328,7 @@ class TreeBanditTest(BaseTest):
         arms_1, mab = self.predict(arms=[1, 2, 4],
                                    decisions=[1, 1, 1, 2, 2],
                                    rewards=[0, 1, 1, 0, 0],
-                                   learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                   learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                    neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                    context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                     [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]],
@@ -360,7 +355,7 @@ class TreeBanditTest(BaseTest):
         rewards = [0, 0, 0, 0, 0, 1]
         contexts = pd.DataFrame({'column1': [1, 2, 3, 3, 2, 1], 'column2': [2, 3, 1, 1, 2, 3]})
 
-        mab = MAB(arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+        mab = MAB(arms, LearningPolicy.EpsilonGreedy(epsilon=0.0), NeighborhoodPolicy.TreeBandit())
         mab.fit(decisions, rewards, contexts['column1'])
         result = mab.predict(pd.Series([1]))
         self.assertEqual(result, 1)
@@ -369,7 +364,7 @@ class TreeBanditTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4],
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                  neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],

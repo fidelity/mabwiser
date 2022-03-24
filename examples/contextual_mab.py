@@ -49,7 +49,7 @@ test = scaler.transform(test_df.values.astype('float64'))
 # Radius contextual policy with radius equals to 5 and ucb1 learning with alpha 1.25
 radius = MAB(arms=ads,
              learning_policy=LearningPolicy.UCB1(alpha=1.25),
-             neighborhood_policy=NeighborhoodPolicy.Radius(radius=5))
+             neighborhood_policy=NeighborhoodPolicy.Radius(radius=5.0))
 
 # Learn from previous ads shown and revenues generated
 radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)

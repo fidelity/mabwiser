@@ -48,7 +48,7 @@ test = scaler.transform(test_df.values.astype('float64'))
 
 # LinUCB learning policy with alpha 1.25 and l2_lambda 1
 linucb = MAB(arms=ads,
-             learning_policy=LearningPolicy.LinUCB(alpha=1.25, l2_lambda=1))
+             learning_policy=LearningPolicy.LinUCB(alpha=1.25, l2_lambda=1.0))
 
 # Learn from previous ads shown and revenues generated
 linucb.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
@@ -78,8 +78,8 @@ linucb.warm_start(arm_to_features, distance_quantile=0.75)
 
 # Radius context policy with radius equals to 1 and LinUCB learning with alpha of 1
 radius = MAB(arms=ads,
-             learning_policy=LearningPolicy.LinUCB(alpha=1),
-             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1))
+             learning_policy=LearningPolicy.LinUCB(alpha=1.0),
+             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1.0))
 
 # Learn from previous ads shown and revenues generated
 radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
@@ -122,7 +122,7 @@ assert(prediction == [1, 2])
 
 # LinTS learning policy with alpha 1.25 and l2_lambda 1
 lints = MAB(arms=ads,
-            learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1))
+            learning_policy=LearningPolicy.LinTS(alpha=1.5, l2_lambda=1.0))
 
 # Learn from previous ads shown and revenues generated
 lints.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
@@ -150,7 +150,7 @@ lints.add_arm(6)
 # Radius context policy with radius equals to 1 and LinTS learning with alpha of 1
 radius = MAB(arms=ads,
              learning_policy=LearningPolicy.LinTS(alpha=0.5),
-             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1))
+             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1.0))
 
 # Learn from previous ads shown and revenues generated
 radius.fit(decisions=train_df['ad'], rewards=train_df['revenues'], contexts=train)
@@ -171,7 +171,7 @@ assert(prediction == [1, 2])
 
 # KNearest context policy with k equals to 4 and LinTS learning with alpha of 1.25
 knearest = MAB(arms=ads,
-               learning_policy=LearningPolicy.LinTS(alpha=1),
+               learning_policy=LearningPolicy.LinTS(alpha=1.0),
                neighborhood_policy=NeighborhoodPolicy.KNearest(k=4))
 
 # Learn from previous ads shown and revenues generated

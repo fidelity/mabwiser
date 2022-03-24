@@ -20,7 +20,7 @@ class _EpsilonGreedy(BaseMAB):
         self.arm_to_sum = dict.fromkeys(self.arms, 0)
         self.arm_to_count = dict.fromkeys(self.arms, 0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Reset the sum, count, and expectations to zero
         reset(self.arm_to_sum, 0)
@@ -29,7 +29,7 @@ class _EpsilonGreedy(BaseMAB):
 
         self._parallel_fit(decisions, rewards, contexts)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         self._parallel_fit(decisions, rewards, contexts)
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
@@ -82,6 +82,6 @@ class _EpsilonGreedy(BaseMAB):
         self.arm_to_sum[arm] = 0
         self.arm_to_count[arm] = 0
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.arm_to_sum.pop(arm)
         self.arm_to_count.pop(arm)

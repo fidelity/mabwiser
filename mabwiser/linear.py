@@ -128,7 +128,7 @@ class _Linear(BaseMAB):
         # Create regression model for each arm
         self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scale)) for arm in arms)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Initialize each model by arm
         self.num_features = contexts.shape[1]
@@ -138,7 +138,7 @@ class _Linear(BaseMAB):
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
@@ -219,5 +219,5 @@ class _Linear(BaseMAB):
         # Return list of predictions
         return predictions
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.arm_to_model.pop(arm)

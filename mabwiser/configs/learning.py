@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
-from enum import Enum
+
+from collections import namedtuple
+
 from typing import Callable, Dict, Optional
 
 from spock import spock
@@ -203,14 +205,12 @@ class LinTS:
     """
 
     alpha: float = 1.0
-    epsilon: float = 0.0
     l2_lambda: float = 1.0
     scale: bool = False
 
     def __post_hook__(self):
         try:
             gt(self.alpha, bound=0.0)
-            ge(self.epsilon, bound=0.0)
             gt(self.l2_lambda, bound=0.0)
         except Exception as e:
             raise ValueError(
@@ -428,23 +428,23 @@ class UCB1:
             )
 
 
-class LearningPolicy(Enum):
-    popularity = Popularity
-    epsilon_greedy = EpsilonGreedy
-    random = Random
-    softmax = Softmax
-    thompson_sampling = ThompsonSampling
-    ucb1 = UCB1
-    lin_greedy = LinGreedy
-    lin_ts = LinTS
-    lin_ucb = LinUCB
+ALL_LP = [
+    Popularity,
+    EpsilonGreedy,
+    Random,
+    Softmax,
+    ThompsonSampling,
+    UCB1,
+    LinGreedy,
+    LinTS,
+    LinUCB,
+]
 
+ALL_LP_NAMES = [val.__name__ for val in ALL_LP]
 
-class SpecialLinearPolicy(Enum):
-    lin_greedy = LinGreedy
-    lin_ts = LinTS
-    lin_ucb = LinUCB
+LP = namedtuple("LP", ALL_LP_NAMES)
 
-    @classmethod
-    def has_value(cls, value):
-        return type(value) in cls._value2member_map_
+LearningPolicy = LP(
+    *ALL_LP
+)
+

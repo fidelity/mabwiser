@@ -10,16 +10,19 @@ This module defines the public interface of the **MABWiser Library** providing a
     - ``NeighborhoodPolicy``
 """
 
-from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
+import attr
+from typing import List, Union, Dict,  NoReturn, Callable, Optional
 
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.tree import DecisionTreeClassifier
 
 from mabwiser._version import __author__, __email__, __version__, __copyright__
 from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
+from mabwiser.configs.learning import LearningPolicy
+from mabwiser.configs.neighborhood import NeighborhoodPolicy
+from mabwiser.configs.validators import is_compatible
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.neighbors import _KNearest, _Radius
@@ -35,636 +38,6 @@ __author__ = __author__
 __email__ = __email__
 __version__ = __version__
 __copyright__ = __copyright__
-
-
-class LearningPolicy(NamedTuple):
-    class EpsilonGreedy(NamedTuple):
-        """Epsilon Greedy Learning Policy.
-
-        This policy selects the arm with the highest expected reward with probability 1 - :math:`\\epsilon`,
-        and with probability :math:`\\epsilon` it selects an arm at random for exploration.
-
-        Attributes
-        ----------
-        epsilon: Num
-            The probability of selecting a random arm for exploration.
-            Integer or float. Must be between 0 and 1.
-            Default value is 0.1.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> mab = MAB(arms, LearningPolicy.EpsilonGreedy(epsilon=0.25), seed=123456)
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm1'
-        """
-        epsilon: Num = 0.1
-
-        def _validate(self):
-            check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
-            check_true(0 <= self.epsilon <= 1, ValueError("The value of epsilon must be between 0 and 1."))
-
-    class LinGreedy(NamedTuple):
-        """LinGreedy Learning Policy.
-
-        This policy trains a ridge regression for each arm.
-        Then, given a given context, it predicts a regression value.
-        This policy selects the arm with the highest regression value with probability 1 - :math:`\\epsilon`,
-        and with probability :math:`\\epsilon` it selects an arm at random for exploration.
-
-        Attributes
-        ----------
-        epsilon: Num
-            The probability of selecting a random arm for exploration.
-            Integer or float. Must be between 0 and 1.
-            Default value is 0.1.
-        l2_lambda: Num
-            The regularization strength.
-            Integer or float. Cannot be negative.
-            Default value is 1.0.
-        scale: bool
-            Whether to scale features to have zero mean and unit variance.
-            Uses StandardScaler in sklearn.preprocessing.
-            Default value is False.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.LinGreedy(epsilon=0.5))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[3, 2, 0, 1]])
-            'Arm2'
-        """
-        epsilon: Num = 0.1
-        l2_lambda: Num = 1.0
-        scale: bool = False
-
-        def _validate(self):
-            check_true(isinstance(self.epsilon, (int, float)), TypeError("Epsilon must be an integer or float."))
-            check_true(0 <= self.epsilon <= 1, ValueError("Epsilon must be between zero and one."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
-            check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
-            check_true(isinstance(self.scale, bool), TypeError("Standardize must be True or False."))
-
-    class LinTS(NamedTuple):
-        """ LinTS Learning Policy
-
-        For each arm LinTS trains a ridge regression and
-        creates a multivariate normal distribution for the coefficients using the
-        calculated coefficients as the mean and the covariance as:
-
-        .. math::
-            \\alpha^{2} (x_i^{T}x_i + \\lambda * I_d)^{-1}
-
-        The normal distribution is randomly sampled to obtain
-        expected coefficients for the ridge regression for each
-        prediction.
-
-        :math:`\\alpha` is a factor used to adjust how conservative the estimate is.
-        Higher :math:`\\alpha` values promote more exploration.
-
-        The multivariate normal distribution uses Cholesky decomposition to guarantee deterministic behavior.
-        This method requires that the covariance is a positive definite matrix.
-        To ensure this is the case, alpha and l2_lambda are required to be greater than zero.
-
-        Attributes
-        ----------
-        alpha: Num
-            The multiplier to determine the degree of exploration.
-            Integer or float. Must be greater than zero.
-            Default value is 1.0.
-        l2_lambda: Num
-            The regularization strength.
-            Integer or float. Must be greater than zero.
-            Default value is 1.0.
-        scale: bool
-            Whether to scale features to have zero mean and unit variance.
-            Uses StandardScaler in sklearn.preprocessing.
-            Default value is False.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.LinTS(alpha=0.25))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[3, 2, 0, 1]])
-            'Arm2'
-        """
-        alpha: Num = 1.0
-        l2_lambda: Num = 1.0
-        scale: bool = False
-
-        def _validate(self):
-            check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
-            check_true(0 < self.alpha, ValueError("The value of alpha must be greater than zero."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
-            check_true(0 < self.l2_lambda, ValueError("The value of l2_lambda must be greater than zero."))
-            check_true(isinstance(self.scale, bool), TypeError("Scale must be True or False."))
-
-    class LinUCB(NamedTuple):
-        """LinUCB Learning Policy.
-
-        This policy trains a ridge regression for each arm.
-        Then, given a given context, it predicts a regression value
-        and calculates the upper confidence bound of that prediction.
-        The arm with the highest highest upper bound is selected.
-
-        The UCB for each arm is calculated as:
-
-        .. math::
-            UCB = x_i \\beta + \\alpha \\sqrt{(x_i^{T}x_i + \\lambda * I_d)^{-1}x_i}
-
-        Where :math:`\\beta` is the matrix of the ridge regression coefficients, :math:`\\lambda` is the regularization
-        strength, and I_d is a dxd identity matrix where d is the number of features in the context data.
-
-        :math:`\\alpha` is a factor used to adjust how conservative the estimate is.
-        Higher :math:`\\alpha` values promote more exploration.
-
-        Attributes
-        ----------
-        alpha: Num
-            The parameter to control the exploration.
-            Integer or float. Cannot be negative.
-            Default value is 1.0.
-        l2_lambda: Num
-            The regularization strength.
-            Integer or float. Cannot be negative.
-            Default value is 1.0.
-        scale: bool
-            Whether to scale features to have zero mean and unit variance.
-            Uses StandardScaler in sklearn.preprocessing.
-            Default value is False.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.LinUCB(alpha=1.25))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[3, 2, 0, 1]])
-            'Arm2'
-        """
-        alpha: Num = 1.0
-        l2_lambda: Num = 1.0
-        scale: bool = False
-
-        def _validate(self):
-            check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
-            check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
-            check_true(isinstance(self.l2_lambda, (int, float)), TypeError("L2_lambda must be an integer or float."))
-            check_true(0 <= self.l2_lambda, ValueError("The value of l2_lambda cannot be negative."))
-            check_true(isinstance(self.scale, bool), TypeError("Scale must be True or False."))
-
-    class Popularity(NamedTuple):
-        """Randomized Popularity Learning Policy.
-
-        Returns a randomized popular arm for each prediction.
-        The probability of selection for each arm is weighted by their mean reward.
-        It assumes that the rewards are non-negative.
-
-        The probability of selection is calculated as:
-
-        .. math::
-            P(arm) = \\frac{ \\mu_i } { \\Sigma{ \\mu }  }
-
-        where :math:`\\mu_i` is the mean reward for that arm.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> mab = MAB(list_of_arms, LearningPolicy.Popularity())
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm1'
-        """
-
-        def _validate(self):
-            pass
-
-    class Random(NamedTuple):
-        """Random Learning Policy.
-
-        Returns a random arm for each prediction.
-        The probability of selection for each arm is uniformly at random.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> mab = MAB(list_of_arms, LearningPolicy.Random())
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm2'
-        """
-
-        def _validate(self):
-            pass
-
-    class Softmax(NamedTuple):
-        """Softmax Learning Policy.
-
-        This policy selects each arm with a probability proportionate to its average reward.
-        The average reward is calculated as a logistic function with each probability as:
-
-        .. math::
-            P(arm) = \\frac{ e ^  \\frac{\\mu_i - \\max{\\mu}}{ \\tau } }
-            { \\Sigma{e ^  \\frac{\\mu - \\max{\\mu}}{ \\tau }}  }
-
-        where :math:`\\mu_i` is the mean reward for that arm and :math:`\\tau` is the "temperature" to determine
-        the degree of exploration.
-
-        Attributes
-        ----------
-        tau: Num
-             The temperature to control the exploration.
-             Integer or float. Must be greater than zero.
-             Default value is 1.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> mab = MAB(list_of_arms, LearningPolicy.Softmax(tau=1))
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm2'
-        """
-        tau: Num = 1
-
-        def _validate(self):
-            check_true(isinstance(self.tau, (int, float)), TypeError("Tau must be an integer or float."))
-            check_true(0 < self.tau, ValueError("The value of tau must be greater than zero."))
-
-    class ThompsonSampling(NamedTuple):
-        """Thompson Sampling Learning Policy.
-
-        This policy creates a beta distribution for each arm and
-        then randomly samples from these distributions.
-        The arm with the highest sample value is selected.
-
-        Notice that rewards must be binary to create beta distributions.
-        If rewards are not binary, see the ``binarizer`` function.
-
-        Attributes
-        ----------
-        binarizer: Callable
-            If rewards are not binary, a binarizer function is required.
-            Given an arm decision and its corresponding reward, the binarizer function
-            returns `True/False` or `0/1` to denote whether the decision counts
-            as a success, i.e., `True/1` based on the reward or `False/0` otherwise.
-
-            The function signature of the binarizer is:
-
-            ``binarize(arm: Arm, reward: Num) -> True/False or 0/1``
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [1, 1, 1, 0]
-            >>> mab = MAB(list_of_arms, LearningPolicy.ThompsonSampling())
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm2'
-
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> arm_to_threshold = {'Arm1':10, 'Arm2':10}
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [10, 20, 15, 7]
-            >>> def binarize(arm, reward): return reward > arm_to_threshold[arm]
-            >>> mab = MAB(list_of_arms, LearningPolicy.ThompsonSampling(binarizer=binarize))
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm2'
-
-
-        """
-        binarizer: Callable = None
-
-        def _validate(self):
-            if self.binarizer:
-                check_true(callable(self.binarizer), TypeError("Binarizer must be a callable function that "
-                                                               "returns True/False or 0/1 to denote whether a given "
-                                                               "reward value counts as a success for a given "
-                                                               "arm decision. Specifically, the function signature is "
-                                                               "binarize(arm: Arm, reward: Num) -> True/False or 0/1"))
-
-    class UCB1(NamedTuple):
-        """Upper Confidence Bound1 Learning Policy.
-
-        This policy calculates an upper confidence bound for the mean reward of each arm.
-        It greedily selects the arm with the highest upper confidence bound.
-
-        The UCB for each arm is calculated as:
-
-        .. math::
-            UCB = \\mu_i + \\alpha \\times \\sqrt[]{\\frac{2 \\times log(N)}{n_i}}
-
-        Where :math:`\\mu_i` is the mean for that arm,
-        :math:`N` is the total number of trials, and
-        :math:`n_i` is the number of times the arm has been selected.
-
-        :math:`\\alpha` is a factor used to adjust how conservative the estimate is.
-        Higher :math:`\\alpha` values promote more exploration.
-
-        Attributes
-        ----------
-        alpha: Num
-            The parameter to control the exploration.
-            Integer of float. Cannot be negative.
-            Default value is 1.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> mab = MAB(list_of_arms, LearningPolicy.UCB1(alpha=1.25))
-            >>> mab.fit(decisions, rewards)
-            >>> mab.predict()
-            'Arm2'
-        """
-
-        alpha: Num = 1
-
-        def _validate(self):
-            check_true(isinstance(self.alpha, (int, float)), TypeError("Alpha must be an integer or float."))
-            check_true(0 <= self.alpha, ValueError("The value of alpha cannot be negative."))
-
-
-class NeighborhoodPolicy(NamedTuple):
-    class Clusters(NamedTuple):
-        """Clusters Neighborhood Policy.
-
-        Clusters is a k-means clustering approach that uses the observations
-        from the closest *cluster* with a learning policy.
-        Supports ``KMeans`` and ``MiniBatchKMeans``.
-
-        Attributes
-        ----------
-        n_clusters: Num
-            The number of clusters. Integer. Must be at least 2. Default value is 2.
-        is_minibatch: bool
-            Boolean flag to use ``MiniBatchKMeans`` or not. Default value is False.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
-            >>> list_of_arms = [1, 2, 3, 4]
-            >>> decisions = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3]
-            >>> rewards = [0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
-            >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
-                            [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.Clusters(3))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
-            [3, 1]
-        """
-        n_clusters: Num = 2
-        is_minibatch: bool = False
-
-        def _validate(self):
-            check_true(isinstance(self.n_clusters, int), TypeError("The number of clusters must be an integer."))
-            check_true(self.n_clusters >= 2, ValueError("The number of clusters must be at least two."))
-            check_true(isinstance(self.is_minibatch, bool), TypeError("The is_minibatch flag must be a boolean."))
-
-    class KNearest(NamedTuple):
-        """KNearest Neighborhood Policy.
-
-        KNearest is a nearest neighbors approach that selects the *k-nearest* observations
-        to be used with a learning policy.
-
-        Attributes
-        ----------
-        k: int
-            The number of neighbors to select.
-            Integer value. Must be greater than zero.
-            Default value is 1.
-        metric: str
-            The metric used to calculate distance.
-            Accepts any of the metrics supported by ``scipy.spatial.distance.cdist``.
-            Default value is Euclidean distance.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
-            >>> list_of_arms = [1, 2, 3, 4]
-            >>> decisions = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3]
-            >>> rewards = [0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
-            >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
-                            [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), \
-                          NeighborhoodPolicy.KNearest(2, "euclidean"))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
-            [1, 1]
-        """
-        k: int = 1
-        metric: str = "euclidean"
-
-        def _validate(self):
-            check_true(isinstance(self.k, int), TypeError("K must be an integer."))
-            check_true((self.metric in Constants.distance_metrics),
-                       ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
-            check_true(self.k > 0, ValueError("K must be greater than zero."))
-
-    class LSHNearest(NamedTuple):
-        """Locality-Sensitive Hashing Approximate Nearest Neighbors Policy.
-
-        LSHNearest is a nearest neighbors approach that uses locality sensitive hashing with a simhash to
-        select observations to be used with a learning policy.
-
-        For the simhash, contexts are projected onto a hyperplane of n_context_cols x n_dimensions and each
-        column of the hyperplane is evaluated for its sign, giving an ordered array of binary values.
-        This is converted to a base 10 integer used as the hash code to assign the context to a hash table. This
-        process is repeated for a specified number of hash tables, where each has a unique, randomly-generated
-        hyperplane. To select the neighbors for a context, the hash code is calculated for each hash table and any
-        contexts with the same hashes are selected as the neighbors.
-
-        As with the radius or k value for other nearest neighbors algorithms, selecting the best number of dimensions
-        and tables requires tuning. For the dimensions, a good starting point is to use the log of the square root of
-        the number of rows in the training data. This will give you sqrt(n_rows) number of hashes.
-
-        The number of dimensions and number of tables have inverse effects from each other on the number of empty
-        neighborhoods and average neighborhood size. Increasing the dimensionality decreases the number of collisions,
-        which increases the precision of the approximate neighborhood but also potentially increases the number of empty
-        neighborhoods. Increasing the number of hash tables increases the likelihood of capturing neighbors the
-        other random hyperplanes miss and increases the average neighborhood size. It should be noted that the fit
-        operation is O(2**n_dimensions).
-
-        Attributes
-        ----------
-        n_dimensions: int
-            The number of dimensions to use for the hyperplane.
-            Integer value. Must be greater than zero.
-            Default value is 5.
-        n_tables: int
-            The number of hash tables.
-            Integer value. Must be greater than zero.
-            Default value is 3.
-        no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if context has no neighbors.
-            If not given, a uniform random distribution over all arms is assumed.
-            The probabilities should sum up to 1.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
-            >>> list_of_arms = [1, 2, 3, 4]
-            >>> decisions = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3]
-            >>> rewards = [0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
-            >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
-                            [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), \
-                          NeighborhoodPolicy.LSHNearest(5, 3))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
-            [3, 1]
-        """
-        n_dimensions: int = 5
-        n_tables: int = 3
-        no_nhood_prob_of_arm: Optional[List] = None
-
-        def _validate(self):
-            check_true(isinstance(self.n_dimensions, int), TypeError("n_dimensions must be an integer."))
-            check_true(self.n_dimensions > 0, ValueError("n_dimensions must be greater than zero."))
-            check_true(isinstance(self.n_tables, int), TypeError("n_tables must be an integer"))
-            check_true(self.n_tables > 0, ValueError("n_tables must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
-                       TypeError("no_nhood_prob_of_arm must be None or List."))
-            if isinstance(self.no_nhood_prob_of_arm, List):
-                check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
-                           ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
-
-    class Radius(NamedTuple):
-        """Radius Neighborhood Policy.
-
-        Radius is a nearest neighborhood approach that selects the observations
-        within a given *radius* to be used with a learning policy.
-
-        Attributes
-        ----------
-        radius: Num
-            The maximum distance within which to select observations.
-            Integer or Float. Must be greater than zero.
-            Default value is 1.
-        metric: str
-            The metric used to calculate distance.
-            Accepts any of the metrics supported by scipy.spatial.distance.cdist.
-            Default value is Euclidean distance.
-        no_nhood_prob_of_arm: None or List
-            The probabilities associated with each arm. Used to select random arm if context has no neighbors.
-            If not given, a uniform random distribution over all arms is assumed.
-            The probabilities should sum up to 1.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
-            >>> list_of_arms = [1, 2, 3, 4]
-            >>> decisions = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3]
-            >>> rewards = [0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
-            >>> contexts = [[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],[0, 2, 2, 3, 5], [1, 3, 1, 1, 1], \
-                            [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), \
-                          NeighborhoodPolicy.Radius(2, "euclidean"))
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
-            [3, 1]
-        """
-        radius: Num = 0.05
-        metric: str = "euclidean"
-        no_nhood_prob_of_arm: Optional[List] = None
-
-        def _validate(self):
-            check_true(isinstance(self.radius, (int, float)), TypeError("Radius must be an integer or a float."))
-            check_true((self.metric in Constants.distance_metrics),
-                       ValueError("Metric must be supported by scipy.spatial.distance.cdist"))
-            check_true(self.radius > 0, ValueError("Radius must be greater than zero."))
-            check_true((self.no_nhood_prob_of_arm is None) or isinstance(self.no_nhood_prob_of_arm, List),
-                       TypeError("no_nhood_prob_of_arm must be None or List."))
-            if isinstance(self.no_nhood_prob_of_arm, List):
-                check_true(np.isclose(sum(self.no_nhood_prob_of_arm), 1.0),
-                           ValueError("no_nhood_prob_of_arm should sum up to 1.0"))
-
-    class TreeBandit(NamedTuple):
-        """TreeBandit Neighborhood Policy.
-
-        This policy fits a decision tree for each arm using context history.
-        It uses the leaves of these trees to partition the context space into regions
-        and keeps a list of rewards for each leaf.
-        To predict, it receives a context vector and goes to the corresponding
-        leaf at each arm's tree and applies the given context-free MAB learning policy
-        to predict expectations and choose an arm.
-
-        The TreeBandit neighborhood policy is compatible with the following
-        context-free learning policies only: EpsilonGreedy, ThompsonSampling and UCB1.
-
-        The TreeBandit neighborhood policy is a modified version of
-        the TreeHeuristic algorithm presented in:
-        Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
-        A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
-
-        Attributes
-        ----------
-        tree_parameters: Dict, **kwarg
-            Parameters of the decision tree.
-            The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
-            When a parameter is not given, the default parameters from
-            sklearn.tree.DecisionTreeClassifier will be chosen.
-            Default value is an empty dictionary.
-
-        Example
-        -------
-            >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
-            >>> list_of_arms = ['Arm1', 'Arm2']
-            >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
-            >>> rewards = [20, 17, 25, 9]
-            >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
-            >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
-            >>> mab.fit(decisions, rewards, contexts)
-            >>> mab.predict([[3, 2, 0, 1]])
-            'Arm2'
-
-        """
-        tree_parameters: Dict = {}
-
-        def _validate(self):
-            check_true(isinstance(self.tree_parameters, dict), TypeError("tree_parameters must be a dictionary."))
-            tree = DecisionTreeClassifier()
-            for key in self.tree_parameters.keys():
-                check_true(key in tree.__dict__.keys(),
-                           ValueError("sklearn.tree.DecisionTreeClassifier doesn't have a parameter " + str(key) + "."))
-
-        def _is_compatible(self, learning_policy: LearningPolicy):
-            # TreeBandit is compatible with these learning policies
-            return isinstance(learning_policy, (LearningPolicy.EpsilonGreedy,
-                                                LearningPolicy.UCB1,
-                                                LearningPolicy.ThompsonSampling))
 
 
 class MAB:
@@ -740,12 +113,12 @@ class MAB:
                                         LearningPolicy.LinGreedy,
                                         LearningPolicy.LinTS,
                                         LearningPolicy.LinUCB],  # The learning policy
-                 neighborhood_policy: Union[None,
+                 neighborhood_policy: Optional[Union[
                                             NeighborhoodPolicy.LSHNearest,
                                             NeighborhoodPolicy.Clusters,
                                             NeighborhoodPolicy.KNearest,
                                             NeighborhoodPolicy.Radius,
-                                            NeighborhoodPolicy.TreeBandit] = None,  # The context policy, optional
+                                            NeighborhoodPolicy.TreeBandit]] = None,  # The context policy, optional
                  seed: int = Constants.default_seed,  # The random seed
                  n_jobs: int = 1,  # Number of parallel jobs
                  backend: str = None  # Parallel backend implementation
@@ -892,7 +265,7 @@ class MAB:
                                     neighborhood_policy.no_nhood_prob_of_arm)
             elif isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
                 self._imp = _TreeBandit(self._rng, self.arms, self.n_jobs, self.backend, lp,
-                                        neighborhood_policy.tree_parameters)
+                                        attr.asdict(neighborhood_policy))
             else:
                 check_true(False, ValueError("Undefined context policy " + str(neighborhood_policy)))
         else:
@@ -925,24 +298,24 @@ class MAB:
             if issubclass(type(lp), _Popularity):
                 return LearningPolicy.Popularity()
             else:
-                return LearningPolicy.EpsilonGreedy(lp.epsilon)
+                return LearningPolicy.EpsilonGreedy(epsilon=lp.epsilon)
         elif isinstance(lp, _Linear):
             if lp.regression == 'ridge':
-                return LearningPolicy.LinGreedy(lp.epsilon, lp.l2_lambda, lp.scale)
+                return LearningPolicy.LinGreedy(epsilon=lp.epsilon, l2_lambda=lp.l2_lambda, scale=lp.scale)
             elif lp.regression == 'ts':
-                return LearningPolicy.LinTS(lp.alpha, lp.l2_lambda, lp.scale)
+                return LearningPolicy.LinTS(alpha=lp.alpha, l2_lambda=lp.l2_lambda, scale=lp.scale)
             elif lp.regression == 'ucb':
-                return LearningPolicy.LinUCB(lp.alpha, lp.l2_lambda, lp.scale)
+                return LearningPolicy.LinUCB(alpha=lp.alpha, l2_lambda=lp.l2_lambda, scale=lp.scale)
             else:
                 check_true(False, ValueError("Undefined regression " + str(lp.regression)))
         elif isinstance(lp, _Random):
             return LearningPolicy.Random()
         elif isinstance(lp, _Softmax):
-            return LearningPolicy.Softmax(lp.tau)
+            return LearningPolicy.Softmax(tau=lp.tau)
         elif isinstance(lp, _ThompsonSampling):
-            return LearningPolicy.ThompsonSampling(lp.binarizer)
+            return LearningPolicy.ThompsonSampling(binarizer=lp.binarizer)
         elif isinstance(lp, _UCB1):
-            return LearningPolicy.UCB1(lp.alpha)
+            return LearningPolicy.UCB1(alpha=lp.alpha)
         else:
             raise NotImplementedError("MAB learning_policy property not implemented for this learning policy.")
 
@@ -956,20 +329,24 @@ class MAB:
         The neighborhood policy
         """
         if isinstance(self._imp, _Clusters):
-            return NeighborhoodPolicy.Clusters(self._imp.n_clusters, isinstance(self._imp.kmeans, MiniBatchKMeans))
+            return NeighborhoodPolicy.Clusters(
+                n_clusters=self._imp.n_clusters, is_minibatch=isinstance(self._imp.kmeans, MiniBatchKMeans)
+            )
         elif isinstance(self._imp, _KNearest):
-            return NeighborhoodPolicy.KNearest(self._imp.k, self._imp.metric)
+            return NeighborhoodPolicy.KNearest(k=self._imp.k, metric=self._imp.metric)
         elif isinstance(self._imp, _LSHNearest):
-            return NeighborhoodPolicy.LSHNearest(self._imp.n_dimensions, self._imp.n_tables,
-                                                 self._imp.no_nhood_prob_of_arm)
+            return NeighborhoodPolicy.LSHNearest(n_dimensions=self._imp.n_dimensions, n_tables=self._imp.n_tables,
+                                                 no_nhood_prob_of_arm=self._imp.no_nhood_prob_of_arm)
         elif isinstance(self._imp, _Radius):
-            return NeighborhoodPolicy.Radius(self._imp.radius, self._imp.metric, self._imp.no_nhood_prob_of_arm)
+            return NeighborhoodPolicy.Radius(
+                radius=self._imp.radius, metric=self._imp.metric, no_nhood_prob_of_arm=self._imp.no_nhood_prob_of_arm
+            )
         elif isinstance(self._imp, _TreeBandit):
-            return NeighborhoodPolicy.TreeBandit(self._imp.tree_parameters)
+            return NeighborhoodPolicy.TreeBandit(tree_parameters=self._imp.tree_parameters)
         else:
             return None
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """ Adds an _arm_ to the list of arms.
 
         Incorporates the arm into the learning and neighborhood policies with no training data.
@@ -1010,7 +387,7 @@ class MAB:
         self.arms.append(arm)
         self._imp.add_arm(arm, binarizer)
 
-    def remove_arm(self, arm: Arm) -> NoReturn:
+    def remove_arm(self, arm: Arm) -> None:
         """Removes an _arm_ from the list of arms.
 
         Parameters
@@ -1041,7 +418,7 @@ class MAB:
             rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
             contexts: Union[None, List[List[Num]],
                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
-            ) -> NoReturn:
+            ) -> None:
         """Fits the multi-armed bandit to the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1097,7 +474,7 @@ class MAB:
     def partial_fit(self,
                     decisions: Union[List[Arm], np.ndarray, pd.Series],
                     rewards: Union[List[Num], np.ndarray, pd.Series],
-                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> NoReturn:
+                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> None:
         """Updates the multi-armed bandit with the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1228,7 +605,7 @@ class MAB:
         # Return a dictionary from arms (key) to expectations (value)
         return self._imp.predict_expectations(contexts)
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
         """Warm-start untrained (cold) arms of the multi-armed bandit.
 
         Validates arguments and raises exceptions in case there are violations.
@@ -1285,8 +662,6 @@ class MAB:
                                LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB)),
                    TypeError("Learning Policy type mismatch."))
 
-        # Learning policy value
-        learning_policy._validate()
 
         # Contextual Policy
         if neighborhood_policy:
@@ -1295,11 +670,10 @@ class MAB:
                                    NeighborhoodPolicy.LSHNearest, NeighborhoodPolicy.Radius,
                                    NeighborhoodPolicy.TreeBandit)),
                        TypeError("Context Policy type mismatch."))
-            neighborhood_policy._validate()
 
             # Tree-Bandit learning policy compatibility
             if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
-                check_true(neighborhood_policy._is_compatible(learning_policy),
+                check_true(is_compatible(learning_policy),
                            ValueError(
                                "Tree-Bandit is not compatible with the learning policy: " + str(learning_policy)))
 

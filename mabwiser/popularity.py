@@ -15,7 +15,7 @@ class _Popularity(_EpsilonGreedy):
         # Init the parent greedy policy with zero epsilon
         super().__init__(rng, arms, n_jobs, backend, epsilon=0.0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Fit as usual greedy
         super().fit(decisions, rewards, contexts)
@@ -23,7 +23,7 @@ class _Popularity(_EpsilonGreedy):
         # Make sure expectations sum up to 1 like probabilities
         self._normalize_expectations()
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Fit as usual greedy
         super().partial_fit(decisions, rewards, contexts)
@@ -67,7 +67,7 @@ class _Popularity(_EpsilonGreedy):
             for k, v in self.arm_to_expectation.items():
                 self.arm_to_expectation[k] = v / total
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.arm_to_sum.pop(arm)
         self.arm_to_count.pop(arm)
         self._normalize_expectations()

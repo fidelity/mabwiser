@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+from mabwiser.configs.validators import is_compatible
 from mabwiser.utils import Arm, Num
 
 
@@ -14,46 +15,41 @@ class BaseTest(unittest.TestCase):
 
     # A list of valid learning policies
     lps = [LearningPolicy.EpsilonGreedy(),
-           LearningPolicy.EpsilonGreedy(epsilon=0),
            LearningPolicy.EpsilonGreedy(epsilon=0.0),
            LearningPolicy.EpsilonGreedy(epsilon=0.5),
-           LearningPolicy.EpsilonGreedy(epsilon=1),
            LearningPolicy.EpsilonGreedy(epsilon=1.0),
            LearningPolicy.Popularity(),
            LearningPolicy.Random(),
            LearningPolicy.Softmax(),
            LearningPolicy.Softmax(tau=0.1),
            LearningPolicy.Softmax(tau=0.5),
-           LearningPolicy.Softmax(tau=1),
            LearningPolicy.Softmax(tau=1.0),
            LearningPolicy.Softmax(tau=5.0),
            LearningPolicy.ThompsonSampling(),
            LearningPolicy.UCB1(),
-           LearningPolicy.UCB1(alpha=0),
            LearningPolicy.UCB1(alpha=0.0),
            LearningPolicy.UCB1(alpha=0.5),
-           LearningPolicy.UCB1(alpha=1),
            LearningPolicy.UCB1(alpha=1.0),
-           LearningPolicy.UCB1(alpha=5)]
+           LearningPolicy.UCB1(alpha=5.0)]
 
-    para_lps = [LearningPolicy.LinGreedy(epsilon=0, l2_lambda=1),
-                LearningPolicy.LinGreedy(epsilon=0.5, l2_lambda=1),
-                LearningPolicy.LinGreedy(epsilon=1, l2_lambda=1),
-                LearningPolicy.LinGreedy(epsilon=0, l2_lambda=0.5),
+    para_lps = [LearningPolicy.LinGreedy(epsilon=0.0, l2_lambda=1.0),
+                LearningPolicy.LinGreedy(epsilon=0.5, l2_lambda=1.0),
+                LearningPolicy.LinGreedy(epsilon=1.0, l2_lambda=1.0),
+                LearningPolicy.LinGreedy(epsilon=0.0, l2_lambda=0.5),
                 LearningPolicy.LinGreedy(epsilon=0.5, l2_lambda=0.5),
-                LearningPolicy.LinGreedy(epsilon=1, l2_lambda=0.5),
-                LearningPolicy.LinTS(alpha=0.00001, l2_lambda=1),
-                LearningPolicy.LinTS(alpha=0.5, l2_lambda=1),
-                LearningPolicy.LinTS(alpha=1, l2_lambda=1),
+                LearningPolicy.LinGreedy(epsilon=1.0, l2_lambda=0.5),
+                LearningPolicy.LinTS(alpha=0.00001, l2_lambda=1.0),
+                LearningPolicy.LinTS(alpha=0.5, l2_lambda=1.0),
+                LearningPolicy.LinTS(alpha=1.0, l2_lambda=1.0),
                 LearningPolicy.LinTS(alpha=0.00001, l2_lambda=0.5),
                 LearningPolicy.LinTS(alpha=0.5, l2_lambda=0.5),
-                LearningPolicy.LinTS(alpha=1, l2_lambda=0.5),
-                LearningPolicy.LinUCB(alpha=0, l2_lambda=1),
-                LearningPolicy.LinUCB(alpha=0.5, l2_lambda=1),
-                LearningPolicy.LinUCB(alpha=1, l2_lambda=1),
-                LearningPolicy.LinUCB(alpha=0, l2_lambda=0.5),
+                LearningPolicy.LinTS(alpha=1.0, l2_lambda=0.5),
+                LearningPolicy.LinUCB(alpha=0.0, l2_lambda=1.0),
+                LearningPolicy.LinUCB(alpha=0.5, l2_lambda=1.0),
+                LearningPolicy.LinUCB(alpha=10.0, l2_lambda=1.0),
+                LearningPolicy.LinUCB(alpha=0.0, l2_lambda=0.5),
                 LearningPolicy.LinUCB(alpha=0.5, l2_lambda=0.5),
-                LearningPolicy.LinUCB(alpha=1, l2_lambda=0.5)]
+                LearningPolicy.LinUCB(alpha=1.0, l2_lambda=0.5)]
 
     # A list of valid context policies
     nps = [NeighborhoodPolicy.LSHNearest(),
@@ -63,8 +59,8 @@ class BaseTest(unittest.TestCase):
            NeighborhoodPolicy.KNearest(k=1),
            NeighborhoodPolicy.KNearest(k=3),
            NeighborhoodPolicy.Radius(),
-           NeighborhoodPolicy.Radius(2.5),
-           NeighborhoodPolicy.Radius(5),
+           NeighborhoodPolicy.Radius(radius=2.5),
+           NeighborhoodPolicy.Radius(radius=5.0),
            NeighborhoodPolicy.TreeBandit()]
 
     cps = [NeighborhoodPolicy.Clusters(),
@@ -122,7 +118,7 @@ class BaseTest(unittest.TestCase):
 
         # Special case for TreeBandit lp/np compatibility
         if isinstance(np, NeighborhoodPolicy.TreeBandit):
-            return np._is_compatible(lp)
+            return is_compatible(lp)
 
         return True
 

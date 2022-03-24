@@ -24,7 +24,7 @@ class _Softmax(BaseMAB):
         self.arm_to_mean = dict.fromkeys(self.arms, 0)
         self.arm_to_exponent = dict.fromkeys(self.arms, 0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Reset the sum, count, and expectations to zero
         reset(self.arm_to_sum, 0)
@@ -36,7 +36,7 @@ class _Softmax(BaseMAB):
         self._expectation_operation()
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)

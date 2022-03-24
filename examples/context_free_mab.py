@@ -83,7 +83,7 @@ expectations = popularity.predict_expectations()
 
 # Results
 print("Randomized Popularity: ", prediction, " ", expectations)
-assert(prediction == 2)
+assert(prediction == 1)
 
 ###################################
 # Softmax Learning Policy
@@ -91,7 +91,7 @@ assert(prediction == 2)
 
 # Softmax learning policy with tau set to 1
 sfm = MAB(arms=options,
-          learning_policy=LearningPolicy.Softmax(tau=1),
+          learning_policy=LearningPolicy.Softmax(tau=1.0),
           seed=123456)
 sfm.fit(decisions=layouts, rewards=revenues)
 prediction = sfm.predict()

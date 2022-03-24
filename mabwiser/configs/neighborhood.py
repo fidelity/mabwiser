@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
+
+from collections import namedtuple
+
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 
 from spock import spock
 from spock.utils import ge, gt
 
 from mabwiser.configs.constants import DistanceMetrics
-from mabwiser.utilities.validators import check_sum_to_unity
+from mabwiser.configs.validators import check_sum_to_unity
+
+from sklearn.tree import DecisionTreeRegressor
+
+from mabwiser.utils import check_true
+
 
 
 @spock
@@ -42,7 +50,7 @@ class Clusters:
     n_clusters: int = 2
     is_minibatch: bool = False
 
-    def __post_hook_(self):
+    def __post_hook__(self):
         try:
             ge(self.n_clusters, bound=2)
         except Exception as e:
@@ -232,22 +240,18 @@ class _DTCSplitter(Enum):
 @spock
 class TreeBandit:
     """TreeBandit Neighborhood Policy.
-
     This policy fits a decision tree for each arm using context history.
     It uses the leaves of these trees to partition the context space into regions
     and keeps a list of rewards for each leaf.
     To predict, it receives a context vector and goes to the corresponding
     leaf at each arm's tree and applies the given context-free MAB learning policy
     to predict expectations and choose an arm.
-
     The TreeBandit neighborhood policy is compatible with the following
     context-free learning policies only: EpsilonGreedy, ThompsonSampling and UCB1.
-
     The TreeBandit neighborhood policy is a modified version of
     the TreeHeuristic algorithm presented in:
     Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
     A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
-
     Attributes
     ----------
     tree_parameters: Dict, **kwarg
@@ -256,7 +260,6 @@ class TreeBandit:
         When a parameter is not given, the default parameters from
         sklearn.tree.DecisionTreeClassifier will be chosen.
         Default value is an empty dictionary.
-
     Example
     -------
         >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
@@ -268,7 +271,6 @@ class TreeBandit:
         >>> mab.fit(decisions, rewards, contexts)
         >>> mab.predict([[3, 2, 0, 1]])
         'Arm2'
-
     """
 
     criterion: Optional[_DTCCriterion] = _DTCCriterion.squared_error
@@ -293,9 +295,75 @@ class TreeBandit:
             )
 
 
-class NeighborhoodPolicy(Enum):
-    lsh_nearest = LSHNearest
-    clusters = Clusters
-    k_nearest = KNearest
-    radius = Radius
-    tree_bandit = TreeBandit
+
+# @spock
+# class TreeBandit:
+#     """TreeBandit Neighborhood Policy.
+#
+#     This policy fits a decision tree for each arm using context history.
+#     It uses the leaves of these trees to partition the context space into regions
+#     and keeps a list of rewards for each leaf.
+#     To predict, it receives a context vector and goes to the corresponding
+#     leaf at each arm's tree and applies the given context-free MAB learning policy
+#     to predict expectations and choose an arm.
+#
+#     The TreeBandit neighborhood policy is compatible with the following
+#     context-free learning policies only: EpsilonGreedy, ThompsonSampling and UCB1.
+#
+#     The TreeBandit neighborhood policy is a modified version of
+#     the TreeHeuristic algorithm presented in:
+#     Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik
+#     A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, UAI 2017
+#
+#     Attributes
+#     ----------
+#     tree_parameters: Dict, **kwarg
+#         Parameters of the decision tree.
+#         The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
+#         When a parameter is not given, the default parameters from
+#         sklearn.tree.DecisionTreeClassifier will be chosen.
+#         Default value is an empty dictionary.
+#
+#     Example
+#     -------
+#         >>> from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+#         >>> list_of_arms = ['Arm1', 'Arm2']
+#         >>> decisions = ['Arm1', 'Arm1', 'Arm2', 'Arm1']
+#         >>> rewards = [20, 17, 25, 9]
+#         >>> contexts = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 1, 0], [3, 2, 1, 0]]
+#         >>> mab = MAB(list_of_arms, LearningPolicy.EpsilonGreedy(epsilon=0), NeighborhoodPolicy.TreeBandit())
+#         >>> mab.fit(decisions, rewards, contexts)
+#         >>> mab.predict([[3, 2, 0, 1]])
+#         'Arm2'
+#
+#     """
+#     tree_parameters: Dict[str, Type] = {}
+#
+#     def __post_hook__(self):
+#         try:
+#             dt_params = DecisionTreeRegressor._get_param_names()
+#             for k in self.tree_parameters.keys():
+#                 check_true(k in dt_params,
+#                            ValueError(f"sklearn.tree.DecisionTreeClassifier doesn't have a parameter {str(k)}."))
+#
+#         except Exception as e:
+#             raise ValueError(
+#                 f"`{self.__class__.__name__}` could not be instantiated -- spock message: {e}"
+#             )
+
+
+ALL_LP = [
+    LSHNearest,
+    Clusters,
+    KNearest,
+    Radius,
+    TreeBandit,
+]
+
+ALL_LP_NAMES = [val.__name__ for val in ALL_LP]
+
+NP = namedtuple("NP", ALL_LP_NAMES)
+
+NeighborhoodPolicy = NP(
+    *ALL_LP
+)

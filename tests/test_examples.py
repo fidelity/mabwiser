@@ -110,7 +110,7 @@ class ExampleTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2],
                                 decisions=[1, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1],
                                 rewards=[10, 17, 22, 9, 4, 0, 7, 8, 20, 9, 50, 5, 7, 12, 10],
-                                learning_policy=LearningPolicy.Softmax(tau=1),
+                                learning_policy=LearningPolicy.Softmax(tau=1.0),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -319,7 +319,7 @@ class ExampleTest(BaseTest):
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
                                  learning_policy=LearningPolicy.UCB1(alpha=1.25),
-                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=5),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=5.0),
                                  context_history=train,
                                  contexts=test,
                                  seed=123456,
@@ -393,7 +393,7 @@ class ExampleTest(BaseTest):
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
                                  learning_policy=LearningPolicy.LinUCB(alpha=1.25),
-                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=1.0),
                                  context_history=train,
                                  contexts=test,
                                  seed=123456,
@@ -455,7 +455,7 @@ class ExampleTest(BaseTest):
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
                                  learning_policy=LearningPolicy.LinTS(alpha=0.5),
-                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
+                                 neighborhood_policy=NeighborhoodPolicy.Radius(radius=1.0),
                                  context_history=train,
                                  contexts=test,
                                  seed=123456,
@@ -485,7 +485,7 @@ class ExampleTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3, 4, 5],
                                  decisions=train_df['ad'],
                                  rewards=train_df['revenues'],
-                                 learning_policy=LearningPolicy.LinTS(alpha=1),
+                                 learning_policy=LearningPolicy.LinTS(alpha=1.0),
                                  neighborhood_policy=NeighborhoodPolicy.KNearest(k=4),
                                  context_history=train,
                                  contexts=test,
@@ -510,14 +510,14 @@ class ExampleTest(BaseTest):
                 return reward >= 220
 
         n_jobs = 1
-        contextual_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(10),
+        contextual_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(radius=10.0),
                                           n_jobs=n_jobs)),
-                           ('UCB1', MAB([0, 1], LearningPolicy.UCB1(1), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                           ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize),
-                                                    NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                           ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=.15),
-                                                 NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
-                           ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(10),
+                           ('UCB1', MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                           ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize),
+                                                    NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                           ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.15),
+                                                 NeighborhoodPolicy.Radius(radius=10.0), n_jobs=n_jobs)),
+                           ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), NeighborhoodPolicy.Radius(radius=10.0),
                                            n_jobs=n_jobs))]
 
         sim = Simulator(contextual_mabs, decisions, rewards, contexts,
@@ -542,10 +542,10 @@ class ExampleTest(BaseTest):
 
         n_jobs = 1
         context_free_mabs = [('Random', MAB([0, 1], LearningPolicy.Random(), n_jobs=n_jobs)),
-                             ('UCB1', MAB([0, 1], LearningPolicy.UCB1(1), n_jobs=n_jobs)),
-                             ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarize),
+                             ('UCB1', MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), n_jobs=n_jobs)),
+                             ('ThompsonSampling', MAB([0, 1], LearningPolicy.ThompsonSampling(binarizer=binarize),
                                                       n_jobs=n_jobs)),
-                             ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=.15), n_jobs=n_jobs)),
+                             ('EpsilonGreedy', MAB([0, 1], LearningPolicy.EpsilonGreedy(epsilon=0.15), n_jobs=n_jobs)),
                              ('Softmax', MAB([0, 1], LearningPolicy.Softmax(), n_jobs=n_jobs))]
 
         sim = Simulator(context_free_mabs, decisions, rewards, contexts=None,
@@ -563,7 +563,7 @@ class ExampleTest(BaseTest):
         contexts = [[random.random() for _ in range(50)] for _ in range(size)]
 
         n_jobs = 1
-        mixed = [('RandomRadius', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(10), n_jobs=n_jobs)),
+        mixed = [('RandomRadius', MAB([0, 1], LearningPolicy.Random(), NeighborhoodPolicy.Radius(radius=1.00), n_jobs=n_jobs)),
                  ('Random', MAB([0, 1], LearningPolicy.Random(), n_jobs=n_jobs))]
 
         sim = Simulator(mixed, decisions, rewards, contexts,
@@ -584,7 +584,7 @@ class ExampleTest(BaseTest):
         hyper_parameter_tuning = []
         for radius in range(6, 10):
             hyper_parameter_tuning.append(('Radius' + str(radius),
-                                           MAB([0, 1], LearningPolicy.UCB1(1), NeighborhoodPolicy.Radius(radius),
+                                           MAB([0, 1], LearningPolicy.UCB1(alpha=1.0), NeighborhoodPolicy.Radius(radius=float(radius)),
                                                n_jobs=n_jobs)))
 
         sim = Simulator(hyper_parameter_tuning, decisions, rewards, contexts,

@@ -28,7 +28,7 @@ class GreedyTest(BaseTest):
         arm, mab = self.predict(arms=[1, 2, 3],
                                 decisions=[1, 1, 1, 3, 3, 3],
                                 rewards=[0, 0, 0, 1, 1, 1],
-                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                 seed=7,
                                 num_run=1,
                                 is_predict=True)
@@ -40,7 +40,7 @@ class GreedyTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3],
                                  rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
-                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                 learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0.0),
                                  seed=7,
                                  num_run=5,
                                  is_predict=True)

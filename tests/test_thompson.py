@@ -46,7 +46,7 @@ class ThompsonTest(BaseTest):
                                 decisions=[1, 2, 1, 1, 2],
                                 rewards=[10, 4, 3, 5, 6],
                                 learning_policy=
-                                LearningPolicy.ThompsonSampling(binarize),
+                                LearningPolicy.ThompsonSampling(binarizer=binarize),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -160,7 +160,7 @@ class ThompsonTest(BaseTest):
         self.predict(arms=[1, 2, 3],
                      decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                      rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                     learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                     learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                      seed=123456,
                      num_run=4,
                      is_predict=True)
@@ -199,7 +199,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 4],
                                  decisions=[1, 1, 4, 4, 2, 2, 1, 1, 4, 2, 1, 4, 1, 2, 4],
                                  rewards=[7, 9, 10, 20, 2, 5, 8, 15, 17, 11, 0, 5, 2, 9, 3],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
@@ -216,7 +216,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=[1, 2, 4],
                                  decisions=[1, 1, 4, 4, 2, 2, 1, 1, 4, 2, 1, 4, 1, 2, 4],
                                  rewards=[7, 9, 10, 20, 2, 5, 8, 15, 17, 11, 0, 5, 2, 9, 3],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=23,
                                  num_run=4,
                                  is_predict=True)
@@ -245,7 +245,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=['one', 'two', 'three'],
                                  decisions=['one', 'one', 'one', 'three', 'two', 'two', 'three', 'one', 'three', 'two'],
                                  rewards=[2, 7, 7, 9, 1, 3, 1, 2, 6, 4],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=17,
                                  num_run=4,
                                  is_predict=True)
@@ -262,7 +262,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=['a', 'b', 'c'],
                                  decisions=['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a'],
                                  rewards=[-1.25, 12, 0.7, 10, 12, 9.2, -1, -10, 4, 0],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=123456,
                                  num_run=5,
                                  is_predict=True)
@@ -279,7 +279,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=['a', 'b', 'c'],
                                  decisions=['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a'],
                                  rewards=[-1.25, 0.7, 12, 10, 12, 9.2, -1, -10, 4, 0],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=9,
                                  num_run=5,
                                  is_predict=True)
@@ -301,7 +301,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=[a, b, c],
                                  decisions=[a, b, c, a, b, c, a, b, c, a],
                                  rewards=[1.25, 0.7, 12, 10, 1.43, 0.2, -1, -10, 4, 0],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=123456,
                                  num_run=4,
                                  is_predict=True)
@@ -323,7 +323,7 @@ class ThompsonTest(BaseTest):
         arms, mab = self.predict(arms=[a, b, c],
                                  decisions=[a, b, c, a, b, c, a, b, c, a, b, b],
                                  rewards=[7, 12, 1, -10, 5, 1, 2, 9, 3, 3, 6, 7],
-                                 learning_policy=LearningPolicy.ThompsonSampling(binarize),
+                                 learning_policy=LearningPolicy.ThompsonSampling(binarizer=binarize),
                                  seed=7,
                                  num_run=4,
                                  is_predict=True)
@@ -341,7 +341,7 @@ class ThompsonTest(BaseTest):
                                 decisions=[1, 2, 1, 1, 2],
                                 rewards=[10, 4, 3, 5, 6],
                                 learning_policy=
-                                LearningPolicy.ThompsonSampling(binarize),
+                                LearningPolicy.ThompsonSampling(binarizer=binarize),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -379,7 +379,7 @@ class ThompsonTest(BaseTest):
                                 decisions=[1, 2, 1, 1, 2],
                                 rewards=[10, 4, 3, 5, 6],
                                 learning_policy=
-                                LearningPolicy.ThompsonSampling(binarize),
+                                LearningPolicy.ThompsonSampling(binarizer=binarize),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -417,7 +417,7 @@ class ThompsonTest(BaseTest):
                                 decisions=[1, 2, 1, 1, 2],
                                 rewards=[10, 4, 3, 5, 6],
                                 learning_policy=
-                                LearningPolicy.ThompsonSampling(binarize),
+                                LearningPolicy.ThompsonSampling(binarizer=binarize),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
@@ -449,7 +449,7 @@ class ThompsonTest(BaseTest):
         arm, mab = self.predict(arms=[0, 1],
                                 decisions=[1, 0, 1, 1, 0],
                                 rewards=[10, 4, 3, 70, 6],
-                                learning_policy=LearningPolicy.ThompsonSampling(bin1),
+                                learning_policy=LearningPolicy.ThompsonSampling(binarizer=bin1),
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)

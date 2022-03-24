@@ -182,7 +182,7 @@ class PopularityTest(BaseTest):
                                  decisions=[1, 1, 1, 2, 2, 3, 3, 3, 3, 3],
                                  rewards=[0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
                                  learning_policy=LearningPolicy.Popularity(),
-                                 neighborhood_policy=NeighborhoodPolicy.Clusters(2),
+                                 neighborhood_policy=NeighborhoodPolicy.Clusters(n_clusters=2),
                                  context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
                                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
