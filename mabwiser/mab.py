@@ -15,7 +15,7 @@ from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
 
 from mabwiser._version import __author__, __email__, __version__, __copyright__
 from mabwiser.approximate import _LSHNearest
@@ -633,9 +633,9 @@ class NeighborhoodPolicy(NamedTuple):
         ----------
         tree_parameters: Dict, **kwarg
             Parameters of the decision tree.
-            The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
+            The keys must match the parameters of sklearn.tree.DecisionTreeRegressor.
             When a parameter is not given, the default parameters from
-            sklearn.tree.DecisionTreeClassifier will be chosen.
+            sklearn.tree.DecisionTreeRegressor will be chosen.
             Default value is an empty dictionary.
 
         Example
@@ -655,10 +655,10 @@ class NeighborhoodPolicy(NamedTuple):
 
         def _validate(self):
             check_true(isinstance(self.tree_parameters, dict), TypeError("tree_parameters must be a dictionary."))
-            tree = DecisionTreeClassifier()
+            tree = DecisionTreeRegressor()
             for key in self.tree_parameters.keys():
                 check_true(key in tree.__dict__.keys(),
-                           ValueError("sklearn.tree.DecisionTreeClassifier doesn't have a parameter " + str(key) + "."))
+                           ValueError("sklearn.tree.DecisionTreeRegressor doesn't have a parameter " + str(key) + "."))
 
         def _is_compatible(self, learning_policy: LearningPolicy):
             # TreeBandit is compatible with these learning policies
