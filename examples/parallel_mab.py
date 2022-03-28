@@ -39,24 +39,13 @@ contexts_train, contexts_test = train_test_split(contexts, test_size=0.3, random
 rewards_train, rewards_test = train_test_split(rewards, test_size=0.3, random_state=seed)
 decisions_train, decisions_test = train_test_split(decisions, test_size=0.3, random_state=seed)
 
-# Fit standard scaler for each arm
-arm_to_scaler = {}
-for arm in arms:
-    # Get indices for arm
-    indices = np.where(decisions_train == arm)
-
-    # Fit standard scaler
-    scaler = StandardScaler()
-    scaler.fit(contexts[indices])
-    arm_to_scaler[arm] = scaler
-
 ########################################################
 # LinUCB Learning Policy
 ########################################################
 
 # LinUCB learning policy with alpha 1.25 and n_jobs = -1 (maximum available cores)
 linucb = MAB(arms=arms,
-             learning_policy=LearningPolicy.LinUCB(alpha=1.25, arm_to_scaler=arm_to_scaler),
+             learning_policy=LearningPolicy.LinUCB(alpha=1.25, scale=True),
              n_jobs=-1)
 
 # Learn from playlists shown and observed click rewards for each arm

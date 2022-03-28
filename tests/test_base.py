@@ -118,11 +118,11 @@ class BaseTest(unittest.TestCase):
             return expectations[0] if num_run == 1 else expectations, mab
 
     @staticmethod
-    def is_compatible(lp, np):
+    def is_compatible(learning_policy, neighborhood_policy):
 
         # Special case for TreeBandit lp/np compatibility
-        if isinstance(np, NeighborhoodPolicy.TreeBandit):
-            return np._is_compatible(lp)
+        if isinstance(neighborhood_policy, NeighborhoodPolicy.TreeBandit):
+            return neighborhood_policy._is_compatible(learning_policy)
 
         return True
 

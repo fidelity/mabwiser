@@ -83,7 +83,7 @@ expectations = popularity.predict_expectations()
 
 # Results
 print("Randomized Popularity: ", prediction, " ", expectations)
-assert(prediction == 2)
+assert(prediction == 1)
 
 ###################################
 # Softmax Learning Policy
