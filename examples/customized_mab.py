@@ -120,7 +120,7 @@ assert(prediction == 2)
 class LinUCBColdStart(_Linear):
     def __init__(self, rng, arms, n_jobs, backend, l2_lambda=1.0, alpha=1.0, features=None):
         # initialize the parent class as is
-        super().__init__(rng, arms, n_jobs, backend, l2_lambda, alpha, 'ucb')
+        super().__init__(rng, arms, n_jobs, backend, alpha, 0.0, l2_lambda, 'ucb', False)
 
         # save the feature vectors
         self.features = features
