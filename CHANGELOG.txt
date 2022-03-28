@@ -5,7 +5,7 @@ MABWiser CHANGELOG
 March, 28, 2022 2.4.1
 -------------------------------------------------------------------------------
 minor:
-- Bug fix for examples
+- Bug fixes in examples
 - Validate tree parameters of TreeBandit to be compatible with sklearn.tree.DecisionTreeRegressor
 
 March, 17, 2022 2.4.0
