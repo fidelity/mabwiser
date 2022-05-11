@@ -6,6 +6,8 @@ MABWiser ([IJAIT 2021](https://www.worldscientific.com/doi/10.1142/S021821302150
 
 The library also provides a simulation utility for comparing different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. 
 
+If you are interested in Bandit-based Recommenders, see also [Mab2Rec library](https://github.com/fidelity/mab2rec) built on top of MABWiser. 
+
 MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments. Documentation is available at [fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
 
 ## Quick Start
