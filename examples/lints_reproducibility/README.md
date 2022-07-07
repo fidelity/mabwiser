@@ -22,3 +22,12 @@ Thankfully, as we prove and demonstrate in the paper, using Cholesky decompositi
 ## Additional Experiments
 There are additional experiments, not presented in detail in the paper due to space limitations. These experiments further verify our study. 
 - [Additional Experiments](additional_experiments) folder demonstrates reproducibility issues in the minimal example, a synthetic dataset, and the Goodreads dataset.
+
+## Incidence Rate on GitHub
+
+Given the popularity of the NumPy library and the SVD algorithm in the ML community, we expect that this issue is prevalent in many research and industrial applications.
+While it is not trivial to know the full extent of the impact of this non-determinism, keyword searches on GitHub can serve to give an indication of how pervasive this problem is in the open source community.
+For this, we looked at the difference between the old NumPy random number generator, which can only use SVD for its multivariate random sampling, and the new random generator, which can use Cholesky.
+At the time of writing, we can find 49K instances of `np.random.multivariate_random` calls (which will have this determinism issue) on [GitHub](https://github.com/search?q=np.random.multivariate_normal&type=code), 76K instances of `np.random` followed by `multivariate_random` at some point (which contains calls made to both the old random number generator and the new one) ([GitHub](https://github.com/search?q=np.random++.multivariate_normal&type=Code)), and 2.7K instances of `np.random.default_rng(…).multivariate_random`, which are calls made to the new version of numpy random number generator ([GitHub](https://github.com/search?q=np.random.default_rng++.multivariate_normal&type=code)).
+Similarly, while we can find [343K instances](https://github.com/search?q=np.random.RandomState&type=Code) of the old random number generator, we can only find [29K](https://github.com/search?q=np.random.default_rng&type=Code) instances of the new random number generator.
+While these queries cannot provide exhaustive numbers, it is for certain that there will be reproducibility issues for some of the 49K calls to the `np.random.multivariate_random` function.
