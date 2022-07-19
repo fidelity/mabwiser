@@ -1,5 +1,5 @@
 # LinTS Reproducibility
-This directory contains all the source code necessary to verify the reproducibility of LinTS as presented in the paper. 
+This directory contains all the source code necessary to verify the reproducibility of LinTS as presented in the paper ["Non-Deterministic Behavior of Thompson Sampling with Linear Payoffs and How to Avoid It"](https://openreview.net/forum?id=sX9d3gfwtE).
 
 The main contribution of our paper is to show that the Thompson Sampling with linear payofss (LinTS) algorithm suffers from non-deterministic behavior. This is highly problematic for experimental results and shadows our evaluations and conclusions. 
 
@@ -31,3 +31,21 @@ For this, we looked at the difference between the old NumPy random number genera
 At the time of writing, we can find 49K instances of `np.random.multivariate_random` calls (which will have this determinism issue) on [GitHub](https://github.com/search?q=np.random.multivariate_normal&type=code), 76K instances of `np.random` followed by `multivariate_random` at some point (which contains calls made to both the old random number generator and the new one) ([GitHub](https://github.com/search?q=np.random++.multivariate_normal&type=Code)), and 2.7K instances of `np.random.default_rng(…).multivariate_random`, which are calls made to the new version of numpy random number generator ([GitHub](https://github.com/search?q=np.random.default_rng++.multivariate_normal&type=code)).
 Similarly, while we can find [343K instances](https://github.com/search?q=np.random.RandomState&type=Code) of the old random number generator, we can only find [29K](https://github.com/search?q=np.random.default_rng&type=Code) instances of the new random number generator.
 While these queries cannot provide exhaustive numbers, it is for certain that there will be reproducibility issues for some of the 49K calls to the `np.random.multivariate_random` function.
+
+## Citation
+
+If you use this reproducibility analysis in a publication, please cite it as:
+
+**[TMLR 2022]** [D. Kilitcioglu and S. Kadioglu, "Non-Deterministic Behavior of Thompson Sampling with Linear Payoffs and How to Avoid It"](https://openreview.net/forum?id=sX9d3gfwtE)
+
+```bibtex
+    @article{
+      kilitcioglu2022nondeterministic,
+      title={Non-Deterministic Behavior of Thompson Sampling with Linear Payoffs and How to Avoid It},
+      author={Doruk Kilitcioglu and Serdar Kadioglu},
+      journal={Transactions on Machine Learning Research},
+      year={2022},
+      url={https://openreview.net/forum?id=sX9d3gfwtE},
+      note={Reproducibility Certification}
+    }
+```
