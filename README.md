@@ -39,7 +39,7 @@ mab.predict()
 Available Learning Policies:
 * Epsilon Greedy [1, 2]
 * LinGreedy [1, 2]
-* LinTS [3]
+* LinTS [3]. See [11] for a formal treatment of reproducibility in LinTS
 * LinUCB [4]
 * Popularity [2]
 * Random [2]
@@ -110,5 +110,6 @@ MABWiser is licensed under the [Apache License 2.0](LICENSE).
 8. Philippe Rigollet and Assaf Zeevi. Nonparametric bandits with covariates 
 9. Indyk, Piotr, Motwani, Rajeev, Raghavan, Prabhakar, Vempala, Santosh. Locality-preserving hashing in multidimensional spaces
 10. Adam N. Elmachtoub, Ryan McNellis, Sechan Oh, Marek Petrik, A practical method for solving contextual bandit problems using decision trees
+11. Doruk Kilitcioglu, Serdar Kadioglu, Non-deterministic behavior of thompson sampling with linear payoffs and how to avoid it
 
 <br>
