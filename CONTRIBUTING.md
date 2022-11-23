@@ -10,6 +10,8 @@ We welcome all types of contributions, including:
 * Documentation fixes
 * Feature requests and user stories (although we can't guarantee we'll get to all requests, it's helpful to know where we can improve)
 
+If you end up using our library in a project, give us a star on GitHub!
+
 Please note that we periodically fork upstream repos to stage contributions from Fidelity. We do not accept contributions against these forked repos, and request you make contributions against upstream projects directly.
 
 If you have any questions, please contact [opensource@fmr.com](mailto:opensource@fmr.com).
@@ -46,12 +48,21 @@ If you won't do the work yourself, please also add a `good first issue` or `help
 ## Code contributions
 
 Code contributions are welcome in all of our projects as long as you follow a few rules:
-
+* With any piece of code, please adhere to PEP-8 standards.
+* If you're fixing an issue with an existing piece of code, please make sure all the tests pass, and there is no change in functionality.
+* If you want to add a new feature, please open up an issue first.
+* When adding a new feature, make sure you have relevant test coverage.
+* Any changes to the public API should conform to the current standards, be properly documented, typed, and be intuitive.
 * Your contribution must be received under the project's open source license.
 * You must have permission to make the contribution. We strongly recommend including a Signed-off-by line to indicate your adherence to the [Developer Certificate of Origin](https://developercertificate.org/).
 * All code contributions must be made via PR, and all checks must pass before merging.
 
 While not strictly necessary, we encourage you to open an issue prior to your pull request to let the project know to expect your code. This helps the team plan for the next release and may result in your feature being a higher priority, and also decreases the likelihood of two independent contributions that do the same thing.
+
+## Documentation contributions
+
+* Make sure you follow the standards set by the rest of the repo.
+* Be concise, but do not omit details. Verbose documentation is preferred to incomplete documentation.
 
 ## Getting started (and helping others find their footing)
 
