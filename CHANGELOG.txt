@@ -2,6 +2,14 @@
 MABWiser CHANGELOG
 =====================
 
+January, 19, 2022 2.5.0
+-------------------------------------------------------------------------------
+major:
+- Update warm start logic to only warm start an arm once
+
+minor:
+- Implement fix for fitting scalers in Linear policies when variance is too small
+
 March, 28, 2022 2.4.1
 -------------------------------------------------------------------------------
 minor:
