@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 from mabwiser.mab import LearningPolicy
-from mabwiser.linear import _RidgeRegression
+from mabwiser.linear import _RidgeRegression, fix_small_variance
 from tests.test_base import BaseTest
 
 
@@ -548,3 +548,23 @@ class RidgeRegressionTest(BaseTest):
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
                                    [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+
+    def test_fix_small_variance(self):
+        rng = np.random.default_rng(1234)
+        context = rng.random((10000, 10))
+
+        # Set first feature to have variance close to zero
+        context[0, 0] = 0.0001
+        context[1:, 0] = [0] * (10000 - 1)
+
+        scaler = StandardScaler()
+        scaler.fit(context)
+
+        self.assertAlmostEqual(scaler.scale_[0], 9.99949999e-07)
+        self.assertAlmostEqual(scaler.var_[0], 9.99900000e-13)
+
+        # Fix small variance
+        fix_small_variance(scaler)
+
+        self.assertAlmostEqual(scaler.scale_[0], 1)
+        self.assertAlmostEqual(scaler.var_[0], 0)

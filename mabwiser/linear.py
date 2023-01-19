@@ -10,6 +10,26 @@ from sklearn.preprocessing import StandardScaler
 from mabwiser.base_mab import BaseMAB
 from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
 
+SCALER_TOLERANCE = 1e-6
+
+
+def fix_small_variance(scaler: StandardScaler) -> NoReturn:
+    """
+    Set variances close to zero to be equal to one in trained standard scaler to make computations stable.
+
+    :param scaler: the scaler to check and fix variances for
+    """
+    if hasattr(scaler, 'scale_') and hasattr(scaler, 'var_'):
+        # Get a mask to pull indices where std smaller than scaler_tolerance
+        mask = scaler.scale_ <= SCALER_TOLERANCE
+
+        # Fix standard deviation
+        scaler.scale_[mask] = 1.0e+00
+
+        # Fix variance accordingly. var_ is allowed to be 0 in scaler.
+        # This helps to track if scale_ are set as ones due to zeros in variances.
+        scaler.var_[mask] = 0.0e+00
+
 
 class _RidgeRegression:
 
@@ -45,6 +65,7 @@ class _RidgeRegression:
                 self.scaler.fit(X)
             else:
                 self.scaler.partial_fit(X)
+            fix_small_variance(self.scaler)
             X = self.scaler.transform(X)
 
         # X transpose
