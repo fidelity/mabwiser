@@ -139,8 +139,10 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
-        self.cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
-        self._copy_arms(self.cold_arm_to_warm_arm)
+        new_cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(self.cold_arm_to_warm_arm, arm_to_features,
+                                                                  distance_quantile)
+        self._copy_arms(new_cold_arm_to_warm_arm)
+        self.cold_arm_to_warm_arm = {**self.cold_arm_to_warm_arm, **new_cold_arm_to_warm_arm}
 
     @abc.abstractmethod
     def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
@@ -360,7 +362,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
         return threshold
 
-    def _get_cold_arm_to_warm_arm(self, arm_to_features, distance_quantile):
+    def _get_cold_arm_to_warm_arm(self, cold_arm_to_warm_arm, arm_to_features, distance_quantile):
 
         # Calculate from-to distances between all pairs of arms based on features
         # and then find minimum distance (threshold) required to warm start an untrained arm
@@ -368,9 +370,11 @@ class BaseMAB(metaclass=abc.ABCMeta):
         distance_threshold = self._get_distance_threshold(distance_from_to, quantile=distance_quantile)
 
         # Cold arms
-        cold_arms = [arm for arm in self.arms if arm not in self.trained_arms]
+        cold_arms = [arm for arm in self.arms if ((arm not in self.trained_arms) and (arm not in cold_arm_to_warm_arm))]
 
-        cold_arm_to_warm_arm = {}
+        # New cold arm to warm arm dictionary
+        new_cold_arm_to_warm_arm = dict()
+
         for cold_arm in cold_arms:
 
             # Collect distance from cold arm to warm arms
@@ -387,6 +391,6 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
             # Warm start if closest distance lower than minimum required distance
             if closest_distance <= distance_threshold:
-                cold_arm_to_warm_arm[cold_arm] = closest_arm
+                new_cold_arm_to_warm_arm[cold_arm] = closest_arm
 
-        return cold_arm_to_warm_arm
+        return new_cold_arm_to_warm_arm

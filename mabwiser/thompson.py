@@ -31,6 +31,9 @@ class _ThompsonSampling(BaseMAB):
         reset(self.arm_to_success_count, 1)
         reset(self.arm_to_fail_count, 1)
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         # Calculate fit
         self._parallel_fit(decisions, rewards)
 

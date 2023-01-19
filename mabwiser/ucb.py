@@ -31,6 +31,9 @@ class _UCB1(BaseMAB):
         reset(self.arm_to_mean, 0)
         reset(self.arm_to_expectation, 0)
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         # Total number of decisions
         self.total_count = len(decisions)
 
