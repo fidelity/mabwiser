@@ -386,3 +386,55 @@ class TreeBanditTest(BaseTest):
         self.assertTrue(3 not in mab._imp.arm_to_tree)
         self.assertTrue(3 not in mab._imp.arm_to_leaf_to_rewards)
         self.assertTrue(3 not in mab._imp.lp.arms)
+
+    def test_warm_start(self):
+        arms_1, mab = self.predict(arms=[1, 2, 4],
+                                   decisions=[1, 1, 1, 2, 2],
+                                   rewards=[0, 1, 1, 0, 0],
+                                   learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                   neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
+                                   context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]],
+                                   contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                   seed=123456,
+                                   num_run=1,
+                                   is_predict=True)
+
+        mab.add_arm(3)
+
+        arms_2 = mab._imp.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
+
+        self.assertListEqual(arms_1, [1, 1])
+        self.assertListEqual(arms_1, arms_2)
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1], 4: [10, 10]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.predict_expectations([[1, 1, 1, 1, 1]]), {1: 1, 2: 0, 3: 1, 4: 0})
+
+    def test_double_warm_start(self):
+        arms_1, mab = self.predict(arms=[1, 2, 4],
+                                   decisions=[1, 1, 1, 2, 2],
+                                   rewards=[0, 1, 1, 0, 0],
+                                   learning_policy=LearningPolicy.EpsilonGreedy(epsilon=0),
+                                   neighborhood_policy=NeighborhoodPolicy.TreeBandit(),
+                                   context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]],
+                                   contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                   seed=123456,
+                                   num_run=1,
+                                   is_predict=True)
+
+        mab.add_arm(3)
+
+        arms_2 = mab._imp.predict([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
+
+        self.assertListEqual(arms_1, [1, 1])
+        self.assertListEqual(arms_1, arms_2)
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1], 4: [10, 10]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.predict_expectations([[1, 1, 1, 1, 1]]), {1: 1, 2: 0, 3: 1, 4: 0})
+
+        # Warm start again, #3 is closest to #2 but shouldn't get warm started again
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5], 4: [10, 10]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.predict_expectations([[1, 1, 1, 1, 1]]), {1: 1, 2: 0, 3: 1, 4: 0})

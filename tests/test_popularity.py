@@ -299,6 +299,28 @@ class PopularityTest(BaseTest):
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0, 1]}, distance_quantile=0.5)
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})
 
+    def test_double_warm_start(self):
+
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 2, 2, 2, 1, 1, 1],
+                              rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1],
+                              learning_policy=LearningPolicy.Popularity(),
+                              seed=7,
+                              num_run=1,
+                              is_predict=False)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 0.0})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})
+
+        # Warm start again, #3 shouldn't change even though it's closer to #2 now
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_expectation, {1: 1.0, 2: 0.0, 3: 1.0})
+
     def test_popularity_contexts(self):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],

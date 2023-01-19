@@ -27,6 +27,9 @@ class _EpsilonGreedy(BaseMAB):
         reset(self.arm_to_count, 0)
         reset(self.arm_to_expectation, 0)
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         self._parallel_fit(decisions, rewards, contexts)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:

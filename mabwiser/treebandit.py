@@ -39,6 +39,9 @@ class _TreeBandit(BaseMAB):
         self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
         self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
             self.lp.is_contextual_binarized = False

@@ -31,6 +31,9 @@ class _Softmax(BaseMAB):
         reset(self.arm_to_count, 0)
         reset(self.arm_to_mean, 0)
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         # Calculate fit
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()

@@ -515,6 +515,30 @@ class ThompsonTest(BaseTest):
         self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 3})
         self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 5})
 
+    def test_double_warm_start(self):
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 2, 2, 2, 1, 1, 1],
+                              rewards=[1, 0, 0, 0, 0, 0, 1, 1, 1],
+                              learning_policy=LearningPolicy.ThompsonSampling(),
+                              seed=7,
+                              num_run=1,
+                              is_predict=False)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 1})
+        self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 1})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 3})
+        self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 5})
+
+        # Warm start again, #3 is closest to #2 but shouldn't get warm started again
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
+        self.assertDictEqual(mab._imp.arm_to_fail_count, {1: 3, 2: 4, 3: 3})
+        self.assertDictEqual(mab._imp.arm_to_success_count, {1: 5, 2: 1, 3: 5})
+
     def test_ts_contexts(self):
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 1, 1, 3, 2, 2, 3, 1, 3],

@@ -135,6 +135,9 @@ class _Linear(BaseMAB):
         for arm in self.arms:
             self.arm_to_model[arm].init(num_features=self.num_features)
 
+        # Reset warm started arms
+        self.cold_arm_to_warm_arm = dict()
+
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
