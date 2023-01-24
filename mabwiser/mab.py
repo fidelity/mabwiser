@@ -842,6 +842,7 @@ class MAB:
         # Create the random number generator
         self._rng = create_rng(self.seed)
         self._is_initial_fit = False
+        self.cold_arms = set()
 
         # Create the learning policy implementor
         lp = None
@@ -1009,6 +1010,7 @@ class MAB:
         self._validate_arm(arm)
         self.arms.append(arm)
         self._imp.add_arm(arm, binarizer)
+        self._refresh_cold_arms()
 
     def remove_arm(self, arm: Arm) -> NoReturn:
         """Removes an _arm_ from the list of arms.
@@ -1035,6 +1037,7 @@ class MAB:
         self._validate_arm(arm)
         self.arms.remove(arm)
         self._imp.remove_arm(arm)
+        self._refresh_cold_arms()
 
     def fit(self,
             decisions: Union[List[Arm], np.ndarray, pd.Series],  # Decisions that are made
@@ -1093,6 +1096,7 @@ class MAB:
 
         # Turn initial to true
         self._is_initial_fit = True
+        self._refresh_cold_arms()
 
     def partial_fit(self,
                     decisions: Union[List[Arm], np.ndarray, pd.Series],
@@ -1149,6 +1153,9 @@ class MAB:
             self._imp.partial_fit(decisions, rewards, contexts)
         else:
             self.fit(decisions, rewards, contexts)
+
+        # Refresh the list of cold arms
+        self._refresh_cold_arms()
 
     def predict(self,
                 contexts: Union[None, List[Num], List[List[Num]],
@@ -1264,6 +1271,7 @@ class MAB:
         check_true(set(self.arms) == set(arm_to_features.keys()),
                    ValueError("The arms in arm features do not match arms."))
         self._imp.warm_start(arm_to_features, distance_quantile)
+        self._refresh_cold_arms()
 
     @staticmethod
     def _validate_mab_args(arms, learning_policy, neighborhood_policy, seed, n_jobs, backend):
@@ -1491,3 +1499,16 @@ class MAB:
 
         else:
             raise NotImplementedError("Unsupported contexts data type")
+
+    def _refresh_cold_arms(self):
+        if not self.neighborhood_policy:
+            # Cold arms are the arms that are defined in the system, but haven't been trained or warm started
+            trained = set(self._imp.trained_arms)
+            warm = set(self._imp.cold_arm_to_warm_arm)
+            self.cold_arms = set(self.arms) - trained - warm
+
+        else:
+            # With neighborhood policies, we end up training and doing inference within the neighborhood.
+            # Each neighborhood can have a different set of trained arms, and if warm start is used,
+            # a different set of cold arms. Therefore, cold arms aren't defined for neighborhood policies.
+            self.cold_arms = set()

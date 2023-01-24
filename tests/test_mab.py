@@ -1767,3 +1767,25 @@ class MABTest(BaseTest):
                 self.assertListEqual(pe1, pe2)
 
         os.remove('mab.pkl')
+
+    def test_cold_arms(self):
+        _, mab = self.predict(arms=[1, 2, 3],
+                              decisions=[1, 1, 1, 1, 2, 2, 2, 1, 2, 1],
+                              rewards=[0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+                              learning_policy=LearningPolicy.LinGreedy(epsilon=0.25),
+                              context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                               [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                               [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                               [0, 2, 1, 0, 0]],
+                              contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                              seed=123456,
+                              num_run=4,
+                              is_predict=True)
+
+        # Before warm start
+        self.assertEqual(mab._imp.trained_arms, [1, 2])
+        self.assertSetEqual(mab.cold_arms, {3})
+
+        # Warm start
+        mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
+        self.assertSetEqual(mab.cold_arms, set())
