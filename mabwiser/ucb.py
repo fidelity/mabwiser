@@ -32,13 +32,16 @@ class _UCB1(BaseMAB):
         reset(self.arm_to_expectation, 0)
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         # Total number of decisions
         self.total_count = len(decisions)
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
                     contexts: Optional[np.ndarray] = None) -> NoReturn:
@@ -48,6 +51,9 @@ class _UCB1(BaseMAB):
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 

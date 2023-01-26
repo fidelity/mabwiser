@@ -40,7 +40,7 @@ class _TreeBandit(BaseMAB):
         self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
@@ -50,6 +50,9 @@ class _TreeBandit(BaseMAB):
 
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
 
@@ -61,6 +64,9 @@ class _TreeBandit(BaseMAB):
 
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
 

@@ -32,11 +32,14 @@ class _Softmax(BaseMAB):
         reset(self.arm_to_mean, 0)
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
                     contexts: Optional[np.ndarray] = None) -> NoReturn:
@@ -44,6 +47,9 @@ class _Softmax(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards)
         self._expectation_operation()
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
