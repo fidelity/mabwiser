@@ -1784,8 +1784,8 @@ class MABTest(BaseTest):
 
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
-        self.assertSetEqual(mab.cold_arms, {3})
+        self.assertListEqual(mab.cold_arms, [3])
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
-        self.assertSetEqual(mab.cold_arms, set())
+        self.assertListEqual(mab.cold_arms, list())

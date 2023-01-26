@@ -102,6 +102,11 @@ class BaseMAB(metaclass=abc.ABCMeta):
         Arms for which at least one decision has been observed are deemed trained."""
         return [arm for arm in self.arms if self.arm_to_status[arm][STATUS_TRAINED]]
 
+    @property
+    def cold_arms(self) -> List[Arm]:
+        return [arm for arm in self.arms if ((not self.arm_to_status[arm][STATUS_TRAINED]) and
+                                             (not self.arm_to_status[arm][STATUS_WARM]))]
+
     def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Introduces a new arm to the bandit.
 
@@ -375,14 +380,10 @@ class BaseMAB(metaclass=abc.ABCMeta):
         distance_from_to = self._get_pairwise_distances(arm_to_features)
         distance_threshold = self._get_distance_threshold(distance_from_to, quantile=distance_quantile)
 
-        # Cold arms
-        cold_arms = [arm for arm in self.arms if ((arm not in self.trained_arms) and
-                                                  (not self.arm_to_status[arm][STATUS_WARM]))]
-
         # New cold arm to warm arm dictionary
         new_cold_arm_to_warm_arm = dict()
 
-        for cold_arm in cold_arms:
+        for cold_arm in self.cold_arms:
 
             # Collect distance from cold arm to warm arms
             arm_to_distance = {}
