@@ -2,9 +2,10 @@
 MABWiser CHANGELOG
 =====================
 
-January, 24, 2022 2.5.1
+January, 24, 2022 2.6.0
 -------------------------------------------------------------------------------
 minor:
+- Implement tracking of warm started and partial fitted arms
 - Implement tracking of cold arms
 
 January, 19, 2022 2.5.0

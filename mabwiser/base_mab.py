@@ -104,6 +104,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @property
     def cold_arms(self) -> List[Arm]:
+        """List of cold arms"""
         return [arm for arm in self.arms if ((not self.arm_to_status[arm][STATUS_TRAINED]) and
                                              (not self.arm_to_status[arm][STATUS_WARM]))]
 

@@ -1503,16 +1503,3 @@ class MAB:
 
         else:
             raise NotImplementedError("Unsupported contexts data type")
-
-    def _refresh_cold_arms(self):
-        if not self.neighborhood_policy:
-            # Cold arms are the arms that are defined in the system, but haven't been trained or warm started
-            trained = set(self._imp.trained_arms)
-            warm = set(self._imp.cold_arm_to_warm_arm)
-            self.cold_arms = set(self.arms) - trained - warm
-
-        else:
-            # With neighborhood policies, we end up training and doing inference within the neighborhood.
-            # Each neighborhood can have a different set of trained arms, and if warm start is used,
-            # a different set of cold arms. Therefore, cold arms aren't defined for neighborhood policies.
-            self.cold_arms = set()
