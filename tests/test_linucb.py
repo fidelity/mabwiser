@@ -3,6 +3,7 @@
 from copy import deepcopy
 import datetime
 import math
+import random
 
 import numpy as np
 import pandas as pd
@@ -692,3 +693,25 @@ class LinUCBTest(BaseTest):
         # Warm start again, #3 shouldn't change even though it's closer to #2 now
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+
+        def test_performance(self):
+            # Generate data
+            random.seed(123456)
+            num_contexts = 10000
+            num_context_history = 100
+            rewards = [random.randint(0, 10) for _ in range(num_contexts)]
+            decisions = [random.choice(['one', 'two', 'three']) for _ in range(num_contexts)]
+            context_history = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
+            contexts = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
+
+            # Call predict method with generated data
+            arm, mab = self.predict(arms=['one', 'two', 'three'],
+                                    decisions=decisions,
+                                    rewards=rewards,
+                                    learning_policy=LearningPolicy.LinUCB(alpha=1.25),
+                                    context_history=context_history,
+                                    contexts=contexts,
+                                    seed=17,
+                                    num_run=4,
+                                    is_predict=True)
+            self.assertEqual(len(arm), 4)

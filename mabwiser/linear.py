@@ -217,31 +217,85 @@ class _Linear(BaseMAB):
 
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
-        for index, row in enumerate(contexts):
-            # Each row needs a separately seeded rng for reproducibility in parallel
-            rng = create_rng(seed=seeds[index])
 
-            # With epsilon probability set arm expectation to random value
-            if rng.rand() < self.epsilon:
-                for arm in arms:
-                    arm_to_expectation[arm] = rng.rand()
+        # Vectorizing the create_rng function
+        vectorized_create_rng = np.vectorize(create_rng)
+
+        # Creates a random value object at once for all the seeds provided
+        rng = vectorized_create_rng(seed=seeds)
+
+        # creating a function for random number for each random value object
+        def initial_random_values(rng_object):
+            return rng_object.rand()
+
+        vectorized_initial_random_values = np.vectorize(initial_random_values, otypes=[float])
+
+        random_values = vectorized_initial_random_values(rng)
+
+        # random_values = np.array([i.rand() for i in rng])
+
+        indexes = np.arange(len(contexts))
+
+        # Comparing the rand value with epsilon
+        def check_random(index):
+
+            if random_values[index] < self.epsilon:
+
+                # Creating random number for each arm using random value
+                updates = {arm: rng[index].rand() for arm in arms}
+
+                arm_to_expectation.update(updates)
 
             else:
-                # Create new seeded generator for model to ensure reproducibility
                 model_rng = create_rng(seed=seeds[index])
+
                 for arm in arms:
                     arm_to_model[arm].rng = model_rng
 
-                    # Get the expectation of each arm from its trained model
-                    arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+                    arm_to_expectation[arm] = arm_to_model[arm].predict(contexts[index])
 
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)
             else:
                 predictions[index] = arm_to_expectation.copy()
 
-        # Return list of predictions
+            return True
+
+        # Vectorizing the above function
+        vectorized_check_random = np.vectorize(check_random, otypes=[bool])
+
+        # Function call for vectorized_check_random
+        vectorized_check_random(indexes)
+
         return predictions
+
+
+
+        # for index, row in enumerate(contexts):
+        #     # Each row needs a separately seeded rng for reproducibility in parallel
+        #     rng = create_rng(seed=seeds[index])
+        #
+        #     # With epsilon probability set arm expectation to random value
+        #     if rng.rand() < self.epsilon:
+        #         for arm in arms:
+        #             arm_to_expectation[arm] = rng.rand()
+        #
+        #     else:
+        #         # Create new seeded generator for model to ensure reproducibility
+        #         model_rng = create_rng(seed=seeds[index])
+        #         for arm in arms:
+        #             arm_to_model[arm].rng = model_rng
+        #
+        #             # Get the expectation of each arm from its trained model
+        #             arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+        #
+        #     if is_predict:
+        #         predictions[index] = argmax(arm_to_expectation)
+        #     else:
+        #         predictions[index] = arm_to_expectation.copy()
+        #
+        # # Return list of predictions
+        # return predictions
 
     def _drop_existing_arm(self, arm: Arm) -> NoReturn:
         self.arm_to_model.pop(arm)
