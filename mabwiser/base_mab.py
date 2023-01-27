@@ -22,8 +22,8 @@ __email__ = __email__
 __version__ = __version__
 __copyright__ = __copyright__
 
-STATUS_TRAINED = 'trained'
-STATUS_WARM = 'warm'
+STATUS_TRAINED = 'is_trained'
+STATUS_WARM = 'is_warm'
 STATUS_WARM_STARTED_BY = 'warm_started_by'
 
 
@@ -409,21 +409,11 @@ class BaseMAB(metaclass=abc.ABCMeta):
                                                      STATUS_WARM_STARTED_BY: None}
                                                for arm in self.arms}
 
-    def _set_arms_as_trained(self, arms: Optional[List[Arm]] = None, decisions: Optional[np.ndarray] = None,
-                             is_partial: bool = True):
-        """Sets the given arms as trained.
-
-        Uses the ``arms`` if provided, otherwise calculates the arms from the ``decisions``.
-        Either ``arms`` or ``decisions`` should be provided.
+    def _set_arms_as_trained(self, decisions: Optional[np.ndarray] = None, is_partial: bool = True):
+        """Sets the given arms as trained, where arms are calculated from the ``decisions``.
         """
-        # Check args
-        if arms is None and decisions is None:
-            raise ValueError("Either ``arms`` or ``decisions`` should be specified.")
-
-        # Calculate arms from decisions if ``arms`` is ``None``
-        if arms is None:
-            # Get list of arms in decisions
-            arms = np.unique(decisions).tolist()
+        # Calculate arms from decisions
+        arms = np.unique(decisions).tolist()
 
         for arm in self.arms:
             if arm in arms:
