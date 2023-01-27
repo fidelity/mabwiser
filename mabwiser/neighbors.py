@@ -75,12 +75,9 @@ class _Neighbors(BaseMAB):
         return self._parallel_predict(contexts, is_predict=False)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
-        # Can only execute warm start when learning policy has been fit in _get_nhood_predictions
-        self.arm_to_features = arm_to_features
-        self.distance_quantile = distance_quantile
+        pass
 
     def _copy_arms(self, cold_arm_to_warm_arm):
-        # Copy arms executed on learning policy in _get_nhood_predictions
         pass
 
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray, contexts: Optional[np.ndarray] = None):
@@ -103,10 +100,6 @@ class _Neighbors(BaseMAB):
 
         # Fit the decisions and rewards of the neighbors
         lp.fit(self.decisions[indices], self.rewards[indices], self.contexts[indices])
-
-        # Warm start
-        if self.arm_to_features is not None:
-            lp.warm_start(self.arm_to_features, self.distance_quantile)
 
         # Predict based on the neighbors
         if is_predict:

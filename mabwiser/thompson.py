@@ -80,6 +80,9 @@ class _ThompsonSampling(BaseMAB):
         else:
             return arm_to_expectation
 
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        self._warm_start(arm_to_features, distance_quantile)
+
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
             self.arm_to_success_count[cold_arm] = deepcopy(self.arm_to_success_count[warm_arm])

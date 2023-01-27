@@ -93,8 +93,7 @@ class _Clusters(BaseMAB):
         return self._parallel_predict(contexts, is_predict=False)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
-        for c in range(self.n_clusters):
-            self.lp_list[c].warm_start(arm_to_features, distance_quantile)
+        pass
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         pass

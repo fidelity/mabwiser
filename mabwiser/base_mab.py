@@ -162,12 +162,9 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
-        cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
-        self._copy_arms(cold_arm_to_warm_arm)
-        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
-            self.arm_to_status[cold_arm][STATUS_WARM] = True
-            self.arm_to_status[cold_arm][STATUS_WARM_STARTED_BY] = warm_arm
+        pass
 
     @abc.abstractmethod
     def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
@@ -434,3 +431,10 @@ class BaseMAB(metaclass=abc.ABCMeta):
                 if not is_partial:
                     self.arm_to_status[arm][STATUS_WARM] = False
                     self.arm_to_status[arm][STATUS_WARM_STARTED_BY] = None
+
+    def _warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+        cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
+        self._copy_arms(cold_arm_to_warm_arm)
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_status[cold_arm][STATUS_WARM] = True
+            self.arm_to_status[cold_arm][STATUS_WARM_STARTED_BY] = warm_arm
