@@ -70,8 +70,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         The dictionary of arms (keys) to their expected rewards (values).
     arm_to_status: Dict[Arm, dict]
         The dictionary of arms (keys) to their status (values), where the status consists of
-        - ``trained``, which indicates whether an arm was ``fit`` or ``partial_fit``;
-        - ``warm``, which indicates whether an arm was warm started, and therefore has a trained model associated;
+        - ``is_trained``, which indicates whether an arm was ``fit`` or ``partial_fit``;
+        - ``is_warm``, which indicates whether an arm was warm started, and therefore has a trained model associated;
         - and ``warm_started_by``, which indicates the arm that originally warm started this arm.
     """
 
