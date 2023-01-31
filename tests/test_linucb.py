@@ -500,43 +500,43 @@ class LinUCBTest(BaseTest):
         b_4 = mab._imp.arm_to_model[4].beta
         self.assertEqual(b_4[0], 0)
 
-    # def test_alpha0_radius1(self):
-    #
-    #     arm, mab = self.predict(arms=[1, 2, 3],
-    #                             decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
-    #                             rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-    #                             learning_policy=LearningPolicy.LinUCB(alpha=0),
-    #                             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
-    #                             context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-    #                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-    #                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-    #                                              [0, 2, 1, 0, 0]],
-    #                             contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
-    #                             seed=123456,
-    #                             num_run=3,
-    #                             is_predict=True)
-    #
-    #     self.assertEqual(len(arm), 3)
-    #     self.assertEqual(arm, [[3, 1], [3, 1], [3, 1]])
-    #
-    # def test_alpha0_nearest5(self):
-    #
-    #     arm, mab = self.predict(arms=[1, 2, 3],
-    #                             decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
-    #                             rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-    #                             learning_policy=LearningPolicy.LinUCB(alpha=0),
-    #                             neighborhood_policy=NeighborhoodPolicy.KNearest(k=5),
-    #                             context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-    #                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-    #                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-    #                                              [0, 2, 1, 0, 0]],
-    #                             contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
-    #                             seed=123456,
-    #                             num_run=3,
-    #                             is_predict=True)
-    #
-    #     self.assertEqual(len(arm), 3)
-    #     self.assertEqual(arm, [[3, 3], [3, 3], [3, 3]])
+    def test_alpha0_radius1(self):
+
+        arm, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0),
+                                neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=True)
+
+        self.assertEqual(len(arm), 3)
+        self.assertEqual(arm, [[3, 1], [3, 1], [3, 1]])
+
+    def test_alpha0_nearest5(self):
+
+        arm, mab = self.predict(arms=[1, 2, 3],
+                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                learning_policy=LearningPolicy.LinUCB(alpha=0),
+                                neighborhood_policy=NeighborhoodPolicy.KNearest(k=5),
+                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                 [0, 2, 1, 0, 0]],
+                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+                                seed=123456,
+                                num_run=3,
+                                is_predict=True)
+
+        self.assertEqual(len(arm), 3)
+        self.assertEqual(arm, [[3, 3], [3, 3], [3, 3]])
 
     def test_scaler(self):
 
