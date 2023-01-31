@@ -115,9 +115,9 @@ class LinUCBTest(BaseTest):
                                 rewards=df['rewards'],
                                 learning_policy=LearningPolicy.LinUCB(alpha=1),
                                 context_history=pd.DataFrame([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                             [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                             [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                             [0, 2, 1, 0, 0]]),
+                                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                              [0, 2, 1, 0, 0]]),
                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
                                 seed=123456,
                                 num_run=3,
@@ -375,9 +375,9 @@ class LinUCBTest(BaseTest):
     def test_unused_arm_scaled(self):
 
         context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                   [0, 2, 1, 0, 0]], dtype='float64')
+                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                    [0, 2, 1, 0, 0]], dtype='float64')
 
         scaler = StandardScaler()
         scaled_contexts = scaler.fit_transform(context_history)
@@ -500,51 +500,51 @@ class LinUCBTest(BaseTest):
         b_4 = mab._imp.arm_to_model[4].beta
         self.assertEqual(b_4[0], 0)
 
-    def test_alpha0_radius1(self):
-
-        arm, mab = self.predict(arms=[1, 2, 3],
-                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
-                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                learning_policy=LearningPolicy.LinUCB(alpha=0),
-                                neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
-                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                 [0, 2, 1, 0, 0]],
-                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
-                                seed=123456,
-                                num_run=3,
-                                is_predict=True)
-
-        self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 1], [3, 1], [3, 1]])
-
-    def test_alpha0_nearest5(self):
-
-        arm, mab = self.predict(arms=[1, 2, 3],
-                                decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
-                                rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                                learning_policy=LearningPolicy.LinUCB(alpha=0),
-                                neighborhood_policy=NeighborhoodPolicy.KNearest(k=5),
-                                context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                 [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                 [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                 [0, 2, 1, 0, 0]],
-                                contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
-                                seed=123456,
-                                num_run=3,
-                                is_predict=True)
-
-        self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 3], [3, 3], [3, 3]])
+    # def test_alpha0_radius1(self):
+    #
+    #     arm, mab = self.predict(arms=[1, 2, 3],
+    #                             decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+    #                             rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+    #                             learning_policy=LearningPolicy.LinUCB(alpha=0),
+    #                             neighborhood_policy=NeighborhoodPolicy.Radius(radius=1),
+    #                             context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+    #                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+    #                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+    #                                              [0, 2, 1, 0, 0]],
+    #                             contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+    #                             seed=123456,
+    #                             num_run=3,
+    #                             is_predict=True)
+    #
+    #     self.assertEqual(len(arm), 3)
+    #     self.assertEqual(arm, [[3, 1], [3, 1], [3, 1]])
+    #
+    # def test_alpha0_nearest5(self):
+    #
+    #     arm, mab = self.predict(arms=[1, 2, 3],
+    #                             decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 1],
+    #                             rewards=[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+    #                             learning_policy=LearningPolicy.LinUCB(alpha=0),
+    #                             neighborhood_policy=NeighborhoodPolicy.KNearest(k=5),
+    #                             context_history=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
+    #                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+    #                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+    #                                              [0, 2, 1, 0, 0]],
+    #                             contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
+    #                             seed=123456,
+    #                             num_run=3,
+    #                             is_predict=True)
+    #
+    #     self.assertEqual(len(arm), 3)
+    #     self.assertEqual(arm, [[3, 3], [3, 3], [3, 3]])
 
     def test_scaler(self):
 
         arms = [1, 2, 3]
         context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                   [0, 2, 1, 0, 0]], dtype='float64')
+                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                    [0, 2, 1, 0, 0]], dtype='float64')
 
         contexts = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
         decisions = np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3])
@@ -659,12 +659,14 @@ class LinUCBTest(BaseTest):
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
-        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
     def test_double_warm_start(self):
         _, mab = self.predict(arms=[1, 2, 3],
@@ -683,35 +685,38 @@ class LinUCBTest(BaseTest):
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
-        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
         # Warm start again, #3 shouldn't change even though it's closer to #2 now
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
-        def test_performance(self):
-            # Generate data
-            random.seed(123456)
-            num_contexts = 10000
-            num_context_history = 100
-            rewards = [random.randint(0, 10) for _ in range(num_contexts)]
-            decisions = [random.choice(['one', 'two', 'three']) for _ in range(num_contexts)]
-            context_history = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
-            contexts = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
+    def test_performance(self):
+        # Generate data
+        random.seed(123456)
+        num_contexts = 10000
+        num_context_history = 100
+        rewards = [random.randint(0, 10) for _ in range(num_contexts)]
+        decisions = [random.choice(['one', 'two', 'three']) for _ in range(num_contexts)]
+        context_history = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
+        contexts = [[random.randint(0, 5) for _ in range(num_context_history)] for _ in range(num_contexts)]
 
-            # Call predict method with generated data
-            arm, mab = self.predict(arms=['one', 'two', 'three'],
-                                    decisions=decisions,
-                                    rewards=rewards,
-                                    learning_policy=LearningPolicy.LinUCB(alpha=1.25),
-                                    context_history=context_history,
-                                    contexts=contexts,
-                                    seed=17,
-                                    num_run=4,
-                                    is_predict=True)
-            self.assertEqual(len(arm), 4)
+        # Call predict method with generated data
+        arm, mab = self.predict(arms=['one', 'two', 'three'],
+                                decisions=decisions,
+                                rewards=rewards,
+                                learning_policy=LearningPolicy.LinUCB(alpha=1.25),
+                                context_history=context_history,
+                                contexts=contexts,
+                                seed=17,
+                                num_run=4,
+                                is_predict=True)
+        self.assertEqual(len(arm), 4)

@@ -36,14 +36,14 @@ class _RidgeRegression:
     def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, scale: bool = False):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
-        self.rng = rng                      # random number generator
-        self.alpha = alpha                  # exploration parameter
-        self.l2_lambda = l2_lambda          # regularization parameter
-        self.scale = scale                  # scale contexts
+        self.rng = rng  # random number generator
+        self.alpha = alpha  # exploration parameter
+        self.l2_lambda = l2_lambda  # regularization parameter
+        self.scale = scale  # scale contexts
 
-        self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
-        self.A = None                       # (XtX + l2_lambda * I_d)
-        self.A_inv = None                   # (XtX + l2_lambda * I_d)^-1
+        self.beta = None  # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
+        self.A = None  # (XtX + l2_lambda * I_d)
+        self.A_inv = None  # (XtX + l2_lambda * I_d)^-1
         self.Xty = None
         self.scaler = None
 
@@ -56,7 +56,11 @@ class _RidgeRegression:
         self.beta = np.dot(self.A_inv, self.Xty)
         self.scaler = StandardScaler() if self.scale else None
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Parameters X : matrix
+        Parameters Y : vector
+        """
 
         # Scale
         if self.scaler is not None:
@@ -81,7 +85,7 @@ class _RidgeRegression:
         # Recalculate beta coefficients
         self.beta = np.dot(self.A_inv, self.Xty)
 
-    def predict(self, x):
+    def predict(self, x: np.ndarray):
 
         # Scale
         if self.scaler is not None:
@@ -90,21 +94,21 @@ class _RidgeRegression:
         # Calculate default expectation y = x * b
         return np.dot(x, self.beta)
 
-    def _scale_predict_context(self, x):
+    def _scale_predict_context(self, x: np.ndarray):
         if not hasattr(self.scaler, 'scale_'):
             return x
 
         # Reshape 1D array to 2D
-        x = x.reshape(1, -1)
+        if x.ndim < 2:
+            x = x.reshape(1, -1)
 
         # Transform and return to previous shape. Convert to float64 to suppress any type warnings.
-        return self.scaler.transform(x.astype('float64')).reshape(-1)
+        return self.scaler.transform(x.astype('float64'))
 
 
 class _LinTS(_RidgeRegression):
 
-    def predict(self, x):
-
+    def predict(self, x: np.ndarray):
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
@@ -119,21 +123,31 @@ class _LinTS(_RidgeRegression):
 
 class _LinUCB(_RidgeRegression):
 
-    def predict(self, x):
+    # def predict(self, x):
+    #
+    #     # Scale
+    #     if self.scaler is not None:
+    #         x = self._scale_predict_context(x)
+    #
+    #     # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
+    #     ucb = (self.alpha * np.sqrt(np.dot(np.dot(x, self.A_inv), x)))
+    #
+    #     # Calculate linucb expectation y = x * b + ucb
+    #     return np.dot(x, self.beta) + ucb
 
+    def predict(self, x: np.ndarray):
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
-        # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
-        ucb = (self.alpha * np.sqrt(np.dot(np.dot(x, self.A_inv), x)))
+        x_A_inv = np.dot(x, self.A_inv)
 
+        # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
         # Calculate linucb expectation y = x * b + ucb
-        return np.dot(x, self.beta) + ucb
+        return np.dot(x, self.beta) + self.alpha * np.sqrt(np.sum(x_A_inv * x, axis=1))
 
 
 class _Linear(BaseMAB):
-
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
@@ -168,11 +182,11 @@ class _Linear(BaseMAB):
 
     def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict for the given context
-        return self._parallel_predict(contexts, is_predict=True)
+        return self.vectorized_predict_contexts(contexts, is_predict=True)
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations for the given context
-        return self._parallel_predict(contexts, is_predict=False)
+        return self.vectorized_predict_contexts(contexts, is_predict=False)
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
@@ -217,85 +231,139 @@ class _Linear(BaseMAB):
 
         # Create an empty list of predictions
         predictions = [None] * len(contexts)
+        #
+        #     # Vectorizing the create_rng function
+        #     vectorized_create_rng = np.vectorize(create_rng)
+        #
+        #     # Creates a random value object at once for all the seeds provided ( 2 for instance
+        #     rng = vectorized_create_rng(seed=seeds)
+        #
+        #     # 1 context and number of arms
+        #
+        #     random_size = len(arms) + 1
+        #
+        #     # creating a function for random number for each random value object
+        #
+        #     def random_generation(rng_object):
+        #         return rng_object.rand()
+        #
+        #     random_generation_v = np.vectorize(random_generation, otypes=[float])
+        #
+        #     random_values = random_generation_v(rng, random_size)
+        #
+        #     # random_values = np.array([i.rand() for i in rng])
+        #
+        #     indexes = np.arange(len(contexts))
+        #
+        #     # Comparing the rand value with epsilon
+        #     def check_random(index):
+        #
+        #         if random_values[index] < self.epsilon:
+        #
+        #             # Creating random number for each arm using random value
+        #             updates = {arm: rng[index].rand() for arm in arms}
+        #
+        #             arm_to_expectation.update(updates)
+        #
+        #         else:
+        #             model_rng = create_rng(seed=seeds[index])
+        #
+        #             for arm in arms:
+        #                 arm_to_model[arm].rng = model_rng
+        #
+        #                 arm_to_expectation[arm] = arm_to_model[arm].predict(contexts[index])
+        #
+        #         if is_predict:
+        #             predictions[index] = argmax(arm_to_expectation)
+        #         else:
+        #             predictions[index] = arm_to_expectation.copy()
+        #
+        #         return True
+        #
+        #     # Vectorizing the above function
+        #     vectorized_check_random = np.vectorize(check_random, otypes=[bool])
+        #
+        #     # Function call for vectorized_check_random
+        #     vectorized_check_random(indexes)
+        #
+        #     print(seeds)
+        #
+        #     return predictions
 
-        # Vectorizing the create_rng function
-        vectorized_create_rng = np.vectorize(create_rng)
+        for index, row in enumerate(contexts):
+            # Each row needs a separately seeded rng for reproducibility in parallel
 
-        # Creates a random value object at once for all the seeds provided
-        rng = vectorized_create_rng(seed=seeds)
+            rng = create_rng(seed=seeds[index])
 
-        # creating a function for random number for each random value object
-        def initial_random_values(rng_object):
-            return rng_object.rand()
-
-        vectorized_initial_random_values = np.vectorize(initial_random_values, otypes=[float])
-
-        random_values = vectorized_initial_random_values(rng)
-
-        # random_values = np.array([i.rand() for i in rng])
-
-        indexes = np.arange(len(contexts))
-
-        # Comparing the rand value with epsilon
-        def check_random(index):
-
-            if random_values[index] < self.epsilon:
-
-                # Creating random number for each arm using random value
-                updates = {arm: rng[index].rand() for arm in arms}
-
-                arm_to_expectation.update(updates)
+            # With epsilon probability set arm expectation to random value
+            if rng.rand() < self.epsilon:
+                for arm in arms:
+                    arm_to_expectation[arm] = rng.rand()
 
             else:
+                # Create new seeded generator for model to ensure reproducibility
                 model_rng = create_rng(seed=seeds[index])
-
                 for arm in arms:
                     arm_to_model[arm].rng = model_rng
 
-                    arm_to_expectation[arm] = arm_to_model[arm].predict(contexts[index])
+                    # Get the expectation of each arm from its trained model
+
+                    arm_to_expectation[arm] = arm_to_model[arm].predict(row)
 
             if is_predict:
                 predictions[index] = argmax(arm_to_expectation)
             else:
                 predictions[index] = arm_to_expectation.copy()
 
-            return True
-
-        # Vectorizing the above function
-        vectorized_check_random = np.vectorize(check_random, otypes=[bool])
-
-        # Function call for vectorized_check_random
-        vectorized_check_random(indexes)
-
+        # Return list of predictions
         return predictions
 
+    def vectorized_predict_contexts(self, contexts: np.ndarray, is_predict: bool,
+                                    seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
 
+        # Get local copy of model, arm_to_expectation and arms to minimize
+        # communication overhead between arms (processes) using shared objects
+        arm_to_model = deepcopy(self.arm_to_model)
+        arm_to_expectation = deepcopy(self.arm_to_expectation)
+        arms = deepcopy(self.arms)
 
-        # for index, row in enumerate(contexts):
-        #     # Each row needs a separately seeded rng for reproducibility in parallel
-        #     rng = create_rng(seed=seeds[index])
-        #
-        #     # With epsilon probability set arm expectation to random value
-        #     if rng.rand() < self.epsilon:
-        #         for arm in arms:
-        #             arm_to_expectation[arm] = rng.rand()
-        #
-        #     else:
-        #         # Create new seeded generator for model to ensure reproducibility
-        #         model_rng = create_rng(seed=seeds[index])
-        #         for arm in arms:
-        #             arm_to_model[arm].rng = model_rng
-        #
-        #             # Get the expectation of each arm from its trained model
-        #             arm_to_expectation[arm] = arm_to_model[arm].predict(row)
-        #
-        #     if is_predict:
-        #         predictions[index] = argmax(arm_to_expectation)
-        #     else:
-        #         predictions[index] = arm_to_expectation.copy()
-        #
-        # # Return list of predictions
-        # return predictions
+        # Converting the arms list to numpy array
+        arms = np.array(arms)
+        # Create an empty list of predictions
+        predictions = []
+
+        num_contexts = contexts.shape[0]
+
+        # Initializing random constructor using global seed value for the below local instance
+        rng = np.random.default_rng(seed=1234)
+
+        # Initializing random values of shape(num_contexts, len(arms))
+        random_values = np.empty((num_contexts, len(arms)), dtype=float)
+
+        # With epsilon probability, select random recommendations
+        # Initializing a random number for each context
+        randoms = rng.random(num_contexts)
+
+        # Comparing the random value with epsilon value and creating an index
+        random_mask = np.array(randoms < self.epsilon)
+        random_indices = random_mask.nonzero()[0]
+
+        # Replacing the random values across indexes if the original randoms are less than the epsilon value
+        random_values[random_indices] = rng.random((random_indices.shape[0], len(arms)))
+
+        # For non-random contexts, calculate the arms -- do the predictions
+        nonrandom_indices = np.where(~random_mask)[0]
+        nonrandom_context = contexts[nonrandom_indices]
+
+        random_values[nonrandom_indices] = np.array([arm_to_model[arm].predict(nonrandom_context) for arm in arms]).T
+
+        if is_predict:
+            predictions.extend(arms[np.argmax(random_values, axis=1)])
+        else:
+
+            predictions.extend([dict(zip(arm_to_expectation.keys(), value)) for value in random_values])
+
+        return predictions
 
     def _drop_existing_arm(self, arm: Arm) -> NoReturn:
         self.arm_to_model.pop(arm)
