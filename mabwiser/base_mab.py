@@ -73,6 +73,8 @@ class BaseMAB(metaclass=abc.ABCMeta):
         - ``is_trained``, which indicates whether an arm was ``fit`` or ``partial_fit``;
         - ``is_warm``, which indicates whether an arm was warm started, and therefore has a trained model associated;
         - and ``warm_started_by``, which indicates the arm that originally warm started this arm.
+        Arms that were initially warm-started and then updated with ``partial_fit`` will retain ``is_warm`` as True
+        with the relevant ``warm_started_by`` arm for tracking purposes.
     """
 
     @abc.abstractmethod
