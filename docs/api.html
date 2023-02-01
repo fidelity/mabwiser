@@ -238,24 +238,17 @@ If set to -2, all CPUs but one are used, and so on.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.cold_arm_to_warm_arm">
-<span class="sig-name descname"><span class="pre">cold_arm_to_warm_arm</span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.cold_arm_to_warm_arm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mapping indicating what arm was used to warm-start cold arms.</p>
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.arm_to_status">
+<span class="sig-name descname"><span class="pre">arm_to_status</span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.arm_to_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dictionary of arms (keys) to their status (values), where the status consists of
+- <code class="docutils literal notranslate"><span class="pre">is_trained</span></code>, which indicates whether an arm was <code class="docutils literal notranslate"><span class="pre">fit</span></code> or <code class="docutils literal notranslate"><span class="pre">partial_fit</span></code>;
+- <code class="docutils literal notranslate"><span class="pre">is_warm</span></code>, which indicates whether an arm was warm started, and therefore has a trained model associated;
+- and <code class="docutils literal notranslate"><span class="pre">warm_started_by</span></code>, which indicates the arm that originally warm started this arm.
+Arms that were initially warm-started and then updated with <code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> will retain <code class="docutils literal notranslate"><span class="pre">is_warm</span></code> as True
+with the relevant <code class="docutils literal notranslate"><span class="pre">warm_started_by</span></code> arm for tracking purposes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Dict[Arm, Arm]:</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.trained_arms">
-<span class="sig-name descname"><span class="pre">trained_arms</span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.trained_arms" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of trained arms.
-Arms for which at least one decision has been observed are deemed trained.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>List[Arm]</p>
+<dd class="field-odd"><p>Dict[Arm, dict]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -266,6 +259,12 @@ Arms for which at least one decision has been observed are deemed trained.</p>
 <dd><p>Introduces a new arm to the bandit.</p>
 <p>Adds the new arm with zero expectations and
 calls the <code class="docutils literal notranslate"><span class="pre">_uptake_new_arm()</span></code> function of the sub-class.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.cold_arms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cold_arms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.cold_arms" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of cold arms</p>
 </dd></dl>
 
 <dl class="py method">
@@ -304,10 +303,20 @@ decision and reward history and corresponding contexts if any.</p>
 <dd><p>Removes arm from the bandit.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.trained_arms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trained_arms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.trained_arms" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of trained arms.</p>
+<p>Arms for which at least one decision has been observed are deemed trained.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="mabwiser.base_mab.BaseMAB.warm_start">
-<span class="sig-name descname"><span class="pre">warm_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm_to_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_quantile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.warm_start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">warm_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arm_to_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_quantile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.base_mab.BaseMAB.warm_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method.</p>
+<p>Warm starts cold arms using similar warm arms based on distances between arm features.
+Only implemented for Learning Policies that make use of <code class="docutils literal notranslate"><span class="pre">_warm_start</span></code> method to copy arm information.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -971,6 +980,11 @@ called function relies a lot on Python objects.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mabwiser.mab.MAB.cold_arms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cold_arms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mabwiser.mab.MAB.cold_arms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="mabwiser.mab.MAB.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decisions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Arm</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#mabwiser.mab.MAB.fit" title="Permalink to this definition">¶</a></dt>
@@ -1484,9 +1498,9 @@ A Practical Method for Solving Contextual Bandit Problems Using Decision Trees, 
 <dt class="sig sig-object py" id="mabwiser.mab.NeighborhoodPolicy.TreeBandit.tree_parameters">
 <span class="sig-name descname"><span class="pre">tree_parameters</span></span><a class="headerlink" href="#mabwiser.mab.NeighborhoodPolicy.TreeBandit.tree_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters of the decision tree.
-The keys must match the parameters of sklearn.tree.DecisionTreeClassifier.
+The keys must match the parameters of sklearn.tree.DecisionTreeRegressor.
 When a parameter is not given, the default parameters from
-sklearn.tree.DecisionTreeClassifier will be chosen.
+sklearn.tree.DecisionTreeRegressor will be chosen.
 Default value is an empty dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
