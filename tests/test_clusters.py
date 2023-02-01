@@ -399,4 +399,4 @@ class ClustersTest(BaseTest):
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5], 4: [0, 1]}, distance_quantile=0.5)
-        self.assertDictEqual(mab._imp.lp_list[0].arm_to_expectation, {1: 1.0, 2: 0.0, 3: 0.6666666666666666, 4: 1.0})
+        self.assertDictEqual(mab._imp.lp_list[0].arm_to_expectation, {1: 1.0, 2: 0.0, 3: 0.6666666666666666, 4: 0})

@@ -969,6 +969,18 @@ class MAB:
         else:
             return None
 
+    @property
+    def cold_arms(self) -> List[Arm]:
+        if not self.neighborhood_policy:
+            # No neighborhood policy, cold arms are calculated at the learning policy level
+            return self._imp.cold_arms
+
+        else:
+            # With neighborhood policies, we end up training and doing inference within the neighborhood.
+            # Each neighborhood can have a different set of trained arms, and if warm start is used,
+            # a different set of cold arms. Therefore, cold arms aren't defined for neighborhood policies.
+            return list()
+
     def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """ Adds an _arm_ to the list of arms.
 

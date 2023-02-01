@@ -157,14 +157,20 @@ class _Linear(BaseMAB):
             self.arm_to_model[arm].init(num_features=self.num_features)
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict for the given context
@@ -173,6 +179,9 @@ class _Linear(BaseMAB):
     def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations for the given context
         return self._parallel_predict(contexts, is_predict=False)
+
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        self._warm_start(arm_to_features, distance_quantile)
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

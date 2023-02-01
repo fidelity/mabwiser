@@ -32,10 +32,13 @@ class _ThompsonSampling(BaseMAB):
         reset(self.arm_to_fail_count, 1)
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
         # Leave the calculation of expectations to predict methods
 
@@ -47,6 +50,9 @@ class _ThompsonSampling(BaseMAB):
 
         # Calculate fit
         self._parallel_fit(decisions, rewards)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
@@ -73,6 +79,9 @@ class _ThompsonSampling(BaseMAB):
             return arm_to_expectation[0]
         else:
             return arm_to_expectation
+
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        self._warm_start(arm_to_features, distance_quantile)
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

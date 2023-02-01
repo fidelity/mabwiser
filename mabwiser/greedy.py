@@ -28,12 +28,18 @@ class _EpsilonGreedy(BaseMAB):
         reset(self.arm_to_expectation, 0)
 
         # Reset warm started arms
-        self.cold_arm_to_warm_arm = dict()
+        self._reset_arm_to_status()
 
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
         self._parallel_fit(decisions, rewards, contexts)
+
+        # Update trained arms
+        self._set_arms_as_trained(decisions=decisions, is_partial=True)
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
 
@@ -62,6 +68,9 @@ class _EpsilonGreedy(BaseMAB):
             expectations = [dict(zip(self.arms, exp)).copy() if probability[index] < self.epsilon
                             else self.arm_to_expectation.copy() for index, exp in enumerate(random_values)]
             return expectations
+
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
+        self._warm_start(arm_to_features, distance_quantile)
 
     def _copy_arms(self, cold_arm_to_warm_arm):
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

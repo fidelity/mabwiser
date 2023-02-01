@@ -22,6 +22,10 @@ __email__ = __email__
 __version__ = __version__
 __copyright__ = __copyright__
 
+IS_TRAINED = 'is_trained'
+IS_WARM = 'is_warm'
+WARM_STARTED_BY = 'warm_started_by'
+
 
 class BaseMAB(metaclass=abc.ABCMeta):
     """Abstract base class for multi-armed bandits.
@@ -64,11 +68,13 @@ class BaseMAB(metaclass=abc.ABCMeta):
         Default value is None. In this case the default backend selected by joblib will be used.
     arm_to_expectation: Dict[Arm, float]
         The dictionary of arms (keys) to their expected rewards (values).
-    cold_arm_to_warm_arm: Dict[Arm, Arm]:
-        Mapping indicating what arm was used to warm-start cold arms.
-    trained_arms: List[Arm]
-        List of trained arms.
-        Arms for which at least one decision has been observed are deemed trained.
+    arm_to_status: Dict[Arm, dict]
+        The dictionary of arms (keys) to their status (values), where the status consists of
+        - ``is_trained``, which indicates whether an arm was ``fit`` or ``partial_fit``;
+        - ``is_warm``, which indicates whether an arm was warm started, and therefore has a trained model associated;
+        - and ``warm_started_by``, which indicates the arm that originally warm started this arm.
+        Arms that were initially warm-started and then updated with ``partial_fit`` will retain ``is_warm`` as True
+        with the relevant ``warm_started_by`` arm for tracking purposes.
     """
 
     @abc.abstractmethod
@@ -83,8 +89,20 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self.backend: str = backend
 
         self.arm_to_expectation: Dict[Arm, float] = dict.fromkeys(self.arms, 0)
-        self.cold_arm_to_warm_arm: Dict[Arm, Arm] = dict()
-        self.trained_arms: List[Arm] = list()
+        self._reset_arm_to_status()
+
+    @property
+    def trained_arms(self) -> List[Arm]:
+        """List of trained arms.
+
+        Arms for which at least one decision has been observed are deemed trained."""
+        return [arm for arm in self.arms if self.arm_to_status[arm][IS_TRAINED]]
+
+    @property
+    def cold_arms(self) -> List[Arm]:
+        """List of cold arms"""
+        return [arm for arm in self.arms if (not self.arm_to_status[arm][IS_TRAINED] and
+                                             not self.arm_to_status[arm][IS_WARM])]
 
     def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
         """Introduces a new arm to the bandit.
@@ -94,12 +112,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         self.arm_to_expectation[arm] = 0
         self._uptake_new_arm(arm, binarizer)
+        self.arm_to_status[arm] = {IS_TRAINED: False, IS_WARM: False, WARM_STARTED_BY: None}
 
     def remove_arm(self, arm: Arm) -> NoReturn:
         """Removes arm from the bandit.
         """
         self.arm_to_expectation.pop(arm)
         self._drop_existing_arm(arm)
+        self.arm_to_status.pop(arm)
 
     @abc.abstractmethod
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
@@ -138,11 +158,14 @@ class BaseMAB(metaclass=abc.ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
-        new_cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(self.cold_arm_to_warm_arm, arm_to_features,
-                                                                  distance_quantile)
-        self._copy_arms(new_cold_arm_to_warm_arm)
-        self.cold_arm_to_warm_arm = {**self.cold_arm_to_warm_arm, **new_cold_arm_to_warm_arm}
+        """Abstract method.
+
+        Warm starts cold arms using similar warm arms based on distances between arm features.
+        Only implemented for Learning Policies that make use of ``_warm_start`` method to copy arm information.
+        """
+        pass
 
     @abc.abstractmethod
     def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
@@ -193,19 +216,6 @@ class BaseMAB(metaclass=abc.ABCMeta):
                           delayed(self._fit_arm)(
                               arm, decisions, rewards, contexts)
                           for arm in self.arms)
-
-        # Get list of arms in decisions
-        # If decision is observed for cold arm, drop arm from cold arm dictionary
-        arms = np.unique(decisions).tolist()
-        for arm in arms:
-            if arm in self.cold_arm_to_warm_arm:
-                self.cold_arm_to_warm_arm.pop(arm)
-
-        # Set/update list of arms for which at least one decision has been observed
-        if len(self.trained_arms) == 0:
-            self.trained_arms = arms
-        else:
-            self.trained_arms = np.unique(self.trained_arms + arms).tolist()
 
     def _parallel_predict(self, contexts: np.ndarray, is_predict: bool):
 
@@ -362,20 +372,17 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
         return threshold
 
-    def _get_cold_arm_to_warm_arm(self, cold_arm_to_warm_arm, arm_to_features, distance_quantile):
+    def _get_cold_arm_to_warm_arm(self, arm_to_features, distance_quantile):
 
         # Calculate from-to distances between all pairs of arms based on features
         # and then find minimum distance (threshold) required to warm start an untrained arm
         distance_from_to = self._get_pairwise_distances(arm_to_features)
         distance_threshold = self._get_distance_threshold(distance_from_to, quantile=distance_quantile)
 
-        # Cold arms
-        cold_arms = [arm for arm in self.arms if ((arm not in self.trained_arms) and (arm not in cold_arm_to_warm_arm))]
-
         # New cold arm to warm arm dictionary
         new_cold_arm_to_warm_arm = dict()
 
-        for cold_arm in cold_arms:
+        for cold_arm in self.cold_arms:
 
             # Collect distance from cold arm to warm arms
             arm_to_distance = {}
@@ -394,3 +401,36 @@ class BaseMAB(metaclass=abc.ABCMeta):
                 new_cold_arm_to_warm_arm[cold_arm] = closest_arm
 
         return new_cold_arm_to_warm_arm
+
+    def _reset_arm_to_status(self):
+        self.arm_to_status: Dict[Arm, dict] = {arm: {IS_TRAINED: False, IS_WARM: False,
+                                                     WARM_STARTED_BY: None}
+                                               for arm in self.arms}
+
+    def _set_arms_as_trained(self, decisions: Optional[np.ndarray] = None, is_partial: bool = True):
+        """Sets the given arms as trained, where arms are calculated from the ``decisions``.
+
+        Used to update status of arms in ``fit`` and ``partial_fit`` methods. Any arm with value in decisions will
+        have ``is_trained`` status updated to be True. When used in ``fit``, arms with values in decisions will also
+        have warm start status re-initialized.
+
+        """
+        # Calculate arms from decisions
+        arms = np.unique(decisions).tolist()
+
+        for arm in self.arms:
+            if arm in arms:
+                # All system arms are now trained
+                self.arm_to_status[arm][IS_TRAINED] = True
+
+                # If fitting from scratch, arm is no longer warm started
+                if not is_partial:
+                    self.arm_to_status[arm][IS_WARM] = False
+                    self.arm_to_status[arm][WARM_STARTED_BY] = None
+
+    def _warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+        cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
+        self._copy_arms(cold_arm_to_warm_arm)
+        for cold_arm, warm_arm in cold_arm_to_warm_arm.items():
+            self.arm_to_status[cold_arm][IS_WARM] = True
+            self.arm_to_status[cold_arm][WARM_STARTED_BY] = warm_arm

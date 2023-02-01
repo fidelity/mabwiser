@@ -2,6 +2,13 @@
 MABWiser CHANGELOG
 =====================
 
+January, 24, 2022 2.6.0
+-------------------------------------------------------------------------------
+major:
+- Implement tracking of warm started and partial fitted arms
+- Implement tracking of cold arms
+- Limit warm start to learning policies
+
 January, 19, 2022 2.5.0
 -------------------------------------------------------------------------------
 major:
