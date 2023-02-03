@@ -36,18 +36,18 @@ class _RidgeRegression:
     def __init__(self, rng: _BaseRNG, alpha: Num = 1.0, l2_lambda: Num = 1.0, scale: bool = False):
 
         # Ridge Regression: https://onlinecourses.science.psu.edu/stat857/node/155/
-        self.rng = rng  # random number generator
-        self.alpha = alpha  # exploration parameter
-        self.l2_lambda = l2_lambda  # regularization parameter
-        self.scale = scale  # scale contexts
+        self.rng = rng                      # random number generator
+        self.alpha = alpha                  # exploration parameter
+        self.l2_lambda = l2_lambda          # regularization parameter
+        self.scale = scale                  # scale contexts
 
-        self.beta = None  # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
-        self.A = None  # (XtX + l2_lambda * I_d)
-        self.A_inv = None  # (XtX + l2_lambda * I_d)^-1
+        self.beta = None                    # (XtX + l2_lambda * I_d)^-1 * Xty = A^-1 * Xty
+        self.A = None                       # (XtX + l2_lambda * I_d)
+        self.A_inv = None                   # (XtX + l2_lambda * I_d)^-1
         self.Xty = None
         self.scaler = None
 
-    def init(self, num_features):
+    def init(self, num_features: int):
         # By default, assume that
         # A is the identity matrix and Xty is set to 0
         self.Xty = np.zeros(num_features)
@@ -57,10 +57,6 @@ class _RidgeRegression:
         self.scaler = StandardScaler() if self.scale else None
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        """
-        Parameters X : matrix
-        Parameters Y : vector
-        """
 
         # Scale
         if self.scaler is not None:
@@ -111,10 +107,10 @@ class _LinTS(_RidgeRegression):
 
         # Randomly sample coefficients from multivariate normal distribution
         # Covariance is enhanced with the exploration factor
-        beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv)
+        beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv, size=x.shape[0])
 
         # Calculate expectation y = x * beta_sampled
-        return np.dot(x, beta_sampled)
+        return np.sum(x * beta_sampled, axis=1)
 
 
 class _LinUCB(_RidgeRegression):
@@ -211,45 +207,34 @@ class _Linear(BaseMAB):
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
         pass
 
-    def _vectorized_predict_context(self, contexts: np.ndarray, is_predict: bool,
-                                    seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
-
-        # Get local copy of model, arm_to_expectation and arms to minimize
-        # communication overhead between arms (processes) using shared objects
-        arm_to_model = deepcopy(self.arm_to_model)
-        arm_to_expectation = deepcopy(self.arm_to_expectation)
-        arms = deepcopy(self.arms)
+    def _vectorized_predict_context(self, contexts: np.ndarray, is_predict: bool) -> List:
 
         # Converting the arms list to numpy array
+        arms = deepcopy(self.arms)
         arms = np.array(arms)
 
-        # Capturing the shape of the contexts array
+        # Initializing array with expectations for each arm
         num_contexts = contexts.shape[0]
+        arm_expectations = np.empty((num_contexts, len(arms)), dtype=float)
 
-        # Initializing expectation with random values of shape(num_contexts, len(arms))
-        expectation = np.empty((num_contexts, len(arms)), dtype=float)
-
-        # With epsilon probability, select random recommendations
-        # Initializing a random number for each context
-        randoms = self.rng.rand(num_contexts)
-
-        # Comparing the random value with epsilon value and creating an index
-        random_mask = np.array(randoms < self.epsilon)
+        # With epsilon probability, assign random flag to context
+        random_values = self.rng.rand(num_contexts)
+        random_mask = np.array(random_values < self.epsilon)
         random_indices = random_mask.nonzero()[0]
 
-        # Replacing the random values across indexes if the original randoms are less than the epsilon value
-        expectation[random_indices] = self.rng.rand((random_indices.shape[0], len(arms)))
+        # For random indices, generate random expectations
+        arm_expectations[random_indices] = self.rng.rand((random_indices.shape[0], len(arms)))
 
-        # For non-random contexts, calculate the arms -- do the predictions
+        # For non-random indices, get expectations for each arm
         nonrandom_indices = np.where(~random_mask)[0]
         nonrandom_context = contexts[nonrandom_indices]
-
-        expectation[nonrandom_indices] = np.array([arm_to_model[arm].predict(nonrandom_context) for arm in arms]).T
+        arm_expectations[nonrandom_indices] = np.array([self.arm_to_model[arm].predict(nonrandom_context)
+                                                        for arm in arms]).T
 
         if is_predict:
-            predictions = arms[np.argmax(expectation, axis=1)].tolist()
+            predictions = arms[np.argmax(arm_expectations, axis=1)].tolist()
         else:
-            predictions = [dict(zip(arm_to_expectation.keys(), value)) for value in expectation]
+            predictions = [dict(zip(self.arms, value)) for value in arm_expectations]
 
         return predictions if len(predictions) > 1 else predictions[0]
 
