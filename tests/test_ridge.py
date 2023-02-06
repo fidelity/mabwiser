@@ -35,7 +35,7 @@ class RidgeRegressionTest(BaseTest):
 
         ridge.init(context.shape[1])
         ridge.fit(context, rewards)
-        prediction = ridge.predict(np.array([0, 1, 2, 3, 5]))
+        prediction = ridge.predict(np.array([[0, 1, 2, 3, 5]]))
         self.assertTrue(math.isclose(prediction, 1.1429050092142725, abs_tol=1e-8))
 
     def test_fit(self):
