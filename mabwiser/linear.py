@@ -107,6 +107,7 @@ class _LinTS(_RidgeRegression):
 
         # Randomly sample coefficients from multivariate normal distribution
         # Covariance is enhanced with the exploration factor
+        # Generates  random samples for all contexts in one single go. type(beta_sampled): np.ndarray
         beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv, size=x.shape[0])
 
         # Calculate expectation y = x * beta_sampled
@@ -124,6 +125,7 @@ class _LinUCB(_RidgeRegression):
         x_A_inv = np.dot(x, self.A_inv)
 
         # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
+        # ucb values are claculated for all the contexts in one single go. type(ucb): np.ndarray
         ucb = self.alpha * np.sqrt(np.sum(x_A_inv * x, axis=1))
 
         # Calculate linucb expectation y = x * b + ucb
