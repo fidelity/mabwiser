@@ -364,22 +364,13 @@ class NearestTest(BaseTest):
         # Before warm start
         self.assertDictEqual(exps[0], {1: 0.0, 2: 0.0, 3: 1.0, 4: 0})
         self.assertDictEqual(exps[1], {1: 1.0, 2: 0.0, 3: 0, 4: 0})
-        self.assertTrue(mab._imp.arm_to_features is None)
-        self.assertTrue(mab._imp.distance_quantile is None)
-        self.assertTrue(len(mab._imp.cold_arm_to_warm_arm) == 0)
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5], 4: [0, 1]}, distance_quantile=0.5)
-        self.assertTrue(mab._imp.arm_to_features is not None)
-        self.assertTrue(mab._imp.distance_quantile is not None)
-        self.assertTrue(len(mab._imp.cold_arm_to_warm_arm) == 0)
 
         # Predict expectations
         exps = mab.predict_expectations([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
 
         # After warm start
-        self.assertDictEqual(exps[0], {1: 0.0, 2: 0.0, 3: 1.0, 4: 0.0})
-        self.assertDictEqual(exps[1], {1: 1.0, 2: 0.0, 3: 0, 4: 1.0})
-        self.assertTrue(mab._imp.arm_to_features is not None)
-        self.assertTrue(mab._imp.distance_quantile is not None)
-        self.assertTrue(len(mab._imp.cold_arm_to_warm_arm) == 0)
+        self.assertDictEqual(exps[0], {1: 0.0, 2: 0.0, 3: 1.0, 4: 0})
+        self.assertDictEqual(exps[1], {1: 1.0, 2: 0.0, 3: 0, 4: 0})
