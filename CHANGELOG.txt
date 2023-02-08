@@ -6,7 +6,7 @@ February, 07, 2023 2.7.0
 -------------------------------------------------------------------------------
 major:
 - Implement vectorized functions for Linear policies to speed-up prediction for multiple inputs.
-- Implement changes in the LinTS, LinGreedy and Parallel tests to accommodate changes from the new function
+- Update tests for LinTS and LinGreedy Policies as a result of using global random seed in vectorized function
 - Implement changes to the predict function for LinTS and LinUCB policy for processing multiple inputs at once
 
 January, 24, 2023 2.6.0
