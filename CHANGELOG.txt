@@ -2,14 +2,20 @@
 MABWiser CHANGELOG
 =====================
 
-January, 24, 2022 2.6.0
+February, 07, 2023 2.7.0
+-------------------------------------------------------------------------------
+major:
+- Implement vectorized functions for Linear policies to speed-up prediction for multiple inputs.
+- Update tests for LinTS and LinGreedy Policies as a result of using global random seed in vectorized function
+
+January, 24, 2023 2.6.0
 -------------------------------------------------------------------------------
 major:
 - Implement tracking of warm started and partial fitted arms
 - Implement tracking of cold arms
 - Limit warm start to learning policies
 
-January, 19, 2022 2.5.0
+January, 19, 2023 2.5.0
 -------------------------------------------------------------------------------
 major:
 - Update warm start logic to only warm start an arm once

@@ -119,7 +119,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[2, 1], [1, 2], [3, 3]])
+        self.assertEqual(arm, [[2, 3], [2, 1], [2, 2]])
 
     def test_epsilon_one_expectations(self):
         exps, mab = self.predict(arms=[1, 2, 3],
@@ -154,7 +154,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[2, 1], [1, 2], [3, 3]])
+        self.assertEqual(arm, [[2, 3], [2, 1], [2, 2]])
 
     def test_df(self):
 
@@ -175,7 +175,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[2, 1], [1, 2], [3, 3]])
+        self.assertEqual(arm, [[2, 3], [2, 1], [2, 2]])
 
     def test_df_list(self):
 
@@ -196,7 +196,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[2, 1], [1, 2], [3, 3]])
+        self.assertEqual(arm, [[2, 3], [2, 1], [2, 2]])
 
     def test_lingreedy_t1(self):
 
@@ -214,7 +214,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[2, 1], [2, 1], [2, 1], [2, 1]])
+        self.assertEqual(arm, [[2, 1], [1, 1], [2, 1], [2, 1]])
 
     def test_lingreedy_t2(self):
 
@@ -232,7 +232,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[3, 1], [2, 1], [1, 3], [2, 3]])
+        self.assertEqual(arm, [[1, 1], [2, 1], [2, 3], [1, 1]])
 
     def test_lingreedy_t3(self):
 
@@ -251,7 +251,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[4, 1], [4, 2], [4, 4], [4, 1]])
+        self.assertEqual(arm, [[2, 4], [4, 4], [2, 2], [4, 4]])
 
     def test_lingreedy_t4(self):
 
@@ -270,7 +270,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[2, 2], [2, 1], [1, 1], [4, 4]])
+        self.assertEqual(arm, [[4, 1], [1, 1], [2, 4], [1, 4]])
 
     def test_lingreedy_t5(self):
 
@@ -288,7 +288,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [["three", "one"], ["two", "one"], ["one", "three"], ["two", "three"]])
+        self.assertEqual(arm, [["one", "one"], ["two", "one"], ["two", "three"], ["one", "one"]])
 
     def test_lingreedy_t6(self):
 
@@ -307,7 +307,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [['three', 'two'], ['three', 'two'], ['two', 'one'], ['two', 'one']])
+        self.assertEqual(arm, [['three', 'one'], ['two', 'two'], ['three', 'one'], ['one', 'three']])
 
     def test_lingreedy_t7(self):
 
@@ -343,7 +343,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [['c', 'c'], ['c', 'c'], ['c', 'c'], ['c', 'c']])
+        self.assertEqual(arm, [['c', 'b'], ['c', 'c'], ['c', 'b'], ['a', 'c']])
 
     def test_lingreedy_t9(self):
 
@@ -366,7 +366,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[c, a], [c, c], [c, c], [c, a]])
+        self.assertEqual(arm, [[c, c], [a, c], [c, c], [c, c]])
 
     def test_lingreedy_t10(self):
 
@@ -389,7 +389,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 4)
-        self.assertEqual(arm, [[c, b], [b, b], [b, b], [a, c]])
+        self.assertEqual(arm, [[a, a], [a, c], [b, b], [b, a]])
 
     def test_unused_arm(self):
 
@@ -406,9 +406,9 @@ class LinGreedyTest(BaseTest):
                                  num_run=1,
                                  is_predict=False)
 
-        self.assertListAlmostEqual(exps[0].values(), [0.004587155963302836, 0.0, 0.6208530805687187, 0.0])
+        self.assertListAlmostEqual(exps[0].values(), [0.004587155963302836, 0.0,  0.6208530805687196, 0.0])
         self.assertListAlmostEqual(exps[1].values(),
-                                   [0.9026245819618994, 0.08302023258745872, 0.14184572228349002, 0.625881702106679])
+                                   [0.0474454214269846, 0.9552527396157818, 0.906050936603124, 0.4569695548539072])
 
     def test_unused_arm2(self):
 
@@ -425,7 +425,7 @@ class LinGreedyTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 1])
+        self.assertEqual(arms, [3, 2])
 
     def test_unused_arm_scaled(self):
 
@@ -448,9 +448,9 @@ class LinGreedyTest(BaseTest):
                                 num_run=1,
                                 is_predict=False)
 
-        self.assertListAlmostEqual(exp[0].values(), [-0.07721690708221138, 0.0, 0.1366841348928508, 0.0])
+        self.assertListAlmostEqual(exp[0].values(), [-0.07721690708221131, 0.0, 0.13668413489285072, 0.0])
         self.assertListAlmostEqual(exp[1].values(),
-                                   [0.9026245819618994, 0.08302023258745872, 0.14184572228349002, 0.625881702106679])
+                                   [0.0474454214269846, 0.9552527396157818, 0.906050936603124, 0.4569695548539072])
 
     def test_unused_arm_scaled2(self):
 
@@ -472,7 +472,7 @@ class LinGreedyTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 1])
+        self.assertEqual(arms, [3, 2])
 
     def test_fit_twice(self):
 
@@ -489,7 +489,7 @@ class LinGreedyTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, [3, 1])
+        self.assertEqual(arm, [3, 2])
 
         b_1 = mab._imp.arm_to_model[1].beta
         self.assertTrue(math.isclose(-0.0825688, b_1[0], abs_tol=0.00001))
@@ -528,7 +528,7 @@ class LinGreedyTest(BaseTest):
                                 seed=123456,
                                 num_run=1,
                                 is_predict=True)
-        self.assertEqual(arm, [3, 1])
+        self.assertEqual(arm, [3, 2])
         self.assertAlmostEqual(mab._imp.arm_to_model[1].beta[0], -0.1520794283674759)
         self.assertAlmostEqual(mab._imp.arm_to_model[2].beta[0], 0)
         self.assertAlmostEqual(mab._imp.arm_to_model[3].beta[0], -0.008110550702115856)
@@ -541,7 +541,7 @@ class LinGreedyTest(BaseTest):
                           [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
                           [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
                           [0, 2, 1, 0, 0]])
-        self.assertEqual(arm, [3, 1])
+        self.assertEqual(arm, [3, 2])
         self.assertAlmostEqual(mab._imp.arm_to_model[1].beta[0], -0.1520794283674759)
         self.assertAlmostEqual(mab._imp.arm_to_model[2].beta[0], 0)
         self.assertAlmostEqual(mab._imp.arm_to_model[3].beta[0], -0.008110550702115856)
@@ -588,7 +588,7 @@ class LinGreedyTest(BaseTest):
                                 num_run=1,
                                 is_predict=True)
 
-        self.assertEqual(arm, [3, 1])
+        self.assertEqual(arm, [3, 2])
 
         b_1 = mab._imp.arm_to_model[1].beta
         self.assertTrue(math.isclose(-0.0825688, b_1[0], abs_tol=0.00001))
@@ -630,7 +630,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 2], [3, 1], [3, 1]])
+        self.assertEqual(arm, [[3, 1], [3, 2], [3, 1]])
 
     def test_alpha0_nearest5(self):
 
@@ -649,7 +649,7 @@ class LinGreedyTest(BaseTest):
                                 is_predict=True)
 
         self.assertEqual(len(arm), 3)
-        self.assertEqual(arm, [[3, 2], [3, 3], [3, 3]])
+        self.assertEqual(arm, [[3, 1], [3, 2], [3, 3]])
 
     def test_scaler_fit(self):
         exp, mab = self.predict(arms=[1, 2, 3],
@@ -794,7 +794,7 @@ class LinGreedyTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertEqual(arms, [3, 1])
+        self.assertEqual(arms, [3, 2])
 
     def test_add_arm(self):
         arm, mab = self.predict(arms=[1, 2, 3],

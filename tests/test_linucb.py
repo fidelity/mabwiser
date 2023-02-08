@@ -3,6 +3,7 @@
 from copy import deepcopy
 import datetime
 import math
+import random
 
 import numpy as np
 import pandas as pd
@@ -114,9 +115,9 @@ class LinUCBTest(BaseTest):
                                 rewards=df['rewards'],
                                 learning_policy=LearningPolicy.LinUCB(alpha=1),
                                 context_history=pd.DataFrame([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                                             [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                                             [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                                             [0, 2, 1, 0, 0]]),
+                                                              [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                                              [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                                              [0, 2, 1, 0, 0]]),
                                 contexts=[[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]],
                                 seed=123456,
                                 num_run=3,
@@ -374,9 +375,9 @@ class LinUCBTest(BaseTest):
     def test_unused_arm_scaled(self):
 
         context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                   [0, 2, 1, 0, 0]], dtype='float64')
+                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                    [0, 2, 1, 0, 0]], dtype='float64')
 
         scaler = StandardScaler()
         scaled_contexts = scaler.fit_transform(context_history)
@@ -541,9 +542,9 @@ class LinUCBTest(BaseTest):
 
         arms = [1, 2, 3]
         context_history = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0],
-                                   [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
-                                   [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
-                                   [0, 2, 1, 0, 0]], dtype='float64')
+                                    [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], [0, 0, 0, 0, 0],
+                                    [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],
+                                    [0, 2, 1, 0, 0]], dtype='float64')
 
         contexts = np.array([[0, 1, 2, 3, 5], [1, 1, 1, 1, 1]])
         decisions = np.array([1, 1, 1, 2, 2, 3, 3, 3, 3, 3])
@@ -658,12 +659,14 @@ class LinUCBTest(BaseTest):
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
-        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0, 0], 3: [0.5, 0.5]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
     def test_double_warm_start(self):
         _, mab = self.predict(arms=[1, 2, 3],
@@ -682,13 +685,16 @@ class LinUCBTest(BaseTest):
         # Before warm start
         self.assertEqual(mab._imp.trained_arms, [1, 2])
         self.assertDictEqual(mab._imp.arm_to_expectation, {1: 0.0, 2: 0.0, 3: 0.0})
-        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[1].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
         self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0, 0, 0, 0, 0])
 
         # Warm start
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0, 1]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
 
         # Warm start again, #3 shouldn't change even though it's closer to #2 now
         mab.warm_start(arm_to_features={1: [0, 1], 2: [0.5, 0.5], 3: [0.5, 0.5]}, distance_quantile=0.5)
-        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta, [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])
+        self.assertListAlmostEqual(mab._imp.arm_to_model[3].beta,
+                                   [0.19635284, 0.11556404, 0.57675997, 0.30597964, -0.39100933])

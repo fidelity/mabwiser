@@ -47,7 +47,7 @@ class _RidgeRegression:
         self.Xty = None
         self.scaler = None
 
-    def init(self, num_features):
+    def init(self, num_features: int):
         # By default, assume that
         # A is the identity matrix and Xty is set to 0
         self.Xty = np.zeros(num_features)
@@ -56,7 +56,7 @@ class _RidgeRegression:
         self.beta = np.dot(self.A_inv, self.Xty)
         self.scaler = StandardScaler() if self.scale else None
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray):
 
         # Scale
         if self.scaler is not None:
@@ -81,7 +81,7 @@ class _RidgeRegression:
         # Recalculate beta coefficients
         self.beta = np.dot(self.A_inv, self.Xty)
 
-    def predict(self, x):
+    def predict(self, x: np.ndarray):
 
         # Scale
         if self.scaler is not None:
@@ -90,50 +90,49 @@ class _RidgeRegression:
         # Calculate default expectation y = x * b
         return np.dot(x, self.beta)
 
-    def _scale_predict_context(self, x):
+    def _scale_predict_context(self, x: np.ndarray):
         if not hasattr(self.scaler, 'scale_'):
             return x
 
-        # Reshape 1D array to 2D
-        x = x.reshape(1, -1)
-
         # Transform and return to previous shape. Convert to float64 to suppress any type warnings.
-        return self.scaler.transform(x.astype('float64')).reshape(-1)
+        return self.scaler.transform(x.astype('float64'))
 
 
 class _LinTS(_RidgeRegression):
 
-    def predict(self, x):
-
+    def predict(self, x: np.ndarray):
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
         # Randomly sample coefficients from multivariate normal distribution
         # Covariance is enhanced with the exploration factor
-        beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv)
+        # Generates  random samples for all contexts in one single go. type(beta_sampled): np.ndarray
+        beta_sampled = self.rng.multivariate_normal(self.beta, np.square(self.alpha) * self.A_inv, size=x.shape[0])
 
         # Calculate expectation y = x * beta_sampled
-        return np.dot(x, beta_sampled)
+        return np.sum(x * beta_sampled, axis=1)
 
 
 class _LinUCB(_RidgeRegression):
 
-    def predict(self, x):
-
+    def predict(self, x: np.ndarray):
         # Scale
         if self.scaler is not None:
             x = self._scale_predict_context(x)
 
+        # Calculating x_A_inv
+        x_A_inv = np.dot(x, self.A_inv)
+
         # Upper confidence bound = alpha * sqrt(x A^-1 xt). Notice that, x = xt
-        ucb = (self.alpha * np.sqrt(np.dot(np.dot(x, self.A_inv), x)))
+        # ucb values are claculated for all the contexts in one single go. type(ucb): np.ndarray
+        ucb = self.alpha * np.sqrt(np.sum(x_A_inv * x, axis=1))
 
         # Calculate linucb expectation y = x * b + ucb
         return np.dot(x, self.beta) + ucb
 
 
 class _Linear(BaseMAB):
-
     factory = {"ts": _LinTS, "ucb": _LinUCB, "ridge": _RidgeRegression}
 
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str],
@@ -174,11 +173,11 @@ class _Linear(BaseMAB):
 
     def predict(self, contexts: np.ndarray = None) -> Union[Arm, List[Arm]]:
         # Return predict for the given context
-        return self._parallel_predict(contexts, is_predict=True)
+        return self._vectorized_predict_context(contexts, is_predict=True)
 
     def predict_expectations(self, contexts: np.ndarray = None) -> Union[Dict[Arm, Num], List[Dict[Arm, Num]]]:
         # Return predict expectations for the given context
-        return self._parallel_predict(contexts, is_predict=False)
+        return self._vectorized_predict_context(contexts, is_predict=False)
 
     def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float):
         self._warm_start(arm_to_features, distance_quantile)
@@ -217,40 +216,38 @@ class _Linear(BaseMAB):
 
     def _predict_contexts(self, contexts: np.ndarray, is_predict: bool,
                           seeds: Optional[np.ndarray] = None, start_index: Optional[int] = None) -> List:
+        pass
 
-        # Get local copy of model, arm_to_expectation and arms to minimize
-        # communication overhead between arms (processes) using shared objects
-        arm_to_model = deepcopy(self.arm_to_model)
-        arm_to_expectation = deepcopy(self.arm_to_expectation)
+    def _vectorized_predict_context(self, contexts: np.ndarray, is_predict: bool) -> List:
+
+        # Converting the arms list to numpy array
         arms = deepcopy(self.arms)
+        arms = np.array(arms)
 
-        # Create an empty list of predictions
-        predictions = [None] * len(contexts)
-        for index, row in enumerate(contexts):
-            # Each row needs a separately seeded rng for reproducibility in parallel
-            rng = create_rng(seed=seeds[index])
+        # Initializing array with expectations for each arm
+        num_contexts = contexts.shape[0]
+        arm_expectations = np.empty((num_contexts, len(arms)), dtype=float)
 
-            # With epsilon probability set arm expectation to random value
-            if rng.rand() < self.epsilon:
-                for arm in arms:
-                    arm_to_expectation[arm] = rng.rand()
+        # With epsilon probability, assign random flag to context
+        random_values = self.rng.rand(num_contexts)
+        random_mask = np.array(random_values < self.epsilon)
+        random_indices = random_mask.nonzero()[0]
 
-            else:
-                # Create new seeded generator for model to ensure reproducibility
-                model_rng = create_rng(seed=seeds[index])
-                for arm in arms:
-                    arm_to_model[arm].rng = model_rng
+        # For random indices, generate random expectations
+        arm_expectations[random_indices] = self.rng.rand((random_indices.shape[0], len(arms)))
 
-                    # Get the expectation of each arm from its trained model
-                    arm_to_expectation[arm] = arm_to_model[arm].predict(row)
+        # For non-random indices, get expectations for each arm
+        nonrandom_indices = np.where(~random_mask)[0]
+        nonrandom_context = contexts[nonrandom_indices]
+        arm_expectations[nonrandom_indices] = np.array([self.arm_to_model[arm].predict(nonrandom_context)
+                                                        for arm in arms]).T
 
-            if is_predict:
-                predictions[index] = argmax(arm_to_expectation)
-            else:
-                predictions[index] = arm_to_expectation.copy()
+        if is_predict:
+            predictions = arms[np.argmax(arm_expectations, axis=1)].tolist()
+        else:
+            predictions = [dict(zip(self.arms, value)) for value in arm_expectations]
 
-        # Return list of predictions
-        return predictions
+        return predictions if len(predictions) > 1 else predictions[0]
 
     def _drop_existing_arm(self, arm: Arm) -> NoReturn:
         self.arm_to_model.pop(arm)
