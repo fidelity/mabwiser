@@ -8,7 +8,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '30 12 * * 1' # Runs every Monday at 8:30 AM EST
+    - cron: '00 12 * * 1' # Runs every Monday at 8:00 AM EST
 
 jobs:
   Test:
