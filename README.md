@@ -6,9 +6,13 @@ MABWiser ([IJAIT 2021](https://www.worldscientific.com/doi/10.1142/S021821302150
 
 The library also provides a simulation utility for comparing different policies and performing hyper-parameter tuning. MABWiser follows a scikit-learn style public interface, adheres to [PEP-8 standards](https://www.python.org/dev/peps/pep-0008/), and is tested heavily. 
 
-For Bandit-based Recommenders, see also our [Mab2Rec library](https://github.com/fidelity/mab2rec) built on top of MABWiser. 
-
 MABWiser is developed by the Artificial Intelligence Center of Excellence at Fidelity Investments. Documentation is available at [fidelity.github.io/mabwiser](https://fidelity.github.io/mabwiser).
+
+## Bandit-based Recommender Systems
+To solve personalized recommendation problems, MABWiser is integrated into our [Mab2Rec library](https://github.com/fidelity/mab2rec). Mab2Rec enables building content- and context-aware recommender systems, whereby MABWiser helps selecting the next best item (arm).
+
+## Bandit-based Large-Neighborhood Search
+To solve combinatorial optimization problems, MABWiser is integrated into [Adaptive Large Neighborhood Search](https://github.com/N-Wouda/ALNS). The ALNS library enables building metaheuristics for complex optimization problems, whereby MABWiser helps selecting the next best destroy, repair operation (arm).  
 
 ## Quick Start
 
