@@ -56,7 +56,7 @@ Available Neighborhood Policies:
 
 ## Installation
 
-MABWiser requires **Python 3.6+** and can be installed from PyPI using ``pip install mabwiser`` or by building from source as shown in [installation instructions](https://fidelity.github.io/mabwiser/installation.html).
+MABWiser requires **Python 3.8+** and can be installed from PyPI using ``pip install mabwiser`` or by building from source as shown in [installation instructions](https://fidelity.github.io/mabwiser/installation.html).
 
 ## Support
 

@@ -22,7 +22,7 @@ setuptools.setup(
     install_requires=required,
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.8+",
         "Operating System :: OS Independent",
     ],
     project_urls={

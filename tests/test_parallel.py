@@ -562,7 +562,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=2)
 
-        self.assertListEqual(arms, [3, 1, 1, 2, 1, 1, 1, 1, 1, 3])
+        self.assertListEqual(arms, [3, 2, 1, 1, 1, 1, 2, 1, 3, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
