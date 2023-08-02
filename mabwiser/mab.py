@@ -667,6 +667,7 @@ class NeighborhoodPolicy(NamedTuple):
                                                 LearningPolicy.ThompsonSampling))
 
 
+# LearningPolicyType is the Union of all possible learning policies
 LearningPolicyType = NewType('LearningPolicyType', Union[LearningPolicy.EpsilonGreedy,
                                                          LearningPolicy.Popularity,
                                                          LearningPolicy.Random,
@@ -678,6 +679,7 @@ LearningPolicyType = NewType('LearningPolicyType', Union[LearningPolicy.EpsilonG
                                                          LearningPolicy.LinUCB])
 
 
+# NeighborhoodPolicyType is the Union of all possible neighborhood policies
 NeighborhoodPolicyType = NewType('NeighborhoodPolicyType', Union[None,
                                                                  NeighborhoodPolicy.LSHNearest,
                                                                  NeighborhoodPolicy.Clusters,
