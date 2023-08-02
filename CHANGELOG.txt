@@ -5,7 +5,7 @@ MABWiser CHANGELOG
 August, 02, 2023 2.7.1
 -------------------------------------------------------------------------------
 minor:
-- Implemented LearningPolicyType and NeighborhoodPolicyType to simply input for MAB.
+- Implemented LearningPolicyType and NeighborhoodPolicyType to simplify input for MAB.
 - Updated tests to accommodate LearningPolicyType and NeighborhoodPolicyType.
 
 February, 07, 2023 2.7.0
