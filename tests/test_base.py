@@ -6,7 +6,7 @@ from typing import List, Union, Optional
 import numpy as np
 import pandas as pd
 
-from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy
+from mabwiser.mab import MAB, LearningPolicy, NeighborhoodPolicy, LearningPolicyType, NeighborhoodPolicyType
 from mabwiser.utils import Arm, Num
 
 
@@ -76,12 +76,8 @@ class BaseTest(unittest.TestCase):
     def predict(arms: List[Arm],
                 decisions: Union[List, np.ndarray, pd.Series],
                 rewards: Union[List, np.ndarray, pd.Series],
-                learning_policy: Union[LearningPolicy.EpsilonGreedy, LearningPolicy.Popularity, LearningPolicy.Random,
-                                       LearningPolicy.Softmax, LearningPolicy.ThompsonSampling, LearningPolicy.UCB1,
-                                       LearningPolicy.LinGreedy, LearningPolicy.LinTS, LearningPolicy.LinUCB],
-                neighborhood_policy: Union[None, NeighborhoodPolicy.Clusters, NeighborhoodPolicy.KNearest,
-                                           NeighborhoodPolicy.LSHNearest, NeighborhoodPolicy.Radius,
-                                           NeighborhoodPolicy.TreeBandit] = None,
+                learning_policy: LearningPolicyType,
+                neighborhood_policy: NeighborhoodPolicyType = None,
                 context_history: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 contexts: Union[None, List[Num], List[List[Num]], np.ndarray, pd.DataFrame, pd.Series] = None,
                 seed: Optional[int] = 123456,
