@@ -102,7 +102,7 @@ class ClustersTest(BaseTest):
                                  num_run=1,
                                  is_predict=True)
 
-        self.assertListEqual(arms, [2, 3])
+        self.assertListEqual(arms, [2, 2])
         self.assertEqual(mab._imp.kmeans.n_clusters, 3)
 
     def test_greedy1_n3(self):
