@@ -750,7 +750,7 @@ class MAB:
 
     def __init__(self,
                  arms: List[Arm],  # The list of arms
-                 learning_policy: LearningPolicyTypeNew,  # The learning policy
+                 learning_policy: LearningPolicyType,  # The learning policy
                  neighborhood_policy: NeighborhoodPolicyType = None,  # The context policy, optional
                  seed: int = Constants.default_seed,  # The random seed
                  n_jobs: int = 1,  # Number of parallel jobs
