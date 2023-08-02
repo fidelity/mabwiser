@@ -10,7 +10,7 @@ This module defines the public interface of the **MABWiser Library** providing a
     - ``NeighborhoodPolicy``
 """
 
-from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional
+from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional, NewType
 
 import numpy as np
 import pandas as pd
@@ -667,6 +667,25 @@ class NeighborhoodPolicy(NamedTuple):
                                                 LearningPolicy.ThompsonSampling))
 
 
+LearningPolicyType = NewType('LearningPolicyType', Union[LearningPolicy.EpsilonGreedy,
+                                                         LearningPolicy.Popularity,
+                                                         LearningPolicy.Random,
+                                                         LearningPolicy.Softmax,
+                                                         LearningPolicy.ThompsonSampling,
+                                                         LearningPolicy.UCB1,
+                                                         LearningPolicy.LinGreedy,
+                                                         LearningPolicy.LinTS,
+                                                         LearningPolicy.LinUCB])
+
+
+NeighborhoodPolicyType = NewType('NeighborhoodPolicyType', Union[None,
+                                                                 NeighborhoodPolicy.LSHNearest,
+                                                                 NeighborhoodPolicy.Clusters,
+                                                                 NeighborhoodPolicy.KNearest,
+                                                                 NeighborhoodPolicy.Radius,
+                                                                 NeighborhoodPolicy.TreeBandit])
+
+
 class MAB:
     """**MABWiser: Contextual Multi-Armed Bandit Library**
 
@@ -676,10 +695,10 @@ class MAB:
     Attributes
     ----------
     arms : list
-        The list of all of the arms available for decisions. Arms can be integers, strings, etc.
-    learning_policy : LearningPolicy
+        The list of all the arms available for decisions. Arms can be integers, strings, etc.
+    learning_policy : LearningPolicyType
         The learning policy.
-    neighborhood_policy : NeighborhoodPolicy
+    neighborhood_policy : NeighborhoodPolicyType
         The neighborhood policy.
     is_contextual : bool
         True if contextual policy is given, false otherwise. This is a read-only data field.
@@ -695,7 +714,7 @@ class MAB:
         - “loky” used by default, can induce some communication and memory overhead when exchanging input and
           output data with the worker Python processes.
         - “multiprocessing” previous process-based backend based on multiprocessing.Pool. Less robust than loky.
-        - “threading” is a very low-overhead backend but it suffers from the Python Global Interpreter Lock if the
+        - “threading” is a very low-overhead backend but, it suffers from the Python Global Interpreter Lock if the
           called function relies a lot on Python objects.
         Default value is None. In this case the default backend selected by joblib will be used.
 
@@ -731,21 +750,8 @@ class MAB:
 
     def __init__(self,
                  arms: List[Arm],  # The list of arms
-                 learning_policy: Union[LearningPolicy.EpsilonGreedy,
-                                        LearningPolicy.Popularity,
-                                        LearningPolicy.Random,
-                                        LearningPolicy.Softmax,
-                                        LearningPolicy.ThompsonSampling,
-                                        LearningPolicy.UCB1,
-                                        LearningPolicy.LinGreedy,
-                                        LearningPolicy.LinTS,
-                                        LearningPolicy.LinUCB],  # The learning policy
-                 neighborhood_policy: Union[None,
-                                            NeighborhoodPolicy.LSHNearest,
-                                            NeighborhoodPolicy.Clusters,
-                                            NeighborhoodPolicy.KNearest,
-                                            NeighborhoodPolicy.Radius,
-                                            NeighborhoodPolicy.TreeBandit] = None,  # The context policy, optional
+                 learning_policy: LearningPolicyTypeNew,  # The learning policy
+                 neighborhood_policy: NeighborhoodPolicyType = None,  # The context policy, optional
                  seed: int = Constants.default_seed,  # The random seed
                  n_jobs: int = 1,  # Number of parallel jobs
                  backend: str = None  # Parallel backend implementation
@@ -757,11 +763,11 @@ class MAB:
         Parameters
         ----------
         arms : List[Union[int, float, str]]
-            The list of all of the arms available for decisions.
+            The list of all the arms available for decisions.
             Arms can be integers, strings, etc.
-        learning_policy : LearningPolicy
+        learning_policy : LearningPolicyType
             The learning policy.
-        neighborhood_policy : NeighborhoodPolicy, optional
+        neighborhood_policy : NeighborhoodPolicyType, optional
             The context policy. Default value is None.
         seed : numbers.Rational, optional
             The random seed to initialize the random number generator.
