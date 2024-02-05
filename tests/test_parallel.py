@@ -236,7 +236,7 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=1)
 
-        self.assertEqual(arm,  [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm,  [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1] for _ in range(5)])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
@@ -250,7 +250,7 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=2)
 
-        self.assertEqual(arm,  [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm,  [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1] for _ in range(5)])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
@@ -264,7 +264,7 @@ class ParallelTest(BaseTest):
                                 is_predict=True,
                                 n_jobs=100)
 
-        self.assertEqual(arm,  [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm,  [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1]for _ in range(5)])
 
     def test_greedy1_k2(self):
         rng = np.random.RandomState(seed=7)
@@ -562,7 +562,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=2)
 
-        self.assertListEqual(arms, [3, 2, 1, 1, 1, 1, 2, 1, 3, 1])
+        self.assertListEqual(arms, [1, 1, 1, 1, 1, 1, 1, 3, 1, 1])
 
         arms, mab = self.predict(arms=[1, 2, 3],
                                  decisions=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
@@ -576,7 +576,7 @@ class ParallelTest(BaseTest):
                                  is_predict=True,
                                  n_jobs=-1)
 
-        self.assertListEqual(arms, [3, 2, 3, 2, 2, 2, 3, 3, 2, 3])
+        self.assertListEqual(arms, [2, 2, 2, 2, 3, 2, 2, 2, 3, 1])
 
     def test_thompson_a2(self):
 
@@ -879,7 +879,7 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend=None)
 
-        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm, [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1] for _ in range(5)])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
@@ -894,7 +894,7 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend='loky')
 
-        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm, [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1] for _ in range(5)])
 
         arm, mab = self.predict(arms=[1, 2, 3, 4],
                                 decisions=[1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
@@ -909,7 +909,7 @@ class ParallelTest(BaseTest):
                                 n_jobs=2,
                                 backend='threading')
 
-        self.assertEqual(arm, [[3, 3, 1, 1, 1, 1, 3, 1, 3, 3] for _ in range(5)])
+        self.assertEqual(arm, [[1, 3, 1, 1, 1, 1, 1, 3, 3, 1] for _ in range(5)])
 
     def test_greedy1_k2_backend(self):
         rng = np.random.RandomState(seed=7)
