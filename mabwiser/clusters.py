@@ -27,9 +27,9 @@ class _Clusters(BaseMAB):
         self.n_clusters = n_clusters
 
         if is_minibatch:
-            self.kmeans = MiniBatchKMeans(n_clusters, random_state=rng.seed)
+            self.kmeans = MiniBatchKMeans(n_clusters, random_state=rng.seed, n_init=3)
         else:
-            self.kmeans = KMeans(n_clusters, random_state=rng.seed)
+            self.kmeans = KMeans(n_clusters, random_state=rng.seed, n_init=10)
 
         # Create the list of learning policies for each cluster
         # Deep copy all parameters of the lp objects, except refer to the originals of rng and arms
