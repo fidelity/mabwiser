@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG, argmax, reset
 
 
 class _EpsilonGreedy(BaseMAB):
@@ -20,7 +20,7 @@ class _EpsilonGreedy(BaseMAB):
         self.arm_to_sum = dict.fromkeys(self.arms, 0)
         self.arm_to_count = dict.fromkeys(self.arms, 0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Reset the sum, count, and expectations to zero
         reset(self.arm_to_sum, 0)
@@ -35,7 +35,7 @@ class _EpsilonGreedy(BaseMAB):
         # Update trained arms
         self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         self._parallel_fit(decisions, rewards, contexts)
 
         # Update trained arms
@@ -94,6 +94,6 @@ class _EpsilonGreedy(BaseMAB):
         self.arm_to_sum[arm] = 0
         self.arm_to_count[arm] = 0
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.arm_to_sum.pop(arm)
         self.arm_to_count.pop(arm)

@@ -5,7 +5,7 @@ import abc
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from typing import List, NoReturn, Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -23,7 +23,7 @@ from mabwiser.utils import Arm, _BaseRNG, create_rng
 
 class _ApproximateNeighbors(_Neighbors, metaclass=abc.ABCMeta):
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         super().fit(decisions, rewards, contexts)
 
         # Initialize planes
@@ -33,7 +33,7 @@ class _ApproximateNeighbors(_Neighbors, metaclass=abc.ABCMeta):
         self._fit_operation(contexts, context_start=0)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
         start = len(self.contexts)
 
         super().partial_fit(decisions, rewards, contexts)
