@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -15,7 +15,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, _BaseRNG, create_rng, reset
 
 
 class _Neighbors(BaseMAB):
@@ -41,7 +41,7 @@ class _Neighbors(BaseMAB):
         # When there are no neighbors, return nan expectations
         reset(self.arm_to_expectation, np.nan)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -53,7 +53,7 @@ class _Neighbors(BaseMAB):
         else:
             self.rewards = rewards
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:
@@ -122,7 +122,7 @@ class _Neighbors(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
         self.lp.add_arm(arm, binarizer)
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.lp.remove_arm(arm)
 
 

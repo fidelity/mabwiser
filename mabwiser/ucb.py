@@ -3,12 +3,12 @@
 
 import math
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import argmax, reset, Arm, Num, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG, argmax, reset
 
 
 class _UCB1(BaseMAB):
@@ -23,7 +23,7 @@ class _UCB1(BaseMAB):
         self.arm_to_count = dict.fromkeys(self.arms, 0)
         self.arm_to_mean = dict.fromkeys(self.arms, 0)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Reset the sum, count, and expectations to zero
         reset(self.arm_to_sum, 0)
@@ -44,7 +44,7 @@ class _UCB1(BaseMAB):
         self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # Update total number of decisions
         self.total_count += len(decisions)

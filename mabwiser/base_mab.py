@@ -6,16 +6,16 @@ This module defines the abstract base class for contextual multi-armed bandit al
 """
 
 import abc
-from itertools import chain
-from typing import Callable, Dict, List, NoReturn, Optional, Union
 import multiprocessing as mp
+from itertools import chain
+from typing import Callable, Dict, List, Optional, Union
 
+import numpy as np
 from joblib import Parallel, delayed
 from scipy.spatial.distance import cdist
-import numpy as np
 
+from mabwiser._version import __author__, __copyright__, __email__, __version__
 from mabwiser.utils import Arm, Num, _BaseRNG, argmin
-from mabwiser._version import __author__, __email__, __version__, __copyright__
 
 __author__ = __author__
 __email__ = __email__
@@ -104,7 +104,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         return [arm for arm in self.arms if (not self.arm_to_status[arm][IS_TRAINED] and
                                              not self.arm_to_status[arm][IS_WARM])]
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """Introduces a new arm to the bandit.
 
         Adds the new arm with zero expectations and
@@ -114,7 +114,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         self._uptake_new_arm(arm, binarizer)
         self.arm_to_status[arm] = {IS_TRAINED: False, IS_WARM: False, WARM_STARTED_BY: None}
 
-    def remove_arm(self, arm: Arm) -> NoReturn:
+    def remove_arm(self, arm: Arm) -> None:
         """Removes arm from the bandit.
         """
         self.arm_to_expectation.pop(arm)
@@ -123,7 +123,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+            contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fits the multi-armed bandit to the given
@@ -133,7 +133,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the given
@@ -159,7 +159,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
         """Abstract method.
 
         Warm starts cold arms using similar warm arms based on distances between arm features.
@@ -168,11 +168,11 @@ class BaseMAB(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
+    def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> None:
         pass
 
     @abc.abstractmethod
-    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """Abstract method.
 
         Updates the multi-armed bandit with the new arm.
@@ -189,7 +189,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _fit_arm(self, arm: Arm, decisions: np.ndarray, rewards: np.ndarray,
-                 contexts: Optional[np.ndarray] = None) -> NoReturn:
+                 contexts: Optional[np.ndarray] = None) -> None:
         """Abstract method.
 
         Fit operation for individual arm.
@@ -428,7 +428,7 @@ class BaseMAB(metaclass=abc.ABCMeta):
                     self.arm_to_status[arm][IS_WARM] = False
                     self.arm_to_status[arm][WARM_STARTED_BY] = None
 
-    def _warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+    def _warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
         cold_arm_to_warm_arm = self._get_cold_arm_to_warm_arm(arm_to_features, distance_quantile)
         self._copy_arms(cold_arm_to_warm_arm)
         for cold_arm, warm_arm in cold_arm_to_warm_arm.items():

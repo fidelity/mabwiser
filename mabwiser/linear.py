@@ -2,18 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, argmax, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, _BaseRNG
 
 SCALER_TOLERANCE = 1e-6
 
 
-def fix_small_variance(scaler: StandardScaler) -> NoReturn:
+def fix_small_variance(scaler: StandardScaler) -> None:
     """
     Set variances close to zero to be equal to one in trained standard scaler to make computations stable.
 
@@ -148,7 +148,7 @@ class _Linear(BaseMAB):
         # Create regression model for each arm
         self.arm_to_model = dict((arm, _Linear.factory.get(regression)(rng, alpha, l2_lambda, scale)) for arm in arms)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Initialize each model by arm
         self.num_features = contexts.shape[1]
@@ -164,7 +164,7 @@ class _Linear(BaseMAB):
         # Update trained arms
         self._set_arms_as_trained(decisions=decisions, is_partial=False)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         # Perform parallel fit
         self._parallel_fit(decisions, rewards, contexts)
 
@@ -249,5 +249,5 @@ class _Linear(BaseMAB):
 
         return predictions if len(predictions) > 1 else predictions[0]
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         self.arm_to_model.pop(arm)

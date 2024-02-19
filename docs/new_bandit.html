@@ -1,93 +1,51 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Adding a New Bandit &mdash; MABWiser 2.7.0 documentation</title>
-  
-
-  
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding a New Bandit &mdash; MABWiser 2.7.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
-
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-        <link rel="author" title="About these documents"
-              href="about.html"/>
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="MABWiser 2.7.0 documentation" href="index.html"/>
-        <link rel="next" title="MABWiser Public API" href="api.html"/>
-        <link rel="prev" title="Contributing" href="contributing.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e8140b17"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MABWiser Public API" href="api.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> MABWiser
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            MABWiser
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <ul class="current">
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Multi-Armed Bandits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quick.html">Quick Start</a></li>
@@ -103,50 +61,32 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">MABWiser Public API</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">MABWiser</a>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MABWiser</a>
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
- 
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Adding a New Bandit</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Adding a New Bandit</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/new_bandit.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
   </ul>
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <section id="adding-a-new-bandit">
-<span id="new-bandit"></span><h1>Adding a New Bandit<a class="headerlink" href="#adding-a-new-bandit" title="Permalink to this headline">¶</a></h1>
+<span id="new-bandit"></span><h1>Adding a New Bandit<a class="headerlink" href="#adding-a-new-bandit" title="Link to this heading"></a></h1>
 <p>In this section, we provide high-level guidelines on how to introduce a new bandit algorithm in MABWiser.</p>
 <div class="admonition-high-level-overview admonition">
 <p class="admonition-title">High-Level Overview</p>
@@ -159,7 +99,7 @@
 <p>These steps can be followed by a Pull Request to include your new policy in the MABWiser library. In the following, the details of each of step are provided.</p>
 </div>
 <section id="exposing-the-public-api">
-<h2>1. Exposing the Public API<a class="headerlink" href="#exposing-the-public-api" title="Permalink to this headline">¶</a></h2>
+<h2>1. Exposing the Public API<a class="headerlink" href="#exposing-the-public-api" title="Link to this heading"></a></h2>
 <p>Imagine you would like to introduce a new bandit algorithm, called <code class="docutils literal notranslate"><span class="pre">MyCoolPolicy</span></code>, with an hyper-parameter <code class="docutils literal notranslate"><span class="pre">my_parameter</span></code>.
 Here we consider introducing a new learning policy, but the case introducing a new neighborhood policy is similar.</p>
 <p>First and foremost, the users of MABWiser need to be able to access your cool bandit algorithm.
@@ -211,7 +151,7 @@ The next step is to connect this bandit with an <em>implementor</em> object in t
 Next, let’s move on to the implementation phase of your cool bandit algorithm!</p>
 </section>
 <section id="implementing-the-bandit-algorithm">
-<h2>2. Implementing the Bandit Algorithm<a class="headerlink" href="#implementing-the-bandit-algorithm" title="Permalink to this headline">¶</a></h2>
+<h2>2. Implementing the Bandit Algorithm<a class="headerlink" href="#implementing-the-bandit-algorithm" title="Link to this heading"></a></h2>
 <p>The previous section allowed users to access your new cool bandit policy.
 What remains is to implement the learning algorithm behind your bandit policy.</p>
 <p>Start by creating a new Python file named <code class="docutils literal notranslate"><span class="pre">mycoolpolicy.py</span></code> under the /mabwiser folder
@@ -250,7 +190,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># These fields are declared here and initialized to zero.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">my_value_to_arm</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arms</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This method trains your algorithm from scratch each time its called.</span>
     <span class="c1"># You might need to reset the internal fields</span>
@@ -261,7 +201,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># This automatically activates parallelization in the training phase.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_fit</span><span class="p">(</span><span class="n">decisions</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">contexts</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decisions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rewards</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">contexts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># This method trains your algorithm in a continuous fashion.</span>
     <span class="c1"># Unlike fit() operation, the partial_fit() does not reset internal fields typically.</span>
     <span class="c1"># This allows us to continue learning online</span>
@@ -284,7 +224,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># so that the user cannot accidentally break your policy.</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_to_expectation</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">warm_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm_to_features</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Num</span><span class="p">]],</span> <span class="n">distance_quantile</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">warm_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm_to_features</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Num</span><span class="p">]],</span> <span class="n">distance_quantile</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># This method warm starts untrained (cold) arms for which no decisions has been observed</span>
     <span class="c1"># A cold arm is warm started using a warm arm that is within some minimum distance from the cold arm</span>
     <span class="c1"># based on the given arm_to_features and distance_quantile inputs.</span>
@@ -293,7 +233,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
     <span class="c1"># Call _copy_arms from the base class.</span>
     <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">warm_start</span><span class="p">(</span><span class="n">arm_to_features</span><span class="p">,</span> <span class="n">distance_quantile</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_copy_arms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cold_arm_to_warm_arm</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Arm</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_copy_arms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cold_arm_to_warm_arm</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Arm</span><span class="p">,</span> <span class="n">Arm</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># TODO:</span>
     <span class="c1"># This method tells the policy how to warm start cold arms, given a cold arm to warm arm mapping.</span>
     <span class="c1"># It will typically involve copying attributes from a warm arm to a cold arm, e.g.</span>
@@ -324,7 +264,7 @@ to implement a class called <code class="docutils literal notranslate"><span cla
 <p><strong>Congratulations!!</strong> You have now implemented your cool new bandit policy. Next, let’s move onto running this for real!</p>
 </section>
 <section id="testing-the-bandit-algorithm">
-<h2>3. Testing the Bandit Algorithm<a class="headerlink" href="#testing-the-bandit-algorithm" title="Permalink to this headline">¶</a></h2>
+<h2>3. Testing the Bandit Algorithm<a class="headerlink" href="#testing-the-bandit-algorithm" title="Link to this heading"></a></h2>
 <p>The previous sections introduced the new bandit algorithm to the public API and implemented the underlying policy.
 What remains to be seen is to use this new algorithm and assess how it performs in action.</p>
 <p>Start by creating a new Python file called <code class="docutils literal notranslate"><span class="pre">test_mycoolbandit.py</span></code> under the /tests folder to implement a class called <code class="docutils literal notranslate"><span class="pre">MyCoolBanditTest</span></code>.
@@ -410,7 +350,7 @@ decisions and rewards to assert that your bandit behaves correctly.</p>
 <p><strong>Congratulations!!</strong> You are now ready to share your new cool policy with everyone. Next, let’s send a pull request for code review.</p>
 </section>
 <section id="sending-a-pull-request">
-<h2>4. Sending a Pull Request<a class="headerlink" href="#sending-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<h2>4. Sending a Pull Request<a class="headerlink" href="#sending-a-pull-request" title="Link to this heading"></a></h2>
 <p>The previous sections finalized the implementation of your cool new policy.
 This is no small step and deserves its own victory dance!
 Now it is time to share it with everyone in the world by sending a pull request so that your code can be merged to the master branch.</p>
@@ -430,70 +370,32 @@ How cool is that? :)</p>
 
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="api.html" class="btn btn-neutral float-right" title="MABWiser Public API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="contributing.html" class="btn btn-neutral" title="Contributing" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="MABWiser Public API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Copyright (C), FMR LLC.
-
-    </p>
+    <p>&#169; Copyright Copyright (C), FMR LLC.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'2.7.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/documentation_options.js"></script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

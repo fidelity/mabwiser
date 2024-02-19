@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import argmax, Arm, Num, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG, argmax
 
 
 class _Random(BaseMAB):
@@ -14,10 +14,10 @@ class _Random(BaseMAB):
     def __init__(self, rng: _BaseRNG, arms: List[Arm], n_jobs: int, backend: Optional[str]):
         super().__init__(rng, arms, n_jobs, backend)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         pass
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         pass
 
     def predict(self, contexts: Optional[np.ndarray] = None) -> Union[Arm, List[Arm]]:
@@ -59,5 +59,5 @@ class _Random(BaseMAB):
     def _uptake_new_arm(self, arm: Arm, binarizer: Callable = None, scaler: Callable = None):
         pass
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         pass

@@ -7,12 +7,12 @@ This module provides a simulation utility for comparing algorithms and hyper-par
 
 import abc
 import logging
-from copy import deepcopy
-from collections import defaultdict
-from itertools import chain
-from typing import Union, List, Optional, NoReturn
-
 import math
+from collections import defaultdict
+from copy import deepcopy
+from itertools import chain
+from typing import List, Optional, Union
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -22,19 +22,19 @@ from scipy.spatial.distance import cdist
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
+from mabwiser._version import __author__, __copyright__, __email__, __version__
+from mabwiser.approximate import _LSHNearest
 from mabwiser.base_mab import BaseMAB
 from mabwiser.greedy import _EpsilonGreedy
 from mabwiser.linear import _Linear
 from mabwiser.mab import MAB
-from mabwiser.neighbors import _Neighbors, _Radius, _KNearest
-from mabwiser.approximate import _LSHNearest
+from mabwiser.neighbors import _KNearest, _Neighbors, _Radius
 from mabwiser.popularity import _Popularity
 from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, check_true, Constants, _BaseRNG, create_rng
-from mabwiser._version import __author__, __email__, __version__, __copyright__
+from mabwiser.utils import Arm, Constants, Num, _BaseRNG, check_true, create_rng
 
 __author__ = __author__
 __email__ = __email__
@@ -338,7 +338,7 @@ class _KNearestSimulator(_NeighborsSimulator):
 
 
 class _ApproximateSimulator(_NeighborsSimulator, metaclass=abc.ABCMeta):
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
         super().fit(decisions, rewards, contexts)
 
         # Initialize planes
@@ -348,7 +348,7 @@ class _ApproximateSimulator(_NeighborsSimulator, metaclass=abc.ABCMeta):
         self._fit_operation(contexts, context_start=0)
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
         start = len(self.contexts)
 
         super().partial_fit(decisions, rewards, contexts)
@@ -755,7 +755,7 @@ class Simulator:
                 self.logger.info('No historic data for ' + str(arm))
         return stats
 
-    def plot(self, metric: str = 'avg', is_per_arm: bool = False) -> NoReturn:
+    def plot(self, metric: str = 'avg', is_per_arm: bool = False) -> None:
         """
         Generates a plot of the cumulative sum of the rewards for each bandit.
         Simulation must be run before calling this method.
@@ -884,7 +884,7 @@ class Simulator:
 
         plt.close('all')
 
-    def run(self) -> NoReturn:
+    def run(self) -> None:
         """ Run simulator
 
         Runs a simulation concurrently for all bandits in the bandits list.

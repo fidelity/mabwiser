@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -14,7 +14,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Arm, Num, reset, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, _BaseRNG, create_rng, reset
 
 
 class _Clusters(BaseMAB):
@@ -48,7 +48,7 @@ class _Clusters(BaseMAB):
         reset(self.arm_to_expectation, np.nan)
 
     def fit(self, decisions: np.ndarray, rewards: np.ndarray,
-            contexts: Optional[np.ndarray] = None) -> NoReturn:
+            contexts: Optional[np.ndarray] = None) -> None:
 
         # Set the historical data for prediction
         self.decisions = decisions
@@ -67,7 +67,7 @@ class _Clusters(BaseMAB):
         self._fit_operation()
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # Binarize the rewards if using Thompson Sampling
         if isinstance(self.lp_list[0], _ThompsonSampling) and self.lp_list[0].binarizer:
@@ -104,7 +104,7 @@ class _Clusters(BaseMAB):
         for lp in self.lp_list:
             lp.add_arm(arm, binarizer)
 
-    def _drop_existing_arm(self, arm: Arm) -> NoReturn:
+    def _drop_existing_arm(self, arm: Arm) -> None:
         # Update each learning policy
         for lp in self.lp_list:
             lp.remove_arm(arm)

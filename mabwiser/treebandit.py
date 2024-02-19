@@ -4,7 +4,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from functools import partial
-from typing import Union, Dict, List, NoReturn, Optional, Callable
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
@@ -17,7 +17,7 @@ from mabwiser.rand import _Random
 from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import argmax, Arm, Num, _BaseRNG, create_rng
+from mabwiser.utils import Arm, Num, _BaseRNG, argmax, create_rng
 
 
 class _TreeBandit(BaseMAB):
@@ -33,7 +33,7 @@ class _TreeBandit(BaseMAB):
         self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
         self.arm_to_leaf_to_rewards = {arm: defaultdict(partial(np.ndarray, 0)) for arm in self.arms}
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # Reset the decision tree and rewards of each arm
         self.arm_to_tree = {arm: DecisionTreeRegressor(**self.tree_parameters) for arm in self.arms}
@@ -48,7 +48,7 @@ class _TreeBandit(BaseMAB):
         # Calculate fit
         self._parallel_fit(decisions, rewards, contexts)
 
-    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # If TS and a binarizer function is given, binarize the rewards
         if isinstance(self.lp, _ThompsonSampling) and self.lp.binarizer:

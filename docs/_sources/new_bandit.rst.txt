@@ -113,7 +113,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # These fields are declared here and initialized to zero.
             self.my_value_to_arm = dict.fromkeys(self.arms, 0)
 
-        def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
             # TODO:
             # This method trains your algorithm from scratch each time its called.
             # You might need to reset the internal fields
@@ -124,7 +124,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # This automatically activates parallelization in the training phase.
             self._parallel_fit(decisions, rewards, contexts)
 
-        def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+        def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
             # This method trains your algorithm in a continuous fashion.
             # Unlike fit() operation, the partial_fit() does not reset internal fields typically.
             # This allows us to continue learning online
@@ -147,7 +147,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # so that the user cannot accidentally break your policy.
             return self.arm_to_expectation.copy()
 
-        def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+        def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
             # This method warm starts untrained (cold) arms for which no decisions has been observed
             # A cold arm is warm started using a warm arm that is within some minimum distance from the cold arm
             # based on the given arm_to_features and distance_quantile inputs.
@@ -156,7 +156,7 @@ Here is, at a high-level, what you need to implement in your bandit policy:
             # Call _copy_arms from the base class.
             return super().warm_start(arm_to_features, distance_quantile)
 
-        def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> NoReturn:
+        def _copy_arms(self, cold_arm_to_warm_arm: Dict[Arm, Arm]) -> None:
             # TODO:
             # This method tells the policy how to warm start cold arms, given a cold arm to warm arm mapping.
             # It will typically involve copying attributes from a warm arm to a cold arm, e.g.

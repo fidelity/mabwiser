@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from copy import deepcopy
-from typing import Callable, Dict, List, NoReturn, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 
 from mabwiser.base_mab import BaseMAB
-from mabwiser.utils import Arm, Num, reset, argmax, _BaseRNG
+from mabwiser.utils import Arm, Num, _BaseRNG, argmax, reset
 
 
 class _ThompsonSampling(BaseMAB):
@@ -22,7 +22,7 @@ class _ThompsonSampling(BaseMAB):
         self.arm_to_success_count = dict.fromkeys(self.arms, 1)
         self.arm_to_fail_count = dict.fromkeys(self.arms, 1)
 
-    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> NoReturn:
+    def fit(self, decisions: np.ndarray, rewards: np.ndarray, contexts: np.ndarray = None) -> None:
 
         # If rewards are non binary, convert them
         rewards = self._get_binary_rewards(decisions, rewards)
@@ -43,7 +43,7 @@ class _ThompsonSampling(BaseMAB):
         # Leave the calculation of expectations to predict methods
 
     def partial_fit(self, decisions: np.ndarray, rewards: np.ndarray,
-                    contexts: Optional[np.ndarray] = None) -> NoReturn:
+                    contexts: Optional[np.ndarray] = None) -> None:
 
         # If rewards are non binary, convert them
         rewards = self._get_binary_rewards(decisions, rewards)

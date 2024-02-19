@@ -10,14 +10,14 @@ This module defines the public interface of the **MABWiser Library** providing a
     - ``NeighborhoodPolicy``
 """
 
-from typing import List, Union, Dict, NamedTuple, NoReturn, Callable, Optional, NewType
+from typing import Callable, Dict, List, NamedTuple, NewType, Optional, Union
 
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.tree import DecisionTreeRegressor
 
-from mabwiser._version import __author__, __email__, __version__, __copyright__
+from mabwiser._version import __author__, __copyright__, __email__, __version__
 from mabwiser.approximate import _LSHNearest
 from mabwiser.clusters import _Clusters
 from mabwiser.greedy import _EpsilonGreedy
@@ -29,7 +29,7 @@ from mabwiser.softmax import _Softmax
 from mabwiser.thompson import _ThompsonSampling
 from mabwiser.treebandit import _TreeBandit
 from mabwiser.ucb import _UCB1
-from mabwiser.utils import Constants, Arm, Num, check_true, check_false, create_rng
+from mabwiser.utils import Arm, Constants, Num, check_false, check_true, create_rng
 
 __author__ = __author__
 __email__ = __email__
@@ -989,7 +989,7 @@ class MAB:
             # a different set of cold arms. Therefore, cold arms aren't defined for neighborhood policies.
             return list()
 
-    def add_arm(self, arm: Arm, binarizer: Callable = None) -> NoReturn:
+    def add_arm(self, arm: Arm, binarizer: Callable = None) -> None:
         """ Adds an _arm_ to the list of arms.
 
         Incorporates the arm into the learning and neighborhood policies with no training data.
@@ -1030,7 +1030,7 @@ class MAB:
         self.arms.append(arm)
         self._imp.add_arm(arm, binarizer)
 
-    def remove_arm(self, arm: Arm) -> NoReturn:
+    def remove_arm(self, arm: Arm) -> None:
         """Removes an _arm_ from the list of arms.
 
         Parameters
@@ -1061,7 +1061,7 @@ class MAB:
             rewards: Union[List[Num], np.ndarray, pd.Series],  # Rewards that are received
             contexts: Union[None, List[List[Num]],
                             np.ndarray, pd.Series, pd.DataFrame] = None  # Contexts, optional
-            ) -> NoReturn:
+            ) -> None:
         """Fits the multi-armed bandit to the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1117,7 +1117,7 @@ class MAB:
     def partial_fit(self,
                     decisions: Union[List[Arm], np.ndarray, pd.Series],
                     rewards: Union[List[Num], np.ndarray, pd.Series],
-                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> NoReturn:
+                    contexts: Union[None, List[List[Num]], np.ndarray, pd.Series, pd.DataFrame] = None) -> None:
         """Updates the multi-armed bandit with the given *decisions*, their corresponding *rewards*
         and *contexts*, if any.
 
@@ -1248,7 +1248,7 @@ class MAB:
         # Return a dictionary from arms (key) to expectations (value)
         return self._imp.predict_expectations(contexts)
 
-    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> NoReturn:
+    def warm_start(self, arm_to_features: Dict[Arm, List[Num]], distance_quantile: float) -> None:
         """Warm-start untrained (cold) arms of the multi-armed bandit.
 
         Validates arguments and raises exceptions in case there are violations.
