@@ -1295,7 +1295,7 @@ class MAB:
         check_true(isinstance(arms, list), TypeError("The arms should be provided in a list."))
         check_false(None in arms, ValueError("The arm list cannot contain None."))
         check_false(np.nan in arms, ValueError("The arm list cannot contain NaN."))
-        check_false(np.Inf in arms, ValueError("The arm list cannot contain Infinity."))
+        check_false(np.inf in arms, ValueError("The arm list cannot contain Infinity."))
         check_true(len(arms) == len(set(arms)), ValueError("The list of arms cannot contain duplicate values."))
 
         # Learning Policy type
@@ -1405,7 +1405,7 @@ class MAB:
         """
         check_false(arm is None, ValueError("The arm cannot be None."))
         check_false(np.nan in [arm], ValueError("The arm cannot be NaN."))
-        check_false(np.Inf in [arm], ValueError("The arm cannot be Infinity."))
+        check_false(np.inf in [arm], ValueError("The arm cannot be Infinity."))
 
     @staticmethod
     def _convert_array(array_like) -> np.ndarray:
