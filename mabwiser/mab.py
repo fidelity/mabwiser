@@ -1405,7 +1405,7 @@ class MAB:
         """
         check_false(arm is None, ValueError("The arm cannot be None."))
         check_false(np.nan in [arm], ValueError("The arm cannot be NaN."))
-        check_false(np.inf in [arm], ValueError("The arm cannot be Infinity."))
+        check_false(np.Inf in [arm], ValueError("The arm cannot be Infinity."))
 
     @staticmethod
     def _convert_array(array_like) -> np.ndarray:

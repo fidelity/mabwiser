@@ -476,14 +476,14 @@ class InvalidTest(BaseTest):
 
     def test_rewards_inf_array(self):
         decisions = np.asarray([1, 1, 1, 2, 2, 2, 3, 3, 3])
-        rewards = np.asarray([0, 0, 0, 0, 0, 0, 1, 1, np.inf])
+        rewards = np.asarray([0, 0, 0, 0, 0, 0, 1, 1, np.Inf])
         mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
         with self.assertRaises(TypeError):
             mab.fit(decisions, rewards)
 
     def test_rewards_inf_df(self):
         history = pd.DataFrame({'decision': [1, 1, 1, 2, 2, 2, 3, 3, 3],
-                                'reward': [0, 0, 0, 0, 0, 0, 1, 1, np.inf]})
+                                'reward': [0, 0, 0, 0, 0, 0, 1, 1, np.Inf]})
         mab = MAB([1, 2, 3], LearningPolicy.EpsilonGreedy(epsilon=0))
         with self.assertRaises(TypeError):
             mab.fit(history['decision'], history['reward'])
@@ -562,7 +562,7 @@ class InvalidTest(BaseTest):
         with self.assertRaises(ValueError):
             mab.add_arm(np.nan)
         with self.assertRaises(ValueError):
-            mab.add_arm(np.inf)
+            mab.add_arm(np.Inf)
         with self.assertRaises(ValueError):
             mab.add_arm(3)
 
